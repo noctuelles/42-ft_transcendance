@@ -35,9 +35,6 @@ export class AuthController {
         if (!user) {
             throw new BadRequestException('No user found on 42 intranet');
         }
-        this.authService.connectUser(user);
-        return {
-            message: 'User connected',
-        };
+        return await this.authService.connectUser(user);
     }
 }
