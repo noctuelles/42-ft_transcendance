@@ -1,11 +1,14 @@
 import {
     BadRequestException,
+    Body,
     Controller,
     Get,
     Post,
     Query,
+    ValidationPipe,
 } from '@nestjs/common';
 import { Api42Service } from 'src/services/api42.service';
+import { RefreshTokenDTO } from './DTO/RefreshTokenDTO';
 import { AuthService } from './services/auth.service';
 
 @Controller('auth')
@@ -36,5 +39,16 @@ export class AuthController {
             throw new BadRequestException('No user found on 42 intranet');
         }
         return await this.authService.connectUser(user);
+    }
+
+    @Post('refresh')
+    async refresh(
+        @Body(new ValidationPipe()) refresh_tokenDTO: RefreshTokenDTO,
+    ) {
+        const refreshToken = refresh_tokenDTO.refresh_token;
+        if (!refreshToken) {
+            throw new BadRequestException('No refresh token provided');
+        }
+        return await this.authService.refresh(refreshToken);
     }
 }
