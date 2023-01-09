@@ -47,7 +47,7 @@ function AppRoutes() {
             navigate('/');
         }
         userContext.updateUser();
-    }, [location]);
+    }, [location, userContext.auth.logged]);
 
     return (
         <Routes>
