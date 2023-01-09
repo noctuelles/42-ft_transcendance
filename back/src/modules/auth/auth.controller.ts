@@ -7,11 +7,14 @@ import {
     Res,
 } from '@nestjs/common';
 import { Api42Service } from 'src/services/api42.service';
-import { PrismaService } from 'src/services/prisma.service';
+import { AuthService } from './services/auth.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly api42Service: Api42Service) {}
+    constructor(
+        private readonly api42Service: Api42Service,
+        private readonly authService: AuthService,
+    ) {}
 
     @Get()
     async redirectToAuth(@Res() res) {
@@ -35,6 +38,7 @@ export class AuthController {
             //TODO Redirect to front with error
             throw new NotFoundException('User not found on 42 intranet');
         }
+        this.authService.connectUser(user);
         res.redirect(process.env.FRONT_URL);
     }
 }
