@@ -16,8 +16,8 @@ export class AuthController {
     ) {}
 
     @Get()
-    async redirectToAuth(): Promise<string> {
-        return (await this.api42Service.get_auth_processes()).url;
+    async redirectToAuth() {
+        return { url: (await this.api42Service.get_auth_processes()).url };
     }
 
     @Post('callback')
