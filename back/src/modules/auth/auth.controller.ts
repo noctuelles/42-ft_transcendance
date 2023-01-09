@@ -7,6 +7,7 @@ import {
     Res,
 } from '@nestjs/common';
 import { Api42Service } from 'src/services/api42.service';
+import { PrismaService } from 'src/services/prisma.service';
 
 @Controller('auth')
 export class AuthController {
