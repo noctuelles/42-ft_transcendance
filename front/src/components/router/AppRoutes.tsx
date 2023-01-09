@@ -19,12 +19,14 @@ function AppRoutes() {
     const navigate = useNavigate();
     const fetching = useRef(false);
     const userContext = React.useContext(UserContext);
+    const logged = userContext.auth.logged;
 
     React.useEffect(() => {
         if (location.pathname === '/callback') {
             const code = new URLSearchParams(location.search).get('code');
             if (code && !fetching.current) {
                 fetching.current = true;
+                userContext.auth.setUpdating(true);
                 fetch(back_url + '/auth/callback?code=' + code, {
                     method: 'POST',
                 })
@@ -36,31 +38,37 @@ function AppRoutes() {
                             data.access_token.token,
                         );
                         Cookies.set(
-                            'bde_pannel_session_cookie',
+                            'transcendance_session_cookie',
                             data.refresh_token.token,
                             {
                                 expires: 7 * 24 * 60 * 60,
                             },
                         );
+                        userContext.auth.setUpdating(false);
+                        navigate('/');
                     });
             }
-            navigate('/');
         }
         userContext.updateUser();
-    }, [location, userContext.auth.logged]);
+    }, [location, logged]);
 
     return (
         <Routes>
+            <Route path="/callback" element={<div></div>} />
             <Route
                 path="/login"
                 element={
-                    userContext.auth.logged ? <Navigate to="/" /> : <Login />
+                    userContext.auth.logged && !userContext.auth.updating ? (
+                        <Navigate to="/" />
+                    ) : (
+                        <Login />
+                    )
                 }
             />
             <Route
                 path="/"
                 element={
-                    userContext.auth.logged ? (
+                    userContext.auth.logged || userContext.auth.updating ? (
                         <LoggedApp />
                     ) : (
                         <Navigate to="/login" />
