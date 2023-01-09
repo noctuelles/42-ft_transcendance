@@ -83,4 +83,20 @@ export class AuthService {
             { expiresIn: '7d' },
         );
     }
+
+    async verifyAccessToken(token: string): Promise<User> {
+        try {
+            const decoded = this.jwtService.verify(token);
+            if (!decoded.type || !decoded.user || decoded.type !== 'access') {
+                throw new BadRequestException('Invalid access token');
+            }
+            return await this.prismaService.user.findUnique({
+                where: {
+                    id: decoded.user.id,
+                },
+            });
+        } catch (e) {
+            throw new BadRequestException('Invalid access token');
+        }
+    }
 }

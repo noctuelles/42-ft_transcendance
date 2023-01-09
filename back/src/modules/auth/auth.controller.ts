@@ -5,6 +5,7 @@ import {
     Get,
     Post,
     Query,
+    UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
 import { Api42Service } from 'src/services/api42.service';
