@@ -24,7 +24,7 @@ export class AuthController {
 
     @Get()
     async redirectToAuth() {
-        return { url: (await this.api42Service.get_auth_processes()).url };
+        return { url: (await this.api42Service.get_auth_process()).url };
     }
 
     @Post('callback')
@@ -35,7 +35,7 @@ export class AuthController {
         const user =
             await this.api42Service.client.auth_manager.response_auth_process(
                 (
-                    await this.api42Service.get_auth_processes()
+                    await this.api42Service.get_auth_process()
                 ).id,
                 code,
             );

@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class Api42Service {
     private _client: Client;
-    private _auth_processes: AuthProcess;
+    private _auth_process: AuthProcess;
 
     constructor() {
         this._client = new Client(
@@ -18,14 +18,14 @@ export class Api42Service {
         return this._client;
     }
 
-    async get_auth_processes(): Promise<AuthProcess> {
-        if (!this._auth_processes) {
-            this._auth_processes =
+    async get_auth_process(): Promise<AuthProcess> {
+        if (!this._auth_process) {
+            this._auth_process =
                 await this.client.auth_manager.init_auth_process(
                     process.env.FRONT_URL + '/callback',
                     ['public'],
                 );
         }
-        return this._auth_processes;
+        return this._auth_process;
     }
 }
