@@ -22,7 +22,7 @@ export class Api42Service {
         if (!this._auth_processes) {
             this._auth_processes =
                 await this.client.auth_manager.init_auth_process(
-                    process.env.SELF_URL + '/auth/callback',
+                    process.env.FRONT_URL + '/callback',
                     ['public'],
                 );
         }

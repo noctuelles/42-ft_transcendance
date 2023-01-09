@@ -2,9 +2,8 @@ import {
     BadRequestException,
     Controller,
     Get,
-    NotFoundException,
+    Post,
     Query,
-    Res,
 } from '@nestjs/common';
 import { Api42Service } from 'src/services/api42.service';
 import { AuthService } from './services/auth.service';
@@ -17,14 +16,13 @@ export class AuthController {
     ) {}
 
     @Get()
-    async redirectToAuth(@Res() res) {
-        res.redirect((await this.api42Service.get_auth_processes()).url);
+    async redirectToAuth(): Promise<string> {
+        return (await this.api42Service.get_auth_processes()).url;
     }
 
-    @Get('callback')
-    async callback(@Query('code') code: string, @Res() res) {
+    @Post('callback')
+    async callback(@Query('code') code: string) {
         if (!code) {
-            //TODO Redirect to front with error
             throw new BadRequestException('No code provided');
         }
         const user =
@@ -35,10 +33,11 @@ export class AuthController {
                 code,
             );
         if (!user) {
-            //TODO Redirect to front with error
-            throw new NotFoundException('User not found on 42 intranet');
+            throw new BadRequestException('No code provided');
         }
         this.authService.connectUser(user);
-        res.redirect(process.env.FRONT_URL);
+        return {
+            message: 'User connected',
+        };
     }
 }
