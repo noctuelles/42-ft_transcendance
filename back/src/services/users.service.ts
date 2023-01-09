@@ -1,3 +1,4 @@
+import { LoggedUser } from '42.js/dist/structures/logged_user';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../modules/prisma/prisma.service';
 
@@ -12,5 +13,15 @@ export class UsersService {
             },
         });
         return user ? true : false;
+    }
+
+    async createUser(user42: LoggedUser) {
+        await this.prismaService.user.create({
+            data: {
+                login: user42.login,
+                name: user42.login,
+                profile_picture: user42.image.link,
+            },
+        });
     }
 }

@@ -11,6 +11,7 @@ export class AuthService {
             console.log('User already exists');
         } else {
             console.log('User does not exist, creating it');
+            await this.userService.createUser(user42);
         }
     }
 }
