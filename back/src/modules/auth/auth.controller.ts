@@ -9,8 +9,11 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { Api42Service } from 'src/services/api42.service';
+import { CurrentUser } from './guards/currentUser.decorator';
 import { RefreshTokenDTO } from './DTO/RefreshTokenDTO';
+import { AuthGuard } from './guards/auth.guard';
 import { AuthService } from './services/auth.service';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -51,5 +54,11 @@ export class AuthController {
             throw new BadRequestException('No refresh token provided');
         }
         return await this.authService.refresh(refreshToken);
+    }
+
+    @Get('test')
+    @UseGuards(AuthGuard)
+    test(@CurrentUser() user: User) {
+        return 'Hey ' + user.login;
     }
 }
