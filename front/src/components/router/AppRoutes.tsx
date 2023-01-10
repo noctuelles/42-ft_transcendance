@@ -19,37 +19,38 @@ function AppRoutes() {
     const navigate = useNavigate();
     const fetching = useRef(false);
     const userContext = React.useContext(UserContext);
-    const logged = userContext.auth.logged;
 
     React.useEffect(() => {
-        if (location.pathname === '/callback') {
-            const code = new URLSearchParams(location.search).get('code');
-            if (code && !fetching.current) {
-                fetching.current = true;
-                userContext.auth.setUpdating(true);
-                fetch(back_url + '/auth/callback?code=' + code, {
-                    method: 'POST',
-                })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        userContext.auth.setLogged(true);
-                        userContext.auth.setAccessToken(
-                            data.access_token.token,
-                        );
-                        Cookies.set(
-                            'transcendance_session_cookie',
-                            data.refresh_token.token,
-                            {
-                                expires: 7 * 24 * 60 * 60,
-                            },
-                        );
-                        userContext.auth.setUpdating(false);
-                        navigate('/');
-                    });
+        if (!fetching.current) {
+            fetching.current = true;
+            if (location.pathname === '/callback') {
+                const code = new URLSearchParams(location.search).get('code');
+                if (code) {
+                    userContext.auth.setUpdating(true);
+                    fetch(back_url + '/auth/callback?code=' + code, {
+                        method: 'POST',
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            userContext.auth.setLogged(true);
+                            userContext.auth.setAccessToken(
+                                data.access_token.token,
+                            );
+                            Cookies.set(
+                                'transcendance_session_cookie',
+                                data.refresh_token.token,
+                                {
+                                    expires: 7 * 24 * 60 * 60,
+                                },
+                            );
+                            userContext.auth.setUpdating(false);
+                            navigate('/');
+                        });
+                }
             }
+            userContext.updateUser();
         }
-        userContext.updateUser();
-    }, [location, logged]);
+    }, [location]);
 
     return (
         <Routes>

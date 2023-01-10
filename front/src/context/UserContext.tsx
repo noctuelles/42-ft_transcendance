@@ -3,7 +3,17 @@ import jwtDecode from 'jwt-decode';
 import React, { useState } from 'react';
 import { back_url } from '../config.json';
 
-export const UserContext = React.createContext({});
+export const UserContext = React.createContext({
+    auth: {
+        logged: false,
+        setLogged: (logged: boolean) => {},
+        setAccessToken: (access_token: string) => {},
+        updating: false,
+        setUpdating: (updating: boolean) => {},
+    },
+    updateUser: () => {},
+    getAccessToken: () => {},
+});
 
 function UserContextProvider(props: any) {
     const [logged, setLogged] = useState(false);
@@ -29,7 +39,10 @@ function UserContextProvider(props: any) {
                 const data = await res.json();
                 if (data.access_token) {
                     setAccessToken(data.access_token.token);
+                    let decode: any = jwtDecode(data.access_token.token);
+                    setUser({ id: decode.user.id, name: decode.user.name });
                     setLogged(true);
+                    Cookies.remove('transcendance_session_cookie');
                     Cookies.set(
                         'transcendance_session_cookie',
                         data.refresh_token.token,
@@ -38,10 +51,12 @@ function UserContextProvider(props: any) {
                         },
                     );
                 } else {
+                    Cookies.remove('transcendance_session_cookie');
                     return false;
                 }
             } else {
                 //TODO Error message
+                Cookies.remove('transcendance_session_cookie');
                 return false;
             }
         }
@@ -58,24 +73,24 @@ function UserContextProvider(props: any) {
                 setUpdating(false);
                 return;
             }
-        }
-        if (!access_token) return;
-        let decode: any = jwtDecode(access_token);
-        if (decode.exp < Date.now() / 1000) {
-            if ((await refreshToken()) === false) {
-                setLogged(false);
-                setUser({ id: -1, name: '' });
-                setAccessToken('');
-                setUpdating(false);
-                return;
+        } else {
+            let decode: any = jwtDecode(access_token);
+            if (decode.exp < Date.now() / 1000) {
+                if ((await refreshToken()) === false) {
+                    setLogged(false);
+                    setUser({ id: -1, name: '' });
+                    setAccessToken('');
+                    setUpdating(false);
+                    return;
+                }
             }
+            setUser({ id: decode.user.id, name: decode.user.name });
         }
-        setUser({ id: decode.user.id, name: decode.user.name });
         setUpdating(false);
     }
 
     async function getAccessToken() {
-        updateUser();
+        await updateUser();
         return access_token;
     }
 
