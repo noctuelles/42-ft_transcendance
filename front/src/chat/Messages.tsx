@@ -1,11 +1,7 @@
 import { useRef } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL } from '../config.json';
-
-interface IMessage {
-    user: string;
-    message: string;
-}
+import IMessage from './IMessage';
 
 export default function Messages() {
     let messages: IMessage[] = getMessages();
