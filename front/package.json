@@ -20,7 +20,11 @@
         "react-dom": "^18.2.0",
         "react-router": "^6.6.1",
         "react-router-dom": "^6.6.1",
+<<<<<<< HEAD
         "react-transition-group": "^4.4.5"
+=======
+        "react-use-websocket": "^4.2.0"
+>>>>>>> 9f448dc (Receive messages from websocket)
     },
     "devDependencies": {
         "@types/node": "^18.11.18",

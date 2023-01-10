@@ -1,3 +1,8 @@
+import { useRef } from 'react';
+import useWebSocket from 'react-use-websocket';
+
+const WS_URL = '';
+
 interface IMessage {
     user: string;
     message: string;
@@ -15,7 +20,36 @@ export default function Messages() {
 }
 
 function getMessages(): IMessage[] {
-    return [];
+    const messages = useRef<IMessage[]>([]);
+    useWebSocket(WS_URL, {
+        share: true,
+        onMessage: ({ data }: { data?: string }) => {
+            if (!data || !isChatMessage(data)) {
+                return;
+            }
+            let newMessages = parseMessages(data);
+            messages.current = [...messages.current, ...newMessages];
+        },
+        filter: ({ data }: { data: string }) => {
+            return isChatMessage(data);
+        },
+    });
+    return messages.current;
+}
+
+function isChatMessage(rawMessage: string): boolean {
+    try {
+        var message = JSON.parse(rawMessage);
+    } catch (error) {
+        return false;
+    }
+    return message?.['event'] == 'chat';
+}
+
+function parseMessages(rawMessage: string): IMessage[] {
+    let jsonMessage = JSON.parse(rawMessage);
+    return jsonMessage['data'];
+}
 
 function Message(props: IMessage) {
     return (
