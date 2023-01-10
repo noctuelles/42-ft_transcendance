@@ -30,7 +30,10 @@ function AppRoutes() {
                     fetch(back_url + '/auth/callback?code=' + code, {
                         method: 'POST',
                     })
-                        .then((res) => res.json())
+                        .then((res) => {
+                            if (res.ok) return res.json();
+                            //TODO Error message
+                        })
                         .then((data) => {
                             userContext.auth.setLogged(true);
                             userContext.auth.setAccessToken(
