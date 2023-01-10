@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import useWebSocket from 'react-use-websocket';
-
-const WS_URL = '';
+import { ws_url as WS_URL } from '../config.json';
 
 interface IMessage {
     user: string;
