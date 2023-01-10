@@ -3,19 +3,7 @@ import jwtDecode from 'jwt-decode';
 import React, { useState } from 'react';
 import { back_url } from '../config.json';
 
-export const UserContext = React.createContext({
-    auth: {
-        logged: false,
-        setLogged: (logged: boolean) => {},
-        setAccessToken: (access_token: string) => {},
-        updating: false,
-        setUpdating: (updating: boolean) => {},
-    },
-    updateUser: () => {},
-    getAccessToken: () => {},
-    id: -1,
-    name: '',
-});
+export const UserContext = React.createContext({});
 
 function UserContextProvider(props: any) {
     const [logged, setLogged] = useState(false);
