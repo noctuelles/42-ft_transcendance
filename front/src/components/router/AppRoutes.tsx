@@ -32,7 +32,6 @@ function AppRoutes() {
                 })
                     .then((res) => res.json())
                     .then((data) => {
-                        console.log(data);
                         userContext.auth.setLogged(true);
                         userContext.auth.setAccessToken(
                             data.access_token.token,
