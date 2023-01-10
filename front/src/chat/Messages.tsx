@@ -4,7 +4,7 @@ import { ws_url as WS_URL } from '../config.json';
 import IMessage from './IMessage';
 
 export default function Messages() {
-    let messages: IMessage[] = getMessages();
+    const messages: IMessage[] = getMessages();
     return (
         <p id="messages">
             {messages.map((x: IMessage, i: number) => (
@@ -22,7 +22,7 @@ function getMessages(): IMessage[] {
             if (!data || !isChatMessage(data)) {
                 return;
             }
-            let newMessages = parseMessages(data);
+            const newMessages = parseMessages(data);
             messages.current = [...messages.current, ...newMessages];
         },
         filter: ({ data }: { data: string }) => {
@@ -42,7 +42,7 @@ function isChatMessage(rawMessage: string): boolean {
 }
 
 function parseMessages(rawMessage: string): IMessage[] {
-    let jsonMessage = JSON.parse(rawMessage);
+    const jsonMessage = JSON.parse(rawMessage);
     return jsonMessage['data'];
 }
 
