@@ -1,0 +1,20 @@
+######################
+# Build for Local dev#
+######################
+
+FROM node:18-alpine AS dev
+
+# Create app directory and set it as our working directory for subsequent operation
+WORKDIR /usr/src/app
+
+# Copy application dependency to the container image.
+COPY package*.json ./
+
+# Install with 'npm ci' (see: https://stackoverflow.com/questions/52499617/what-is-the-difference-between-npm-install-and-npm-ci)
+RUN npm ci
+
+# Copy the app source into the image
+COPY . .
+
+# Generate prisma client code
+RUN npm run prisma:generate

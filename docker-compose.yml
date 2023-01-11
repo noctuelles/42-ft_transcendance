@@ -1,8 +1,17 @@
 version: '3.7'
 
 services:
-  db:
-
   back:
-
-  front:
+    build:
+      dockerfile: Dockerfile
+      context: ./back/.
+      target: dev
+    container_name: nestjs
+    env_file:
+      - ./back/.env
+    volumes:
+      - ./back/.:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev
+    ports:
+      - 3000:3000
