@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import useWebSocket from 'react-use-websocket';
-import { ws_url as WS_URL } from '../config.json';
+import { ws_url as WS_URL } from '@/config.json';
 import IMessage from './IMessage';
 
 export default function Messages() {

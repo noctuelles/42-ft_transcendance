@@ -1,4 +1,4 @@
-import './Chat.css';
+import '@/style/chat/Chat.css';
 import Messages from './Messages';
 import UserInput from './UserInput';
 

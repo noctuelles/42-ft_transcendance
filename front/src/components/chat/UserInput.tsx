@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import IMessage from './IMessage';
-import { ws_url as WS_URL } from '../config.json';
+import { ws_url as WS_URL } from '@/config.json';
 
 export default function UserInput() {
     const [userInput, setUserInput] = useState('');
