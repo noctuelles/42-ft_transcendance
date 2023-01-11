@@ -23,46 +23,67 @@ export class AuthService {
             },
         });
         if (!user) throw new Error('User not found');
-        return {
-            access_token: {
-                token: this.generateAccessToken(user),
-                expires_in: '180s',
-            },
-            refresh_token: {
-                token: this.generateRefreshToken(user),
-                expires_in: '7d',
-            },
-        };
+        return await this.generateTokens(user);
     }
 
     async refresh(refreshToken: string) {
         try {
             const token = this.jwtService.verify(refreshToken);
-            if (!token.type || !token.user || token.type !== 'refresh') {
+            if (
+                !token.type ||
+                !token.user ||
+                !token.identifier ||
+                token.type !== 'refresh'
+            ) {
                 throw new BadRequestException('Invalid refresh token');
             }
+            const identifier =
+                await this.prismaService.authIdentifier.findUnique({
+                    where: {
+                        identifier: token.identifier,
+                    },
+                });
+            if (!identifier) {
+                await this.prismaService.authIdentifier.deleteMany({
+                    where: {
+                        userId: token.user.id,
+                    },
+                });
+                throw new BadRequestException('Invalid refresh token');
+            }
+            await this.prismaService.authIdentifier.delete({
+                where: {
+                    identifier: token.identifier,
+                },
+            });
             const user = await this.prismaService.user.findUnique({
                 where: {
                     id: token.user.id,
                 },
             });
             if (!user) throw new BadRequestException('User not found');
-            return {
-                access_token: {
-                    token: this.generateAccessToken(user),
-                    expires_in: '180s',
-                },
-                refresh_token: {
-                    token: this.generateRefreshToken(user),
-                    expires_in: '7d',
-                },
-            };
+            return await this.generateTokens(user);
         } catch (e) {
             throw new BadRequestException('Invalid refresh token');
         }
     }
 
-    generateAccessToken(user: User): String {
+    async generateTokens(user: User) {
+        const access_token = this.generateAccessToken(user);
+        const new_refresh_token = await this.generateRefreshToken(user);
+        return {
+            access_token: {
+                token: access_token,
+                expires_in: '180s',
+            },
+            refresh_token: {
+                token: new_refresh_token,
+                expires_in: '7d',
+            },
+        };
+    }
+
+    generateAccessToken(user: User) {
         return this.jwtService.sign({
             type: 'access',
             user: {
@@ -72,10 +93,18 @@ export class AuthService {
         });
     }
 
-    generateRefreshToken(user: User): String {
+    async generateRefreshToken(user: User) {
+        const identifier = crypto.randomUUID();
+        await this.prismaService.authIdentifier.create({
+            data: {
+                userId: user.id,
+                identifier: identifier,
+            },
+        });
         return this.jwtService.sign(
             {
                 type: 'refresh',
+                identifier: identifier,
                 user: {
                     id: user.id,
                 },

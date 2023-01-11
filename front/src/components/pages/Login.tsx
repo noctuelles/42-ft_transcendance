@@ -5,7 +5,10 @@ function Login() {
     const [authUrl, setAuthUrl] = useState('');
     useEffect(() => {
         fetch(back_url + '/auth')
-            .then((res) => res.json())
+            .then((res) => {
+                if (res.ok) return res.json();
+                //TODO Error message
+            })
             .then((data) => {
                 setAuthUrl(data.url);
             });
