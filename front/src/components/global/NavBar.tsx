@@ -9,17 +9,13 @@ function NavBar(props: any) {
 
   return (
 		<nav className="navBar">
-			<Link to="">
-				<img src={Logo} id="logo" />
-			</Link>
-			<h4>Le Pong</h4>
 			<ul className="navLinks">
-				<li className="navItem"><Link to="/">Home</Link></li>
-				<li className="navItem"><Link to="/profile">Profile</Link></li>
+				<li className="navItem"><Link to="/">Play</Link></li>
+				<li className="navItem"><Link to="/social">Social</Link></li>
 			</ul>
 			<div className="navRight">
 				<img src={Logo}/>
-				<p>{userContext.name}</p>
+				<Link to="/profile">{userContext.name}</Link>
 			</div>
 		</nav>
   );
