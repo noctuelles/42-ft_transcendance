@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router';
-import Header from './Header';
+import NavBar from '../global/NavBar';
 
 function LoggedApp() {
     return (
         <div>
-            <Header />
+            <NavBar />
             <Outlet />
         </div>
     );

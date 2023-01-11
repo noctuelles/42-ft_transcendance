@@ -1,0 +1,43 @@
+nav {
+	display: flex;
+	border: solid;
+	border-radius: 30px;
+	margin-top: 20px;
+	padding-left: 50px;
+	padding-right: 50px;
+
+	flex-direction: row;
+	justify-content: space-between;
+	box-shadow: 0px 0px 5px black;
+	align-items: center;
+	background-color: darkgray;
+}
+
+#logo {
+	width: 42px;
+	border-radius: 30px;
+	height: 42px;
+}
+
+.navLinks {
+	list-style: none;
+	display: flex;
+	margin: 0;
+	align-items: center;
+}
+
+.navLinks a {
+	text-decoration: none;
+	padding: 10px 15px;
+}
+
+.navRight {
+	display: flex;
+	align-items: center;
+}
+
+.navRight img {
+	border-radius: 30px;
+	width: 40px;
+	height: 40px;
+}

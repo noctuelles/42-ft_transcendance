@@ -6,9 +6,10 @@ import {
     useLocation,
     useNavigate,
 } from 'react-router';
+
 import LoggedApp from '../global/LoggedApp';
-import FakePage1 from '../pages/FakePage1';
-import FakePage2 from '../pages/FakePage2';
+import Profile from '../pages/Profile'
+import Home from '../pages/Home'
 import Login from '../pages/Login';
 import { back_url } from '../../config.json';
 import { UserContext } from '../../context/UserContext';
@@ -96,10 +97,10 @@ function AppRoutes() {
                     )
                 }
             >
-                <Route index element={<Navigate to="page1" />} />
-                <Route path="page1" element={<FakePage1 />} />
-                <Route path="page2" element={<FakePage2 />} />
-                <Route path="*" element={<Navigate to="page1" />} />
+                <Route index element={<Navigate to="home" />} />
+                <Route path="home" element={<Home />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="*" element={<Navigate to="profile" />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
