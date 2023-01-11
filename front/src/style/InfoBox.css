@@ -1,0 +1,63 @@
+.infos {
+    position: fixed;
+    top: 5px;
+    right: 3px;
+    z-index: 10000;
+}
+
+.infos .appear {
+    opacity: 0;
+    transform: translateX(100px);
+}
+
+.infos .appear-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: all 0.2s ease-in;
+}
+
+.infos .exit {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.infos .exit-active {
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.2s ease-in;
+}
+
+.info-item {
+    width: 200px;
+    border-radius: 5px;
+    height: fit-content;
+    padding: 5px;
+    margin: 5px;
+    color: black;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    z-index: 1000;
+}
+
+.info-item .cross-icon {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+
+.info-item-success {
+    background-color: rgba(0, 255, 0, 0.3);
+}
+
+.info-item-warning {
+    background-color: rgba(208, 155, 9, 0.3);
+}
+
+.info-item-error {
+    background-color: rgba(255, 0, 0, 0.3);
+}
