@@ -9,8 +9,9 @@ import {
 
 import LoggedApp from '../global/LoggedApp';
 import Profile from '../pages/Profile'
-import Home from '../pages/Home'
+import Play from '../pages/Play'
 import Login from '../pages/Login';
+import Social from '../pages/Social';
 import { back_url } from '../../config.json';
 import { UserContext } from '../../context/UserContext';
 import Cookies from 'js-cookie';
@@ -97,10 +98,11 @@ function AppRoutes() {
                     )
                 }
             >
-                <Route index element={<Navigate to="home" />} />
-                <Route path="home" element={<Home />} />
+                <Route index element={<Navigate to="play" />} />
+                <Route path="play" element={<Play />} />
+                <Route path="social" element={<Social />} />
                 <Route path="profile" element={<Profile />} />
-                <Route path="*" element={<Navigate to="profile" />} />
+                <Route path="*" element={<Navigate to="play" />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>

@@ -1,6 +1,5 @@
 import React from "react";
-import ProfileInfo from './details/ProfileInfo'
-import {Container, Row, Col} from 'react-bootstrap'
+import '../../style/Profile.css'
 
 class Profile extends React.Component<{}, {
 		photo: any,
@@ -21,7 +20,9 @@ class Profile extends React.Component<{}, {
 
 	render() {
 		return (
-			<p>{this.state.username}</p>
+			<div className="profilePage">
+				<p>blabla</p>
+			</div>
 		);
 	}
 }
