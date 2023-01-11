@@ -1,5 +1,4 @@
 :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;
@@ -8,6 +7,43 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background: rgb(131, 130, 124);
+    background-repeat: no-repeat;
+    background: -webkit-linear-gradient(
+        rgba(131, 130, 124, 1) 0%,
+        rgba(181, 181, 181, 1) 50%,
+        rgba(129, 129, 128, 1) 100%
+    );
+    background: -moz-linear-gradient(
+        rgba(131, 130, 124, 1) 0%,
+        rgba(181, 181, 181, 1) 50%,
+        rgba(129, 129, 128, 1) 100%
+    );
+    background: -ms-linear-gradient(
+        rgba(131, 130, 124, 1) 0%,
+        rgba(181, 181, 181, 1) 50%,
+        rgba(129, 129, 128, 1) 100%
+    );
+    background: -o-linear-gradient(
+        rgba(131, 130, 124, 1) 0%,
+        rgba(181, 181, 181, 1) 50%,
+        rgba(129, 129, 128, 1) 100%
+    );
+    background: linear-gradient(
+        rgba(131, 130, 124, 1) 0%,
+        rgba(181, 181, 181, 1) 50%,
+        rgba(129, 129, 128, 1) 100%
+    );
+    font-family: 'Viga', sans-serif;
 }
 
 body {
