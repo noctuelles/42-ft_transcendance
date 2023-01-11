@@ -24,7 +24,7 @@ function AppRoutes() {
     const userContext = React.useContext(UserContext);
 
     React.useEffect(() => {
-        if (!fetching.current) {
+		if (!fetching.current) {
             fetching.current = true;
             if (location.pathname === '/callback') {
                 const code = new URLSearchParams(location.search).get('code');
