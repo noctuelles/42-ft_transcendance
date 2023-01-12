@@ -113,6 +113,7 @@ export class AuthService {
             user: {
                 id: user.id,
                 name: user.name,
+                profile_picture: user.profile_picture,
             },
         });
     }
