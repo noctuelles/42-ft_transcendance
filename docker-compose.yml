@@ -1,17 +1,33 @@
 version: '3.7'
 
+#https://stackoverflow.com/questions/46166304/docker-compose-volumes-without-colon
+
 services:
   back:
     build:
-      dockerfile: Dockerfile
-      context: ./back/.
+      context: ./back
       target: dev
     container_name: nestjs
     env_file:
       - ./back/.env
     volumes:
-      - ./back/.:/usr/src/app
+      - ./back:/usr/src/app
+        # Anonymous volume. Why ? Because there's platform specific data: /usr/src/app/node_modules volume is initialized from the image
       - /usr/src/app/node_modules
     command: npm run start:dev
     ports:
       - 3000:3000
+
+  front:
+    build:
+      context: ./front
+      target: dev
+    container_name: react
+    volumes:
+      - ./front:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - back
+    command: npm run dev
+    ports:
+      - 8080:8080
