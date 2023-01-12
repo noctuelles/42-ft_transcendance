@@ -13,11 +13,12 @@ export const UserContext = React.createContext({
         updating: false,
         setUpdating: (updating: boolean) => {},
         creatingUser: {
-            id: -1,
+            login: '',
             name: '',
             profile_picture: '',
         },
-        setCreatingUser: (creatingUser: any) => {},
+        setCreatingUser: (user: any) => {},
+        changeName: (name: string) => {},
     },
     updateUser: () => {},
     getAccessToken: () => {},
@@ -35,7 +36,7 @@ function UserContextProvider(props: any) {
     const [access_token, setAccessToken] = useState('');
     const [user, setUser] = useState({ id: -1, name: '', profile_picture: '' });
     const [creatingUser, setCreatingUser] = useState({
-        id: -1,
+        login: '',
         name: '',
         profile_picture: '',
     });
@@ -121,6 +122,10 @@ function UserContextProvider(props: any) {
         return access_token;
     }
 
+    function changeName(name: string) {
+        setCreatingUser({ ...creatingUser, name: name });
+    }
+
     return (
         <UserContext.Provider
             value={{
@@ -134,6 +139,7 @@ function UserContextProvider(props: any) {
                     setUpdating,
                     creatingUser,
                     setCreatingUser,
+                    changeName,
                 },
                 updateUser,
                 getAccessToken,
