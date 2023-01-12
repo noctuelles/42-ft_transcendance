@@ -16,14 +16,15 @@ export default function Messages() {
 
 function getMessages(): IMessage[] {
     const messages = useRef<IMessage[]>([]);
+    console.log('I am using the URL: ', WS_URL);
     useWebSocket(WS_URL, {
         share: true,
         onMessage: ({ data }: { data?: string }) => {
             if (!data || !isChatMessage(data)) {
                 return;
             }
-            const newMessages = parseMessages(data);
-            messages.current = [...messages.current, ...newMessages];
+            const newMessage = parseMessage(data);
+            messages.current = [...messages.current, newMessage];
         },
         filter: ({ data }: { data: string }) => {
             return isChatMessage(data);
@@ -41,7 +42,7 @@ function isChatMessage(rawMessage: string): boolean {
     return message?.['event'] == 'chat';
 }
 
-function parseMessages(rawMessage: string): IMessage[] {
+function parseMessage(rawMessage: string): IMessage {
     const jsonMessage = JSON.parse(rawMessage);
     return jsonMessage['data'];
 }
