@@ -3,11 +3,13 @@ import {
     Body,
     Controller,
     Get,
+    Param,
     Post,
     Query,
     UseGuards,
     ValidationPipe,
 } from '@nestjs/common';
+const fs = require('fs');
 
 import { Api42Service } from 'src/services/api42.service';
 import { CurrentUser } from './guards/currentUser.decorator';
@@ -15,12 +17,16 @@ import { RefreshTokenDTO } from './DTO/RefreshTokenDTO';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthService } from './services/auth.service';
 import { User } from '@prisma/client';
+import { UsersService } from 'src/services/users.service';
+import { FormDataRequest } from 'nestjs-form-data';
+import { CreateUserDTO } from './DTO/CreateUserDTO';
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly api42Service: Api42Service,
         private readonly authService: AuthService,
+        private readonly usersService: UsersService,
     ) {}
 
     @Get()
@@ -55,6 +61,35 @@ export class AuthController {
             throw new BadRequestException('No refresh token provided');
         }
         return await this.authService.refresh(refreshToken);
+    }
+
+    @Get('name/:name')
+    async testName(@Param('name') name: string) {
+        if (name.length < 3)
+            return {
+                valid: false,
+                reason: 'Le nom doit faire au moins 3 caractères',
+            };
+        if (name.length > 20)
+            return {
+                valid: false,
+                reason: 'Le nom ne doit pas dépasser 20 caractères',
+            };
+        if (await this.usersService.isUserWithName(name)) {
+            return {
+                valid: false,
+                reason: 'Le nom est déja utilisé',
+            };
+        }
+        return {
+            valid: true,
+        };
+    }
+
+    @Post('create')
+    @FormDataRequest()
+    async createUser(@Body(new ValidationPipe()) user: CreateUserDTO) {
+        return await this.authService.validUser(user);
     }
 
     @Get('test')

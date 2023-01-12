@@ -4,6 +4,7 @@ import { Api42Service } from 'src/services/api42.service';
 import { UsersService } from 'src/services/users.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './services/auth.service';
+import { NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
     imports: [
@@ -11,6 +12,7 @@ import { AuthService } from './services/auth.service';
             secret: `${process.env.JWT_SECRET}`,
             signOptions: { expiresIn: '180s' },
         }),
+        NestjsFormDataModule,
     ],
     controllers: [AuthController],
     providers: [Api42Service, UsersService, AuthService],

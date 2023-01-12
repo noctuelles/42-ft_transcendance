@@ -7,7 +7,7 @@ export class CdnController {
 
     @Get('user/:userLogin')
     async user(@Param('userLogin') userLogin: string, @Res() res) {
-        const imgPath = `./cdn/profile_pictures/${userLogin}.jpg`;
+        const imgPath = `./cdn/profile_pictures/${userLogin}`;
         return res.sendFile(imgPath, { root: 'public' });
     }
 }
