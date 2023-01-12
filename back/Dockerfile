@@ -2,7 +2,7 @@
 # Build for Local dev#
 ######################
 
-FROM node:lts-alpine AS dev
+FROM node:latest AS dev
 
 # Create app directory and set it as our working directory for subsequent operation
 WORKDIR /usr/src/app
