@@ -1,2 +1,11 @@
 node_modules
 dist
+coverage
+Dockerfile
+.git
+.dockerignore
+.gitignore
+.env
+.env.sample
+.prettier*
+.eslint*
