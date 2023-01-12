@@ -4,8 +4,8 @@ nav {
 	border-radius: 30px;
 	margin-top: 20px;
 	margin-bottom: 20px;
-	padding-left: 15px;
-	padding-right: 25px;
+	padding-left: 5%;
+	padding-right: 1em;
 
 	justify-content: space-between;
 	box-shadow: 0px 0px 2px black;
