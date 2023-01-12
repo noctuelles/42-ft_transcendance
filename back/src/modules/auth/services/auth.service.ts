@@ -15,7 +15,11 @@ export class AuthService {
 
     async connectUser(user42: LoggedUser) {
         if (!(await this.userService.isUserWithLogin(user42.login))) {
-            await this.userService.createUser(user42);
+            const user = await this.userService.createUser(user42);
+            return {
+                state: 'creating',
+                user: user,
+            };
         }
         const user = await this.prismaService.user.findUnique({
             where: {
@@ -23,7 +27,11 @@ export class AuthService {
             },
         });
         if (!user) throw new Error('User not found');
-        return await this.generateTokens(user);
+        const tokens = await this.generateTokens(user);
+        return {
+            state: 'connected',
+            tokens: tokens,
+        };
     }
 
     async refresh(refreshToken: string) {
