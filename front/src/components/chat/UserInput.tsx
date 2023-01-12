@@ -20,7 +20,10 @@ export default function UserInput() {
     );
     function onSubmit(e: any) {
         e.preventDefault();
-        const message: IMessage = { user: 'Alice', message: userInput };
+        const message: IMessage = {
+            user: '', // TODO: We don't trust front anymore, so user field is going to be removed
+            message: userInput,
+        };
         const jsonMessage = { event: 'chat', data: message };
         sendMessage(JSON.stringify(jsonMessage));
         setUserInput('');

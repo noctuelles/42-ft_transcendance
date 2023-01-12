@@ -31,6 +31,7 @@ export class ChatGateway {
     @WebSocketServer() server;
     @SubscribeMessage('chat')
     async handleMessage(_: any, data: any) {
+        data.user = 'Alice'; // TODO: Get user associated with this socket
         if (!isIMessage(data)) {
             return;
         }
