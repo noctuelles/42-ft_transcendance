@@ -1,0 +1,112 @@
+.user-creation-title {
+    text-align: center;
+    font-size: 60px;
+}
+
+.user-creation-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user-creation-form-sec1 {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-top: 50px;
+}
+
+.user-creation-form-label {
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+.user-creation-form-name-input {
+    width: 100%;
+    height: 30px;
+    font-size: 25px;
+    font-family: 'Viga', sans-serif;
+    border: none;
+    background-color: #d9d9d9;
+}
+
+.user-creation-form-sec2 {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+    height: fit-content;
+    justify-content: space-between;
+}
+
+.user-creation-form-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user-creation-form-image-preview {
+    width: 400px;
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.user-creation-form-btn {
+    width: 200px;
+    height: 200px;
+    border: none;
+    border: solid 2px transparent;
+}
+
+.user-creation-form-btn-ready {
+    cursor: pointer;
+    background-color: #ffb800;
+}
+
+.user-creation-form-btn-ready:hover {
+    border: solid 2px black;
+}
+
+.user-creation-form-btn-not-ready {
+    cursor: not-allowed;
+    background-color: #d9d9d9;
+}
+
+.user-creation-form-check {
+    width: 100%;
+    height: 100%;
+}
+
+.user-creation-form-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-creation-form-image-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.user-creation-file-label {
+    color: black;
+    display: inline-block;
+    cursor: pointer;
+    background-color: #d9d9d9;
+    width: calc(100% - 4px);
+    text-align: center;
+    height: 30px;
+    font-size: 25px;
+    font-family: 'Viga', sans-serif;
+    border: solid 2px transparent;
+    padding-top: 8px;
+}
+
+.user-creation-file-label:hover {
+    border: solid 2px black;
+}

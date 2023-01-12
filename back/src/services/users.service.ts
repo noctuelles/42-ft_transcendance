@@ -32,6 +32,7 @@ export class UsersService {
         fs.writeFile(
             `./public/cdn/profile_pictures/${user42.login}.jpg`,
             buffer,
+            () => {},
         );
         const user = {
             login: user42.login,
