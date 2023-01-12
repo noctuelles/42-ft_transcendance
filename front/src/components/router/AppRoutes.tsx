@@ -6,10 +6,12 @@ import {
     useLocation,
     useNavigate,
 } from 'react-router';
+
 import LoggedApp from '../global/LoggedApp';
-import FakePage1 from '../pages/FakePage1';
-import FakePage2 from '../pages/FakePage2';
+import Profile from '../pages/Profile'
+import Play from '../pages/Play'
 import Login from '../pages/Login';
+import Social from '../pages/Social';
 import { back_url } from '../../config.json';
 import { UserContext } from '../../context/UserContext';
 import Cookies from 'js-cookie';
@@ -21,7 +23,7 @@ function AppRoutes() {
     const userContext = React.useContext(UserContext);
 
     React.useEffect(() => {
-        if (!fetching.current) {
+		if (!fetching.current) {
             fetching.current = true;
             if (location.pathname === '/callback') {
                 const code = new URLSearchParams(location.search).get('code');
@@ -78,10 +80,11 @@ function AppRoutes() {
                     )
                 }
             >
-                <Route index element={<Navigate to="page1" />} />
-                <Route path="page1" element={<FakePage1 />} />
-                <Route path="page2" element={<FakePage2 />} />
-                <Route path="*" element={<Navigate to="page1" />} />
+                <Route index element={<Navigate to="play" />} />
+                <Route path="play" element={<Play />} />
+                <Route path="social" element={<Social />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="*" element={<Navigate to="play" />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
