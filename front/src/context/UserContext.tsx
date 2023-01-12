@@ -63,7 +63,7 @@ function UserContextProvider(props: any) {
                     setUser({
                         id: decode.user.id,
                         name: decode.user.name,
-                        profile_picture: '',
+                        profile_picture: decode.user.profile_picture,
                     });
                     setLogged(true);
                     Cookies.remove('transcendance_session_cookie');
@@ -111,7 +111,7 @@ function UserContextProvider(props: any) {
             setUser({
                 id: decode.user.id,
                 name: decode.user.name,
-                profile_picture: '',
+                profile_picture: decode.user.profile_picture,
             });
         }
         setUpdating(false);

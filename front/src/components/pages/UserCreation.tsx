@@ -48,7 +48,7 @@ function UserCreation() {
                 if (res.ok) return res.json();
                 //TODO Error message
             })
-            .then((data) => {
+            .then(async (data) => {
                 if (data.state == 'connected') {
                     userContext.auth.setLogged(true);
                     userContext.auth.setAccessToken(
@@ -62,6 +62,7 @@ function UserCreation() {
                         },
                     );
                     userContext.auth.setUpdating(false);
+                    await userContext.updateUser();
                     navigate('/');
                 }
             });
@@ -99,7 +100,7 @@ function UserCreation() {
                             id="file"
                             name="file"
                             type="file"
-                            accept="image/jpg"
+                            accept="image/jpeg"
                             className="user-creation-form-image-input"
                             ref={btnRef}
                         />
