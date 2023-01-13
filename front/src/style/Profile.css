@@ -4,28 +4,3 @@
 	padding: 1rem;
 	border: 2px solid;
 }
-
-.top-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding-right: 1rem;
-	padding-left: 1rem;
-	margin-bottom: 1rem;
-}
-
-.top-header img {
-	width: 120px;
-	height: 120px;
-	border-radius: 50%;
-}
-
-.top-header input[type=text] {
-	padding: 0.2em;
-	font-size: 0.7em;
-}
-
-p {
-	margin: 5px;
-	display: inline;
-}

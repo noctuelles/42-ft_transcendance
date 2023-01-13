@@ -1,41 +1,21 @@
-import React from "react";
+import ProfileHeader from './details/profile/ProfileHeader'
+import MatchHistoryTable from './details/profile/MatchHistoryTable'
 import '../../style/Profile.css'
-import {UserContext} from '../../context/UserContext';
 
-class Profile extends React.Component<{}, {
-		photo: any,
-		username: string,
-		victory: number,
-		matches: number 
-	}> {
-	constructor(props: any) {
-		super(props);
+const Matches = [
+	{playerOne: 'dhubleur', playerTwo: 'plouvel', winner: 'plouvel', duration: '4:32', nbrOfBounce: 423},
+	{playerOne: 'jmaia', playerTwo: 'bsavinel', winner: 'jmaia', duration: '3:12', nbrOfBounce: 301},
+	{playerOne: 'jmaia', playerTwo: 'plouvel', winner: 'jmaia', duration: '6:73', nbrOfBounce: 859}
+];
 
-
-		this.state = {
-			photo: null,
-			username: "plouvel",
-			victory: 2,
-			matches: 42
-		};
-	}
-
-	render() {
+const Profile = (props: any) => {
 		return (
 			<div className="container">
-				<div className="top-header">
-					<p>{this.state.username}</p>
-					<div className="search">
-						<input type="text" placeholder="Search a profile..."/>
-						<button type="submit">bonjour</button>
-					</div>
-					<img src="https://cdn.intra.42.fr/users/1022f4b45a249d0c6cea0572d68baab8/plouvel.jpg"/>
-				</div>
-				<hr></hr>
-				<p>Lorem ipsum</p>
+				<ProfileHeader username="plouvel"/>
+				<hr/>
+				<MatchHistoryTable matches={Matches}/>
 			</div>
 		);
-	}
 }
 
 export default Profile;
