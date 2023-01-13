@@ -6,11 +6,11 @@ import IMessage from './IMessage';
 export default function Messages() {
     const messages: IMessage[] = getMessages();
     return (
-        <p id="messages">
+        <div id="messages">
             {messages.map((x: IMessage, i: number) => (
                 <Message key={i} user={x.user} message={x.message} />
             ))}
-        </p>
+        </div>
     );
 }
 
