@@ -14,7 +14,7 @@ function NavBar(props: any) {
 			</ul>
 			<div className="navRight">
 				<img src="wewe"/>
-				<Link to="/profile">Lol</Link>
+				<Link to="/profile">{userContext.name}</Link>
 			</div>
 		</nav>
   );
