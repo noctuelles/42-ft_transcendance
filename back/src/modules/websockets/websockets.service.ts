@@ -1,16 +1,61 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class WebsocketsService {
-    private sockets: any[] = [];
+    private _sockets = [];
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly prismaService: PrismaService,
+    ) {}
 
-    idx = 1;
-    registertSocket(socket) {
-        this.sockets.push(socket);
+    async registertSocket(socket) {
         socket.on('close', () => {
-            this.sockets = this.sockets.filter((s) => s !== socket);
+            this._sockets = this._sockets.filter((s) => s !== socket);
         });
-        socket.user = 'User ' + this.idx++;
+        const cookies = socket['request'].headers.cookie;
+        if (!cookies) {
+            this.send(socket, 'error', 'No cookies found');
+            socket.close();
+            return;
+        }
+        const cookie = cookies
+            .split(';')
+            .find((c) => c.includes('transcendance_session_cookie'));
+        if (!cookie) {
+            this.send(socket, 'error', 'No session cookie found');
+            socket.close();
+            return;
+        }
+        const sessionCookie = cookie.split('=')[1];
+        if (!sessionCookie) {
+            this.send(socket, 'error', 'No session cookie found');
+            socket.close();
+            return;
+        }
+        try {
+            const session = this.jwtService.verify(sessionCookie);
+            if (!session || !session.user || !session.user.id) {
+                this.send(socket, 'error', 'Invalid session cookie');
+                socket.close();
+                return;
+            }
+            const user = await this.prismaService.user.findUnique({
+                where: { id: session.user.id },
+            });
+            if (!user) {
+                this.send(socket, 'error', 'Invalid session cookie');
+                socket.close();
+                return;
+            }
+            socket['user'] = user;
+            this._sockets.push(socket);
+        } catch (e) {
+            this.send(socket, 'error', 'Invalid session cookie');
+            socket.close();
+            return;
+        }
     }
 
     send(client, event: string, data: any) {
@@ -18,8 +63,8 @@ export class WebsocketsService {
     }
 
     broadcast(event: string, data: any) {
-        this.sockets.forEach((socket) => {
-            socket.send(JSON.stringify({ event: event, data: data }));
+        this._sockets.forEach((socket) => {
+            this.send(socket, event, data);
         });
     }
 }
