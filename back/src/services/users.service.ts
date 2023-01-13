@@ -41,7 +41,7 @@ export class UsersService {
         const arrayBuffer = await blob.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         fs.writeFile(
-            `./public/cdn/profile_pictures/${user42.login}.jpg`,
+            `${process.env.CDN_FOLDER}/profile_pictures/${user42.login}.jpg`,
             buffer,
             () => {},
         );
@@ -61,7 +61,7 @@ export class UsersService {
             throw new BadRequestException('User not found');
         if (user.profile_picture) {
             fs.writeFile(
-                `./public/cdn/profile_pictures/${user.login}.jpg`,
+                `${process.env.CDN_FOLDER}/profile_pictures/${user.login}.jpg`,
                 user.profile_picture.buffer,
                 () => {},
             );
