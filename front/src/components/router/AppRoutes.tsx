@@ -13,6 +13,7 @@ import Login from '../pages/Login';
 import { back_url } from '../../config.json';
 import { UserContext } from '../../context/UserContext';
 import Cookies from 'js-cookie';
+import UserCreation from '../pages/UserCreation';
 
 function AppRoutes() {
     const location = useLocation();
@@ -35,19 +36,26 @@ function AppRoutes() {
                             //TODO Error message
                         })
                         .then((data) => {
-                            userContext.auth.setLogged(true);
-                            userContext.auth.setAccessToken(
-                                data.access_token.token,
-                            );
-                            Cookies.set(
-                                'transcendance_session_cookie',
-                                data.refresh_token.token,
-                                {
-                                    expires: 7 * 24 * 60 * 60,
-                                },
-                            );
-                            userContext.auth.setUpdating(false);
-                            navigate('/');
+                            if (data.state == 'connected') {
+                                userContext.auth.setLogged(true);
+                                userContext.auth.setAccessToken(
+                                    data.tokens.access_token.token,
+                                );
+                                Cookies.set(
+                                    'transcendance_session_cookie',
+                                    data.tokens.refresh_token.token,
+                                    {
+                                        expires: 7 * 24 * 60 * 60,
+                                    },
+                                );
+                                userContext.auth.setUpdating(false);
+                                navigate('/');
+                            } else if (data.state == 'creating') {
+                                userContext.auth.setCreating(true);
+                                userContext.auth.setUpdating(false);
+                                userContext.auth.setCreatingUser(data.user);
+                                navigate('/userCreation');
+                            }
                         });
                 }
             }
@@ -65,6 +73,16 @@ function AppRoutes() {
                         <Navigate to="/" />
                     ) : (
                         <Login />
+                    )
+                }
+            />
+            <Route
+                path="/userCreation"
+                element={
+                    !userContext.auth.creating && !userContext.auth.updating ? (
+                        <Navigate to="/" />
+                    ) : (
+                        <UserCreation />
                     )
                 }
             />

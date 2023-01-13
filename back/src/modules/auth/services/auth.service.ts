@@ -4,6 +4,7 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { UsersService } from 'src/services/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDTO } from '../DTO/CreateUserDTO';
 
 @Injectable()
 export class AuthService {
@@ -15,15 +16,38 @@ export class AuthService {
 
     async connectUser(user42: LoggedUser) {
         if (!(await this.userService.isUserWithLogin(user42.login))) {
-            await this.userService.createUser(user42);
+            const user = await this.userService.createUser(user42);
+            return {
+                state: 'creating',
+                user: user,
+            };
         }
         const user = await this.prismaService.user.findUnique({
             where: {
                 login: user42.login,
             },
         });
-        if (!user) throw new Error('User not found');
-        return await this.generateTokens(user);
+        if (!user) throw new BadRequestException('User not found');
+        const tokens = await this.generateTokens(user);
+        return {
+            state: 'connected',
+            tokens: tokens,
+        };
+    }
+
+    async validUser(user: CreateUserDTO) {
+        await this.userService.validUser(user);
+        const finalUser = await this.prismaService.user.findUnique({
+            where: {
+                login: user.login,
+            },
+        });
+        if (!user) throw new BadRequestException('User not found');
+        const tokens = await this.generateTokens(finalUser);
+        return {
+            state: 'connected',
+            tokens: tokens,
+        };
     }
 
     async refresh(refreshToken: string) {
@@ -89,6 +113,7 @@ export class AuthService {
             user: {
                 id: user.id,
                 name: user.name,
+                profile_picture: user.profile_picture,
             },
         });
     }

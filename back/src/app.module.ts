@@ -4,10 +4,11 @@ import { Api42Service } from './services/api42.service';
 import { UsersService } from './services/users.service';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { PrismaService } from './modules/prisma/prisma.service';
+import { CdnModule } from './modules/cdn/cdn.module';
 
 @Global()
 @Module({
-    imports: [AuthModule, PrismaModule],
+    imports: [AuthModule, PrismaModule, CdnModule],
     controllers: [],
     providers: [Api42Service, PrismaService, UsersService],
     exports: [PrismaModule],
