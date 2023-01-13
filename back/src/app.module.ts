@@ -4,7 +4,6 @@ import { ChatModule } from './chat/chat.module';
 import { Api42Service } from './services/api42.service';
 import { UsersService } from './services/users.service';
 import { PrismaService } from './modules/prisma/prisma.service';
-import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { CdnModule } from './modules/cdn/cdn.module';
