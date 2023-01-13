@@ -16,7 +16,6 @@ export default function Messages() {
 
 function getMessages(): IMessage[] {
     const messages = useRef<IMessage[]>([]);
-    console.log('I am using the URL: ', WS_URL);
     useWebSocket(WS_URL, {
         share: true,
         onMessage: ({ data }: { data?: string }) => {
