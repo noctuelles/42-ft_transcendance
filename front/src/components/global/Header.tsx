@@ -9,6 +9,9 @@ function Header() {
             <Link to="page2" className="link">
                 Page 2
             </Link>
+            <Link to="chat" className="link">
+                Chat
+            </Link>
         </div>
     );
 }

@@ -41,14 +41,18 @@ export class UsersService {
         const arrayBuffer = await blob.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         fs.writeFile(
-            `./public/cdn/profile_pictures/${user42.login}.jpg`,
+            this.getUserProfilePicturePath(user42.login),
             buffer,
             () => {},
         );
         const user = {
             login: user42.login,
-            name: user42.login,
-            profile_picture: `${process.env.SELF_URL}/cdn/user/${user42.login}.jpg`,
+            name:
+                user42.login +
+                '_'.repeat(
+                    user42.login.length < 3 ? 3 - user42.login.length : 0,
+                ),
+            profile_picture: this.getUserProfilePictureUrl(user42.login),
         };
         this.creatingUsers.push(user);
         return user;
@@ -61,7 +65,7 @@ export class UsersService {
             throw new BadRequestException('User not found');
         if (user.profile_picture) {
             fs.writeFile(
-                `./public/cdn/profile_pictures/${user.login}.jpg`,
+                this.getUserProfilePicturePath(user.login),
                 user.profile_picture.buffer,
                 () => {},
             );
@@ -70,8 +74,16 @@ export class UsersService {
             data: {
                 login: user.login,
                 name: user.name,
-                profile_picture: `${process.env.SELF_URL}/cdn/user/${user.login}.jpg`,
+                profile_picture: this.getUserProfilePictureUrl(user.login),
             },
         });
+    }
+
+    getUserProfilePictureUrl(login: string) {
+        return `${process.env.SELF_URL}/cdn/user/${login}.jpg`;
+    }
+
+    getUserProfilePicturePath(login: string) {
+        return `${process.env.CDN_FOLDER}/profile_pictures/${login}.jpg`;
     }
 }
