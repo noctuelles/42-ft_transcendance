@@ -52,12 +52,12 @@ function AppRoutes() {
                                     },
                                 );
                                 userContext.auth.setUpdating(false);
-                                navigate('/');
+                                navigate('/', { replace: true });
                             } else if (data.state == 'creating') {
                                 userContext.auth.setCreating(true);
                                 userContext.auth.setUpdating(false);
                                 userContext.auth.setCreatingUser(data.user);
-                                navigate('/userCreation');
+                                navigate('/userCreation', { replace: true });
                             }
                         });
                 }
@@ -73,7 +73,7 @@ function AppRoutes() {
                 path="/login"
                 element={
                     userContext.auth.logged && !userContext.auth.updating ? (
-                        <Navigate to="/" />
+                        <Navigate replace to="/" />
                     ) : (
                         <Login />
                     )
@@ -83,7 +83,7 @@ function AppRoutes() {
                 path="/userCreation"
                 element={
                     !userContext.auth.creating && !userContext.auth.updating ? (
-                        <Navigate to="/" />
+                        <Navigate replace to="/" />
                     ) : (
                         <UserCreation />
                     )
@@ -95,18 +95,18 @@ function AppRoutes() {
                     userContext.auth.logged || userContext.auth.updating ? (
                         <LoggedApp />
                     ) : (
-                        <Navigate to="/login" />
+                        <Navigate replace to="/login" />
                     )
                 }
             >
-                <Route index element={<Navigate to="play" />} />
+                <Route index element={<Navigate replace to="play" />} />
                 <Route path="play" element={<Play />} />
                 <Route path="social" element={<Social />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="chat" element={<Chat />} />
-                <Route path="*" element={<Navigate to="play" />} />
+                <Route path="*" element={<Navigate replace to="play" />} />
             </Route>
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate replace to="/" />} />
         </Routes>
     );
 }
