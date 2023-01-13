@@ -15,7 +15,7 @@ export default function UserInput() {
                 value={userInput}
                 onChange={(event) => setUserInput(event.target.value)}
             />
-            <input type="submit" value="Envoyer" />
+            <input type="submit" value="Send" />
         </form>
     );
     function onSubmit(e: any) {
