@@ -68,17 +68,17 @@ export class AuthController {
         if (name.length < 3)
             return {
                 valid: false,
-                reason: 'Le nom doit faire au moins 3 caractères',
+                reason: 'The name must be at least 3 characters long',
             };
         if (name.length > 20)
             return {
                 valid: false,
-                reason: 'Le nom ne doit pas dépasser 20 caractères',
+                reason: 'The name must be at most 20 characters long',
             };
         if (await this.usersService.isUserWithName(name)) {
             return {
                 valid: false,
-                reason: 'Le nom est déja utilisé',
+                reason: 'The name is already taken',
             };
         }
         return {

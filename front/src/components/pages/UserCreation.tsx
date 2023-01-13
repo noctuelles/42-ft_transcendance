@@ -71,12 +71,12 @@ function UserCreation() {
     return (
         <div className="user-creation">
             <h1 className="user-creation-title">
-                Préparation du sujet pour l'expérience
+                Subject preparation for experiment
             </h1>
             <form className="user-creation-form">
                 <div className="user-creation-form-sec1">
                     <label className="user-creation-form-name-label user-creation-form-label">
-                        Nom
+                        Name
                     </label>
                     <input
                         type="text"
@@ -108,7 +108,7 @@ function UserCreation() {
                             htmlFor="file"
                             className="user-creation-file-label"
                         >
-                            Sélectionner un fichier
+                            Select a file
                         </label>
                     </div>
                     <div className="user-creation-form-right">

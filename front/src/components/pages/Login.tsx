@@ -82,7 +82,7 @@ function Login() {
                 />
             </svg>
             <p className="login-explain">
-                Cliques sur le portail pour te connecter avec ton compte 42
+                Click on the portal to connect with you 42 account
             </p>
         </div>
     );
