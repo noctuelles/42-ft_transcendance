@@ -4,40 +4,21 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 
-function sendChatMessage(client: any, message: Message) {
-    client.send(JSON.stringify({ event: 'chat', data: message }));
-}
-
-function isIMessage(data: any) {
-    return typeof data?.user === 'string' && typeof data?.message === 'string';
-}
-
-class Message {
-    user: string;
-    message: string;
-    constructor(obj: IMessage) {
-        this.user = obj.user;
-        this.message = obj.message;
-    }
-}
-
-interface IMessage {
-    user: string;
-    message: string;
-}
+import { Message, IMessage, ChatService } from '../chat/chat.service';
 
 @WebSocketGateway()
 export class ChatGateway {
+    constructor(private readonly chatService: ChatService) {}
     @WebSocketServer() server;
     @SubscribeMessage('chat')
     async handleMessage(_: any, data: any) {
         data.user = 'Alice'; // TODO: Get user associated with this socket
-        if (!isIMessage(data)) {
+        if (!this.chatService.isIMessage(data)) {
             return;
         }
         let message = new Message(data);
         this.server.clients.forEach((client: any) =>
-            sendChatMessage(client, message),
+            this.chatService.sendChatMessage(client, message),
         );
     }
 }
