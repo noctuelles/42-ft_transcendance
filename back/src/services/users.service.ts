@@ -47,7 +47,7 @@ export class UsersService {
         );
         const user = {
             login: user42.login,
-            name: user42.login,
+            name: user42.login + '_'.repeat(3 - user42.login.length),
             profile_picture: `${process.env.SELF_URL}/cdn/user/${user42.login}.jpg`,
         };
         this.creatingUsers.push(user);
