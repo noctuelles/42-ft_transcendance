@@ -34,7 +34,12 @@ export class UsersService {
         return user ? true : false;
     }
 
-    async createUser(user42: LoggedUser) {
+    /*
+     ** Function called when the user is not in the database
+     ** We create a temporary user with the login and the profile picture
+     ** This user will be deleted if the user doesn't create his account
+     */
+    async initUser(user42: LoggedUser) {
         const response = await fetch(user42.image.link);
         const blob = await response.blob();
         const arrayBuffer = await blob.arrayBuffer();
@@ -53,11 +58,18 @@ export class UsersService {
         return user;
     }
 
-    async validUser(user: CreateUserDTO) {
+    /*
+     ** Function called when the user has choosed his name and pp
+     ** Create the user in the database definitively
+     */
+    async createUser(user: CreateUserDTO) {
         if (
             this.creatingUsers.filter((u) => u.login === user.login).length == 0
         )
             throw new BadRequestException('User not found');
+        this.creatingUsers = this.creatingUsers.filter(
+            (u) => u.login !== user.login,
+        );
         if (user.profile_picture) {
             fs.writeFile(
                 `./public/cdn/profile_pictures/${user.login}.jpg`,
