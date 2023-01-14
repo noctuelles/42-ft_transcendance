@@ -84,11 +84,13 @@ export class AuthService {
 				});
 				throw new BadRequestException('Invalid refresh token');
 			}
-			await this.prismaService.authIdentifier.delete({
-				where: {
-					identifier: token.identifier,
-				},
-			});
+			setTimeout(() => {
+				this.prismaService.authIdentifier.delete({
+					where: {
+						identifier: token.identifier,
+					},
+				});
+			}, 1000 * 2);
 			const user = await this.prismaService.user.findUnique({
 				where: {
 					id: token.user.id,
