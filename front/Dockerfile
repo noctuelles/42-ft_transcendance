@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 COPY --chown=node:node package*.json ./
 
 # Install with 'npm ci' (see: https://stackoverflow.com/questions/52499617/what-is-the-difference-between-npm-install-and-npm-ci)
-RUN npm install
+RUN npm ci
 
 # Copy the app source into the image
 COPY --chown=node:node . .
