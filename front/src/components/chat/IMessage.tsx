@@ -1,4 +1,4 @@
 export default interface IMessage {
-    user: string;
-    message: string;
+	user: string;
+	message: string;
 }
