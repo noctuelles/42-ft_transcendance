@@ -52,6 +52,7 @@ function AppRoutes() {
 									},
 								);
 								userContext.auth.setUpdating(false);
+								userContext.updateUser();
 								navigate('/', { replace: true });
 							} else if (data.state == 'creating') {
 								userContext.auth.setCreating(true);
