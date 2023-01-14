@@ -8,16 +8,16 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { UsersModule } from '../users/users.module';
 
 @Module({
-    imports: [
-        JwtModule.register({
-            secret: `${process.env.JWT_SECRET}`,
-            signOptions: { expiresIn: '180s' },
-        }),
-        NestjsFormDataModule,
-        PrismaModule,
-        UsersModule,
-    ],
-    controllers: [AuthController],
-    providers: [Api42Service, AuthService],
+	imports: [
+		JwtModule.register({
+			secret: `${process.env.JWT_SECRET}`,
+			signOptions: { expiresIn: '180s' },
+		}),
+		NestjsFormDataModule,
+		PrismaModule,
+		UsersModule,
+	],
+	controllers: [AuthController],
+	providers: [Api42Service, AuthService],
 })
 export class AuthModule {}

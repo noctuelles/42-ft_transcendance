@@ -7,9 +7,9 @@ import { ChatModule } from './modules/chat/chat.module';
 
 @Global()
 @Module({
-    imports: [PrismaModule, UsersModule, AuthModule, CdnModule, ChatModule],
-    controllers: [],
-    providers: [],
-    exports: [],
+	imports: [PrismaModule, UsersModule, AuthModule, CdnModule, ChatModule],
+	controllers: [],
+	providers: [],
+	exports: [],
 })
 export class AppModule {}

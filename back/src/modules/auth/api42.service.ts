@@ -24,7 +24,7 @@ export class Api42Service {
 				await this.client.auth_manager.init_auth_process(
 					process.env.FRONT_URL + '/callback',
 					['public'],
-			);
+				);
 		}
 		return this._auth_process;
 	}
