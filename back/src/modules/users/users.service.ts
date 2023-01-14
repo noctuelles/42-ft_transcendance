@@ -12,7 +12,7 @@ interface ICreatingUser {
 
 @Injectable()
 export class UsersService {
-    private creatingUsers = [];
+    private creatingUsers: ICreatingUser[] = [];
 
     constructor(private readonly prismaService: PrismaService) {}
 
