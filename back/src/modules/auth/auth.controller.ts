@@ -10,13 +10,13 @@ import {
 } from '@nestjs/common';
 const fs = require('fs');
 
-import { Api42Service } from 'src/services/api42.service';
+import { Api42Service } from './api42.service';
 import { CurrentUser } from './guards/currentUser.decorator';
 import { RefreshTokenDTO } from './DTO/RefreshTokenDTO';
 import { AuthGuard } from './guards/auth.guard';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './auth.service';
 import { User } from '@prisma/client';
-import { UsersService } from 'src/services/users.service';
+import { UsersService } from 'src/modules/users/users.service';
 import { FormDataRequest } from 'nestjs-form-data';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
 

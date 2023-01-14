@@ -2,9 +2,9 @@ import { LoggedUser } from '42.js/dist/structures/logged_user';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { User } from '@prisma/client';
-import { UsersService } from 'src/services/users.service';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDTO } from '../DTO/CreateUserDTO';
+import { CreateUserDTO } from './DTO/CreateUserDTO';
 
 @Injectable()
 export class AuthService {
