@@ -14,9 +14,14 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 	) {}
 
+	/*
+	 ** Function called when 42 redirect the user to the callback url
+	 ** If the user is not in the database, we call the function to init it
+	 ** Else we generate the tokens and return them
+	 */
 	async connectUser(user42: LoggedUser) {
 		if (!(await this.userService.isUserWithLogin(user42.login))) {
-			const user = await this.userService.createUser(user42);
+			const user = await this.userService.initUser(user42);
 			return {
 				state: 'creating',
 				user: user,
@@ -35,8 +40,12 @@ export class AuthService {
 		};
 	}
 
-	async validUser(user: CreateUserDTO) {
-		await this.userService.validUser(user);
+	/*
+	 ** Function called when the users has choosed his name and pp
+	 ** We create the user in the database and generate the tokens
+	 */
+	async createUser(user: CreateUserDTO) {
+		await this.userService.createUser(user);
 		const finalUser = await this.prismaService.user.findUnique({
 			where: {
 				login: user.login,
@@ -56,17 +65,17 @@ export class AuthService {
 			if (
 				!token.type ||
 				!token.user ||
-			!token.identifier ||
-		token.type !== 'refresh'
+				!token.identifier ||
+				token.type !== 'refresh'
 			) {
 				throw new BadRequestException('Invalid refresh token');
 			}
 			const identifier =
 				await this.prismaService.authIdentifier.findUnique({
-				where: {
-					identifier: token.identifier,
-				},
-			});
+					where: {
+						identifier: token.identifier,
+					},
+				});
 			if (!identifier) {
 				await this.prismaService.authIdentifier.deleteMany({
 					where: {

@@ -2,7 +2,8 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
-	Get, Param,
+	Get,
+	Param,
 	Post,
 	Query,
 	UseGuards,
@@ -44,7 +45,7 @@ export class AuthController {
 					await this.api42Service.get_auth_process()
 				).id,
 				code,
-		);
+			);
 		if (!user) {
 			throw new BadRequestException('No user found on 42 intranet');
 		}
@@ -69,26 +70,26 @@ export class AuthController {
 				valid: false,
 				reason: 'The name must be at least 3 characters long',
 			};
-			if (name.length > 20)
-				return {
-					valid: false,
-					reason: 'The name must be at most 20 characters long',
-				};
-				if (await this.usersService.isUserWithName(name)) {
-					return {
-						valid: false,
-						reason: 'The name is already taken',
-					};
-				}
-				return {
-					valid: true,
-				};
+		if (name.length > 20)
+			return {
+				valid: false,
+				reason: 'The name must be at most 20 characters long',
+			};
+		if (await this.usersService.isUserWithName(name)) {
+			return {
+				valid: false,
+				reason: 'The name is already taken',
+			};
+		}
+		return {
+			valid: true,
+		};
 	}
 
 	@Post('create')
 	@FormDataRequest()
 	async createUser(@Body(new ValidationPipe()) user: CreateUserDTO) {
-		return await this.authService.validUser(user);
+		return await this.authService.createUser(user);
 	}
 
 	@Get('test')
