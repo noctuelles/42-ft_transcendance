@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function ProfileInfo(props: any) {
-	return (
-		<p>{props.username}</p>
-	);
+	return <p>{props.username}</p>;
 }
 
 export default ProfileInfo;
