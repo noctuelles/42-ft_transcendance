@@ -6,10 +6,11 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { CdnModule } from './modules/cdn/cdn.module';
+import {ChatModule} from './chat/chat.module';
 
 @Global()
 @Module({
-	imports: [AuthModule, PrismaModule, CdnModule, UsersModule],
+	imports: [AuthModule, PrismaModule, CdnModule, UsersModule, ChatModule],
 	controllers: [],
 	providers: [Api42Service, PrismaService, UsersService],
 	exports: [PrismaModule],

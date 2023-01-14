@@ -8,8 +8,9 @@ import {
 } from 'react-router';
 
 import LoggedApp from '../global/LoggedApp';
-import Profile from '../pages/Profile'
-import Play from '../pages/Play'
+import Profile from '../pages/Profile';
+import Play from '../pages/Play';
+import Chat from '@/components/chat/Chat';
 import Login from '../pages/Login';
 import Social from '../pages/Social';
 import { back_url } from '../../config.json';
@@ -24,7 +25,7 @@ function AppRoutes() {
     const userContext = React.useContext(UserContext);
 
     React.useEffect(() => {
-		if (!fetching.current) {
+        if (!fetching.current) {
             fetching.current = true;
             if (location.pathname === '/callback') {
                 const code = new URLSearchParams(location.search).get('code');
@@ -102,6 +103,7 @@ function AppRoutes() {
                 <Route path="play" element={<Play />} />
                 <Route path="social" element={<Social />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="chat" element={<Chat />} />
                 <Route path="*" element={<Navigate to="play" />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
