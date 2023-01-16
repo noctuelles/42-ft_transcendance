@@ -1,14 +1,14 @@
 @font-face {
 	font-family: 'PixeBoyRegular';
 	src: local('PixeBoyRegular'),
-	url('../font/PixeBoyRegular.woff2') format('woff2'),
-	url('../font/PixeBoyRegular.woff') format('woff');
+		url('../font/PixeBoyRegular.woff2') format('woff2'),
+		url('../font/PixeBoyRegular.woff') format('woff');
 	font-weight: normal;
 	font-style: normal;
 }
 
 :root {
-	font-family: 'PixeBoyRegular', Inter, Avenir, Helvetica, Arial, sans-serif;
+	font-family: 'Viga', sans-serif;
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 400;
@@ -19,61 +19,43 @@
 	-webkit-text-size-adjust: 100%;
 }
 
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-	font-family: 'PixeBoyRegular';
-	font-size: 1.5rem;
-	line-height: 24px;
-	font-weight: 400;
-}
-
-*::after,
-*::before {
-	box-sizing: border-box;
-}
-
-
 html {
-    height: 100%;
-    width: 100%;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    background: rgb(131, 130, 124);
-    background-repeat: no-repeat;
-    background: -webkit-linear-gradient(
-        rgba(131, 130, 124, 1) 0%,
-        rgba(181, 181, 181, 1) 50%,
-        rgba(129, 129, 128, 1) 100%
-    );
-    background: -moz-linear-gradient(
-        rgba(131, 130, 124, 1) 0%,
-        rgba(181, 181, 181, 1) 50%,
-        rgba(129, 129, 128, 1) 100%
-    );
-    background: -ms-linear-gradient(
-        rgba(131, 130, 124, 1) 0%,
-        rgba(181, 181, 181, 1) 50%,
-        rgba(129, 129, 128, 1) 100%
-    );
-    background: -o-linear-gradient(
-        rgba(131, 130, 124, 1) 0%,
-        rgba(181, 181, 181, 1) 50%,
-        rgba(129, 129, 128, 1) 100%
-    );
-    background: linear-gradient(
-        rgba(131, 130, 124, 1) 0%,
-        rgba(181, 181, 181, 1) 50%,
-        rgba(129, 129, 128, 1) 100%
-    );
-    font-family: 'Viga', sans-serif;
+	height: 100%;
+	width: 100%;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	background: rgb(131, 130, 124);
+	background-repeat: no-repeat;
+	background: -webkit-linear-gradient(
+		rgba(131, 130, 124, 1) 0%,
+		rgba(181, 181, 181, 1) 50%,
+		rgba(129, 129, 128, 1) 100%
+	);
+	background: -moz-linear-gradient(
+		rgba(131, 130, 124, 1) 0%,
+		rgba(181, 181, 181, 1) 50%,
+		rgba(129, 129, 128, 1) 100%
+	);
+	background: -ms-linear-gradient(
+		rgba(131, 130, 124, 1) 0%,
+		rgba(181, 181, 181, 1) 50%,
+		rgba(129, 129, 128, 1) 100%
+	);
+	background: -o-linear-gradient(
+		rgba(131, 130, 124, 1) 0%,
+		rgba(181, 181, 181, 1) 50%,
+		rgba(129, 129, 128, 1) 100%
+	);
+	background: linear-gradient(
+		rgba(131, 130, 124, 1) 0%,
+		rgba(181, 181, 181, 1) 50%,
+		rgba(129, 129, 128, 1) 100%
+	);
 }
 
 body {
-	max-width: 70%;
-	margin-right: auto;
-	margin-left: auto;
+	margin: 0;
+	padding: 0;
 }

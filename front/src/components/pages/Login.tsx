@@ -4,43 +4,43 @@ import '../../style/Login.css';
 import portal from '../../assets/portal.svg';
 
 function Login() {
-    const [authUrl, setAuthUrl] = useState('');
-    useEffect(() => {
-        fetch(back_url + '/auth')
-            .then((res) => {
-                if (res.ok) return res.json();
-                //TODO Error message
-            })
-            .then((data) => {
-                setAuthUrl(data.url);
-            });
-    }, [setAuthUrl]);
+	const [authUrl, setAuthUrl] = useState('');
+	useEffect(() => {
+		fetch(back_url + '/auth')
+			.then((res) => {
+				if (res.ok) return res.json();
+				//TODO Error message
+			})
+			.then((data) => {
+				setAuthUrl(data.url);
+			});
+	}, [setAuthUrl]);
 
-    function redirectToAuth() {
-        if (authUrl !== '') window.location.replace(authUrl);
-    }
+	function redirectToAuth() {
+		if (authUrl !== '') window.location.replace(authUrl);
+	}
 
-    return (
-        <div className="login">
-            <div className="login-main">
-                <h1 className="login-title">APERTRANSCENDENCE</h1>
-                <h2 className="login-subtitle">GAME</h2>
-            </div>
-            <svg
-                className="login-portal"
-                version="1.1"
-                id="Layer_7"
-                x="0px"
-                y="0px"
-                width="64px"
-                height="64px"
-                viewBox="0 0 64 64"
-            >
-                <g>
-                    <g>
-                        <path
-                            onClick={redirectToAuth}
-                            d="M38.772,3.061c-2.183-0.146-4.421,0.354-6.448,1.426
+	return (
+		<div className="login">
+			<div className="login-main">
+				<h1 className="login-title">APERTRANSCENDENCE</h1>
+				<h2 className="login-subtitle">GAME</h2>
+			</div>
+			<svg
+				className="login-portal"
+				version="1.1"
+				id="Layer_7"
+				x="0px"
+				y="0px"
+				width="64px"
+				height="64px"
+				viewBox="0 0 64 64"
+			>
+				<g>
+					<g>
+						<path
+							onClick={redirectToAuth}
+							d="M38.772,3.061c-2.183-0.146-4.421,0.354-6.448,1.426
 			c-5.897,3.117-9.298,9.234-12.095,15.009c1.301-3.668,1.301-4.312,4.504-10.253c-7.839,9.244-11.66,21.842-10.228,33.883
 			c0.612,5.148,2.432,10.277,6.101,14.049c0.109,0.112,0.219,0.222,0.331,0.331c2.722,2.651,6.574,4.032,10.351,3.289
 			c4.681-0.921,8.386-4.618,11.086-8.336c6.953-9.575,10.924-23.206,8.701-34.954c-0.86-4.549-2.773-9.384-6.556-12.287
@@ -51,12 +51,12 @@ function Login() {
 			c0.546-3.312,2.258-10.271,3.895-13.218c1.637-2.947,4.248-6.969,6.222-8.677c3.577-3.097,5.306-3.043,7.04-3.029
 			c1.74,0.014,4.498,1.77,5.726,5.045c2.06,5.495,2.684,12.167,0.803,17.802c1.715-4.31,2.255-8.328,1.984-12.942
 			c-0.082-1.392-0.246-2.62-0.246-2.62s1.284,3.194,1.474,6.303C47.352,24.71,47.025,29.139,46.754,31.756z"
-                        />
-                    </g>
-                </g>
-                <path
-                    onClick={redirectToAuth}
-                    d="M51.075,17.506c-0.86-4.549-2.773-9.384-6.556-12.287c-1.725-1.323-3.712-2.022-5.747-2.159
+						/>
+					</g>
+				</g>
+				<path
+					onClick={redirectToAuth}
+					d="M51.075,17.506c-0.86-4.549-2.773-9.384-6.556-12.287c-1.725-1.323-3.712-2.022-5.747-2.159
 	c-0.248-0.017-0.498-0.025-0.747-0.025c-1.942,0-3.904,0.501-5.701,1.451c-5.897,3.117-9.298,9.234-12.095,15.009
 	c1.301-3.668,1.301-4.312,4.504-10.253c-7.839,9.244-11.66,21.842-10.228,33.883c0.612,5.148,2.432,10.277,6.101,14.049
 	c0.109,0.112,0.219,0.222,0.331,0.331c2.228,2.17,5.213,3.489,8.294,3.489c0.683,0,1.371-0.065,2.057-0.2
@@ -79,13 +79,13 @@ function Login() {
 	c1.509-0.798,3.158-1.219,4.767-1.219c0.205,0,0.41,0.007,0.614,0.02c1.311,0.088,2.562,0.472,3.681,1.108l0.009-0.008
 	c0.029,0.017,0.059,0.04,0.088,0.058c0.015,0.009,0.032,0.015,0.047,0.024l0.001,0.008c1.07,0.664,2.212,1.602,3.192,2.894
 	c0.104,0.137,0.236,0.369,0.382,0.653c1.71,2.565,2.607,5.627,3.071,8.084C50.142,23.332,49.765,29.469,48.184,35.471z"
-                />
-            </svg>
-            <p className="login-explain">
-                Cliques sur le portail pour te connecter avec ton compte 42
-            </p>
-        </div>
-    );
+				/>
+			</svg>
+			<p className="login-explain">
+				Click on the portal to connect with you 42 account
+			</p>
+		</div>
+	);
 }
 
 export default Login;
