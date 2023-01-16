@@ -4,7 +4,7 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 
-import { Message, IMessage, ChatService } from '../chat/chat.service';
+import { Message, ChatService } from '../chat/chat.service';
 
 @WebSocketGateway()
 export class ChatGateway {
@@ -12,7 +12,7 @@ export class ChatGateway {
 	@WebSocketServer() server;
 	@SubscribeMessage('chat')
 	async handleMessage(socket: any, data: any) {
-		data.user = 'Alice'; // TODO: Get user associated with this socket
+		data.user = socket.user.name;
 		if (!this.chatService.isIMessage(data)) {
 			return;
 		}
