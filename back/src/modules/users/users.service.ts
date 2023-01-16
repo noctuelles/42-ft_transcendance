@@ -85,4 +85,16 @@ export class UsersService {
 			},
 		});
 	}
+
+	//TODO: Remove this function
+	async createDevUser(name: string) {
+		await this.prismaService.user.create({
+			data: {
+				login: name,
+				name: name,
+				profile_picture:
+					'https://cdn.discordapp.com/attachments/1052674310034182196/1064564672122077204/turret.png',
+			},
+		});
+	}
 }

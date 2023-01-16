@@ -59,6 +59,22 @@ export class AuthService {
 		};
 	}
 
+	//TODO: Remove this function
+	async dev(name: string) {
+		await this.userService.createDevUser(name);
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				login: name,
+			},
+		});
+		if (!user) throw new BadRequestException('User not found');
+		const tokens = await this.generateTokens(user);
+		return {
+			state: 'connected',
+			tokens: tokens,
+		};
+	}
+
 	async refresh(refreshToken: string) {
 		try {
 			const token = this.jwtService.verify(refreshToken);
