@@ -1,0 +1,27 @@
+.play {
+	height: 100%;
+}
+
+.play-state-lobby {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.play-btn {
+	background-color: #ffb800;
+	border: 2px solid transparent;
+	border-radius: 15px;
+	color: #000;
+	cursor: pointer;
+	transform: translateY(-100%);
+	cursor: pointer;
+	width: 300px;
+	height: 100px;
+	font-size: 40px;
+	font-weight: 600;
+}
+
+.play-btn:hover {
+	border: solid 2px black;
+}

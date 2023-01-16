@@ -3,7 +3,7 @@ import NavBar from '../global/NavBar';
 
 function LoggedApp() {
 	return (
-		<div>
+		<div className="logged">
 			<NavBar />
 			<Outlet />
 		</div>
