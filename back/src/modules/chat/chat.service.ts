@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { WebsocketsService } from '../websockets/websockets.service';
 
 export class Message {
 	user: string;
@@ -16,8 +17,10 @@ export interface IMessage {
 
 @Injectable()
 export class ChatService {
-	sendChatMessage(client: any, message: Message) {
-		client.send(JSON.stringify({ event: 'chat', data: message }));
+	constructor(private readonly websocketsService: WebsocketsService) {}
+
+	broadcastMessage(message: Message) {
+		this.websocketsService.broadcast('chat', message);
 	}
 
 	isIMessage(data: any) {
