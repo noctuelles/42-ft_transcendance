@@ -27,6 +27,32 @@ function AppRoutes() {
 	React.useEffect(() => {
 		if (!fetching.current) {
 			fetching.current = true;
+
+			//TODO: Remove this
+			if (location.pathname === '/dev') {
+				const name = new URLSearchParams(location.search).get('name');
+				fetch(back_url + '/auth/dev/' + name, {
+					method: 'POST',
+				})
+					.then((res) => res.json())
+					.then((data) => {
+						userContext.auth.setLogged(true);
+						userContext.auth.setAccessToken(
+							data.tokens.access_token.token,
+						);
+						Cookies.set(
+							'transcendance_session_cookie',
+							data.tokens.refresh_token.token,
+							{
+								expires: 7 * 24 * 60 * 60,
+							},
+						);
+						userContext.auth.setUpdating(false);
+						userContext.updateUser();
+						navigate('/', { replace: true });
+					});
+			}
+
 			if (location.pathname === '/callback') {
 				const code = new URLSearchParams(location.search).get('code');
 				if (code) {
