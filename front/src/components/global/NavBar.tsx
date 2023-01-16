@@ -20,8 +20,8 @@ function NavBar(props: any) {
 				</li>
 			</ul>
 			<div className="navRight">
-				<img src="wewe" />
-				<Link to="/profile">{userContext.name}</Link>
+				<img src={userContext.user.profile_picture}/>
+				<Link to="/profile">{userContext.user.name}</Link>
 			</div>
 		</nav>
 	);

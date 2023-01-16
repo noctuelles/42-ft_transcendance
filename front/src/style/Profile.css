@@ -1,4 +1,6 @@
-.profilePage {
+.container {
 	border-radius: 20px;
 	background-color: lightgray;
+	padding: 1rem;
+	border: 2px solid;
 }
