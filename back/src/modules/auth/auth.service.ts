@@ -61,8 +61,13 @@ export class AuthService {
 
 	//TODO: Remove this function
 	async dev(name: string) {
-		await this.userService.createDevUser(name);
-		const user = await this.prismaService.user.findUnique({
+		let user = await this.prismaService.user.findUnique({
+			where: {
+				login: name,
+			},
+		});
+		if (!user) await this.userService.createDevUser(name);
+		user = await this.prismaService.user.findUnique({
 			where: {
 				login: name,
 			},
