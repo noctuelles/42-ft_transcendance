@@ -19,7 +19,7 @@ export interface IMessage {
 export class ChatService {
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
-	sendChatMessageToAll(message: Message) {
+	broadcastMessage(message: Message) {
 		this.websocketsService.broadcast('chat', message);
 	}
 

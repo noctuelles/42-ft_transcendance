@@ -10,7 +10,7 @@ export class WebsocketsService {
 		private readonly prismaService: PrismaService,
 	) {}
 
-	async registertSocket(socket) {
+	async registerSocket(socket) {
 		socket.on('close', () => {
 			this._sockets = this._sockets.filter((s) => s !== socket);
 		});

@@ -17,6 +17,6 @@ export class ChatGateway {
 			return;
 		}
 		let message = new Message(data);
-		this.chatService.sendChatMessageToAll(message);
+		this.chatService.broadcastMessage(message);
 	}
 }
