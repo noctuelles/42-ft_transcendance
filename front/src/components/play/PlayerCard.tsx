@@ -1,4 +1,4 @@
-import { IPlayerInfo } from '../pages/Play';
+import { IGamePlayer, IPlayerInfo } from '../pages/Play';
 import '@/style/play/PlayerCard.css';
 
 export enum PlayerPosition {
@@ -12,7 +12,7 @@ export enum PlayerCardType {
 }
 
 interface IPlayerCardProps {
-	player: IPlayerInfo;
+	player: IGamePlayer;
 	position: PlayerPosition;
 	type: PlayerCardType;
 }
@@ -26,10 +26,16 @@ function PlayerCard(props: IPlayerCardProps) {
 				<div className="card-content">
 					<img
 						className="card-img"
-						src={props.player.profile_picture}
+						src={props.player.infos.profile_picture}
 						alt="avatar"
 					/>
-					<h3 className="card-name">{props.player.name}</h3>
+					<h3 className="card-name">{props.player.infos.name}</h3>
+				</div>
+			)}
+			{props.type === PlayerCardType.DURING_GAME && (
+				<div className="card-content">
+					<h3 className="card-name">{props.player.infos.name}</h3>
+					<h3 className="card-score">{props.player.points}</h3>
 				</div>
 			)}
 		</div>

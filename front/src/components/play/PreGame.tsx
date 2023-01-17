@@ -1,4 +1,4 @@
-import { GameState, IPlayerInfo } from '../pages/Play';
+import { GameState, IGamePlayer, IPlayerInfo } from '../pages/Play';
 import PlayerCard, { PlayerCardType, PlayerPosition } from './PlayerCard';
 import '@/style/play/PreGame.css';
 import { ws_url as WS_URL } from '@/config.json';
@@ -6,7 +6,7 @@ import useWebSocket from 'react-use-websocket';
 import { useState } from 'react';
 
 interface IPreGameProps {
-	players: IPlayerInfo[];
+	players: IGamePlayer[];
 	setGameState: (gameState: GameState) => void;
 }
 

@@ -4,6 +4,7 @@ import Matchmaking from '../play/Matchmaking';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import PreGame from '../play/PreGame';
+import Game from '../play/Game';
 
 export enum GameState {
 	LOBBY = 'lobby',
@@ -60,11 +61,9 @@ const Play = () => {
 				/>
 			)}
 			{gameState === GameState.PREGAME && (
-				<PreGame
-					players={players.map((p) => p.infos)}
-					setGameState={setGameState}
-				/>
+				<PreGame players={players} setGameState={setGameState} />
 			)}
+			{gameState === GameState.PLAYING && <Game players={players} />}
 		</div>
 	);
 };

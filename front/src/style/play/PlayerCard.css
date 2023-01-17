@@ -7,6 +7,10 @@
 	width: 400px;
 }
 
+.card-during-game {
+	width: 200px;
+}
+
 .card-left {
 	background-color: #ffb800;
 }
@@ -23,6 +27,10 @@
 	align-items: center;
 }
 
+.card-during-game .card-content {
+	justify-content: space-between;
+}
+
 .card-right .card-content {
 	flex-direction: row-reverse;
 }
@@ -31,10 +39,14 @@
 	font-size: 30px;
 }
 
-.card-left .card-name {
+.card-score {
+	font-size: 30px;
+}
+
+.card-left .card-name .card-before-game {
 	margin-left: 20px;
 }
-.card-right .card-name {
+.card-right .card-name .card-before-game {
 	margin-right: 20px;
 }
 
