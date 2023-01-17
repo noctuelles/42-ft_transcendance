@@ -1,6 +1,6 @@
 generator client {
-    provider = "prisma-client-js"
-	binaryTargets = ["native", "debian-openssl-1.1.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -9,24 +9,44 @@ datasource db {
 }
 
 model User {
-    id              Int              @id @unique @default(autoincrement())
-	login           String           @unique
-    name            String           @unique
-	profile			Profile?
-    profile_picture String
-    AuthIdentifier  AuthIdentifier[]
+    id             Int              @id @unique @default(autoincrement())
+    login          String
+    name           String
+    profile        Profile          @relation(fields: [profileId], references: [id])
+    profileId      Int              @unique
+    AuthIdentifier AuthIdentifier[]
+    friendsOf      User[]           @relation("Friends")
+    friends        User[]           @relation("Friends")
+}
+
+model Message {
+    id      Int      @id @unique @default(autoincrement())
+    sendAt  DateTime
+    content String
 }
 
 model Profile {
-	id				Int			@id	@unique	@default(autoincrement())
-	playedMatches	Int			@default(0)
-	wonMatches		Int			@default(0)
-	user			User		@relation(fields: [userId], references: [id])
-	userId			Int			@unique
+    id            Int    @id @unique @default(autoincrement())
+    picture       String
+    playedMatches Int    @default(0)
+    wonMatches    Int    @default(0)
+    user          User?
+}
+
+model Match {
+    id       Int      @id @unique @default(autoincrement())
+    winner   Int
+    duration DateTime
 }
 
 model AuthIdentifier {
     identifier String @id @unique
     user       User   @relation(fields: [userId], references: [id])
     userId     Int
+}
+
+enum ChannelRole {
+    ADMIN
+    OPERATOR
+    USER
 }
