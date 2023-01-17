@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../style/NavBar.css';
-import { UserContext } from '../../context/UserContext';
+import '@/style/NavBar.css';
+import { UserContext } from '@/context/UserContext';
 
 function NavBar(props: any) {
 	const userContext = React.useContext(UserContext);
@@ -20,7 +20,7 @@ function NavBar(props: any) {
 				</li>
 			</ul>
 			<div className="navRight">
-				<img src={userContext.user.profile_picture}/>
+				<img src={userContext.user.profile_picture} />
 				<Link to="/profile">{userContext.user.name}</Link>
 			</div>
 		</nav>

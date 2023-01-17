@@ -1,5 +1,5 @@
-import '../../../../style/details/profile/MatchHistoryTable.css'
-import MatchHistoryRow from "./MatchHistoryRow";
+import '@/style/details/profile/MatchHistoryTable.css';
+import MatchHistoryRow from './MatchHistoryRow';
 
 interface Match {
 	playerOne: string;
@@ -7,16 +7,13 @@ interface Match {
 	winner: string;
 	duration: string;
 	nbrOfBounce: number;
-};
+}
 
 const MatchHistoryTable = (props: any) => {
-	const rows = [];
+	const rows: JSX.Element = [];
 
 	props.matches.forEach((match: Match) => {
-		rows.push(
-			<MatchHistoryRow
-				match={match} />
-		);
+		rows.push(<MatchHistoryRow match={match} />);
 	});
 
 	return (
@@ -24,11 +21,9 @@ const MatchHistoryTable = (props: any) => {
 			<thead>
 				<p>Match History:</p>
 			</thead>
-			<tbody>
-				{rows}
-			</tbody>
+			<tbody>{rows}</tbody>
 		</table>
 	);
-}
+};
 
-export default MatchHistoryTable
+export default MatchHistoryTable;
