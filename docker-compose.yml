@@ -15,6 +15,7 @@ services:
         # Anonymous volume. Why ? Because there's platform specific data: /usr/src/app/node_modules volume is initialized from the image
       - /usr/src/app/node_modules
     command: npm run start:dev
+    restart: always
     depends_on:
       - db
     ports:
@@ -25,7 +26,7 @@ services:
   db:
     image: postgres:latest
     ports:
-      - 5434:5434
+      - 5432:5432
     container_name: postgres
     restart: always
     env_file:
