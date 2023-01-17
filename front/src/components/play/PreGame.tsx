@@ -1,14 +1,26 @@
-import { IGamePlayer } from '../pages/Play';
+import { IPlayerInfo } from '../pages/Play';
+import PlayerCard, { PlayerCardType, PlayerPosition } from './PlayerCard';
+import '@/style/play/PreGame.css';
 
 interface IPreGameProps {
-	players: IGamePlayer[];
+	players: IPlayerInfo[];
 }
 
 function PreGame(props: IPreGameProps) {
 	return (
 		<div className="pre-game">
-			<p>{props.players[0].infos.name}</p>
-			<p>{props.players[1].infos.name}</p>
+			<div className="pre-game-players">
+				<PlayerCard
+					player={props.players[0]}
+					position={PlayerPosition.LEFT}
+					type={PlayerCardType.BEFORE_GAME}
+				/>
+				<PlayerCard
+					player={props.players[1]}
+					position={PlayerPosition.RIGHT}
+					type={PlayerCardType.BEFORE_GAME}
+				/>
+			</div>
 		</div>
 	);
 }

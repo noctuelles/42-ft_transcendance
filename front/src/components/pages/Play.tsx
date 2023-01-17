@@ -59,7 +59,9 @@ const Play = () => {
 					joinMatch={joinMatch}
 				/>
 			)}
-			{gameState === GameState.PREGAME && <PreGame players={players} />}
+			{gameState === GameState.PREGAME && (
+				<PreGame players={players.map((p) => p.infos)} />
+			)}
 		</div>
 	);
 };

@@ -1,0 +1,45 @@
+.player-card {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.card-before-game {
+	width: 400px;
+}
+
+.card-left {
+	background-color: #ffb800;
+}
+
+.card-right {
+	background-color: #17c0e9;
+}
+
+.card-content {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.card-right .card-content {
+	flex-direction: row-reverse;
+}
+
+.card-name {
+	font-size: 30px;
+}
+
+.card-left .card-name {
+	margin-left: 20px;
+}
+.card-right .card-name {
+	margin-right: 20px;
+}
+
+.card-img {
+	width: auto;
+	height: 80%;
+	border-radius: 100%;
+}
