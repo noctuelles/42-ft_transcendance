@@ -60,7 +60,10 @@ const Play = () => {
 				/>
 			)}
 			{gameState === GameState.PREGAME && (
-				<PreGame players={players.map((p) => p.infos)} />
+				<PreGame
+					players={players.map((p) => p.infos)}
+					setGameState={setGameState}
+				/>
 			)}
 		</div>
 	);
