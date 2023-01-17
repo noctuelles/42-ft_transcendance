@@ -6,6 +6,7 @@ import { CdnModule } from './modules/cdn/cdn.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WebsocketsModule } from './modules/websockets/websockets.module';
+import { GameModule } from './modules/game/game.module';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { WebsocketsModule } from './modules/websockets/websockets.module';
 		CdnModule,
 		WebsocketsModule,
 		ChatModule,
+		GameModule,
 		JwtModule.register({
 			secret: `${process.env.JWT_SECRET}`,
 			signOptions: { expiresIn: '180s' },
