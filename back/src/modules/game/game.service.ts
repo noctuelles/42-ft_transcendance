@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
+import { Game } from './Game';
 
 @Injectable()
 export class GameService {
 	queue = [];
+	games = [];
 
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
@@ -25,6 +27,12 @@ export class GameService {
 			};
 			this.websocketsService.send(player1, 'matchmaking', msg);
 			this.websocketsService.send(player2, 'matchmaking', msg);
+			const game = new Game(
+				{ socket: player1, user: player1.user },
+				{ socket: player2, user: player2.user },
+				this.websocketsService,
+			);
+			this.games.push(game);
 		}
 	}
 
