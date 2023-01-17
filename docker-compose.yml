@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 #https://stackoverflow.com/questions/46166304/docker-compose-volumes-without-colon
 
@@ -15,8 +15,22 @@ services:
         # Anonymous volume. Why ? Because there's platform specific data: /usr/src/app/node_modules volume is initialized from the image
       - /usr/src/app/node_modules
     command: npm run start:dev
+    restart: always
+    depends_on:
+      - db
     ports:
       - 3000:3000
+    networks:
+      - transcendance
+
+  db:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    env_file:
+      - ./back/.env
+    networks:
+      - transcendance
 
   front:
     build:
@@ -31,3 +45,8 @@ services:
     command: npm run dev
     ports:
       - 8080:8080
+    networks:
+      - transcendance
+
+networks:
+  transcendance:

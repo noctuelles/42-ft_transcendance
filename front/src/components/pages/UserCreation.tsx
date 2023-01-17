@@ -1,9 +1,9 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { UserContext } from '../../context/UserContext';
-import checkIcon from '../../assets/check_icon.png';
-import '../../style/UserCreation.css';
+import { UserContext } from '@/context/UserContext';
+import checkIcon from '@/assets/check_icon.png';
+import '@/style/UserCreation.css';
 import ImageLoad from 'image-preview-react';
-import { back_url } from '../../config.json';
+import { back_url } from '@/config.json';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router';
 

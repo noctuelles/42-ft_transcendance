@@ -1,0 +1,32 @@
+.match-container {
+	border: 1px solid;
+	border-radius: 20px;
+	margin-top: 10px;
+	padding: 5px;
+}
+
+.match-summary {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.match-summary .profile-pic {
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+}
+
+.match-summary #fight {
+	width: 40px;
+	height: 40px;
+}
+
+hr {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+h4 {
+	text-align: center;
+}

@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 import React, { useState } from 'react';
-import { back_url } from '../config.json';
+import { back_url } from '@/config.json';
 
 export const UserContext = React.createContext({
 	auth: {

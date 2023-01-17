@@ -1,6 +1,6 @@
 generator client {
-    provider = "prisma-client-js"
-	binaryTargets = ["native", "debian-openssl-1.1.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -10,19 +10,19 @@ datasource db {
 
 model User {
     id              Int              @id @unique @default(autoincrement())
-	login           String           @unique
+    login           String           @unique
     name            String           @unique
-	profile			Profile?
+    profile         Profile?
     profile_picture String
     AuthIdentifier  AuthIdentifier[]
 }
 
 model Profile {
-	id				Int			@id	@unique	@default(autoincrement())
-	playedMatches	Int			@default(0)
-	wonMatches		Int			@default(0)
-	user			User		@relation(fields: [userId], references: [id])
-	userId			Int			@unique
+    id            Int  @id @unique @default(autoincrement())
+    playedMatches Int  @default(0)
+    wonMatches    Int  @default(0)
+    user          User @relation(fields: [userId], references: [id])
+    userId        Int  @unique
 }
 
 model AuthIdentifier {

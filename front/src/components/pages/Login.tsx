@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { back_url } from '../../config.json';
-import '../../style/Login.css';
-import portal from '../../assets/portal.svg';
+import { back_url } from '@/config.json';
+import '@/style/Login.css';
+import portal from '@/assets/portal.svg';
 
 function Login() {
 	const [authUrl, setAuthUrl] = useState('');
