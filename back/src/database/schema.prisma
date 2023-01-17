@@ -8,6 +8,11 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// An User can have played multiple match (as the user one or user two) -> 1-n relationship.
+// An User can have won multiple matches -> 1-n relationship.
+// An User can have a single profile -> 1-1 relationship.
+// Tables Match holds the FK-key.
+
 model User {
     id              Int              @id @unique @default(autoincrement())
     login           String           @unique
@@ -15,6 +20,10 @@ model User {
     profile         Profile?
     profile_picture String
     AuthIdentifier  AuthIdentifier[]
+    matchAsUserOne  Match[]          @relation("UserOne")
+    matchAsUserTwo  Match[]          @relation("UserTwo")
+    matchesWon      Match[]          @relation("WinnerUser")
+    matchesLost     Match[]          @relation("LooserUser")
 }
 
 model Profile {
@@ -23,6 +32,21 @@ model Profile {
     wonMatches    Int  @default(0)
     user          User @relation(fields: [userId], references: [id])
     userId        Int  @unique
+}
+
+model Match {
+    id         Int       @id @unique @default(autoincrement())
+    createdAt  DateTime  @default(now())
+    finishedAt DateTime?
+    bounces    Int
+    userOne    User      @relation("UserOne", fields: [userOneId], references: [id])
+    userTwo    User      @relation("UserTwo", fields: [userTwoId], references: [id])
+    winner     User      @relation("WinnerUser", fields: [winnerId], references: [id])
+    looser     User      @relation("LooserUser", fields: [looserId], references: [id])
+    userOneId  Int
+    userTwoId  Int
+    winnerId   Int
+    looserId   Int
 }
 
 model AuthIdentifier {
