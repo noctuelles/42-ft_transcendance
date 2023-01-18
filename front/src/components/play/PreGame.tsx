@@ -13,11 +13,15 @@ interface IPreGameProps {
 function PreGame(props: IPreGameProps) {
 	const [time, setTime] = useState(10);
 
+	function isPreGameEvent(data: any) {
+		return data.event === 'match-starting';
+	}
+
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }) => {
 			data = JSON.parse(data);
-			if (data.event === 'match-starting') {
+			if (isPreGameEvent(data)) {
 				setTime(data.data.time);
 			}
 			if (time === 0) {
@@ -25,7 +29,7 @@ function PreGame(props: IPreGameProps) {
 			}
 		},
 		filter: ({ data }) => {
-			return data.event === 'match-starting';
+			return isPreGameEvent(JSON.parse(data));
 		},
 	});
 

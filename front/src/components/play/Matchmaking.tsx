@@ -10,16 +10,20 @@ interface IMatchmakingProps {
 }
 
 function Matchmaking(props: IMatchmakingProps) {
+	function isMatchmakingEvent(data: any) {
+		return data.event === 'matchmaking' && data.data.action === 'match';
+	}
+
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }) => {
 			data = JSON.parse(data);
-			if (data.event === 'matchmaking' && data.data.action === 'match') {
+			if (isMatchmakingEvent(data)) {
 				props.joinMatch(data.data.player1, data.data.player2);
 			}
 		},
 		filter: ({ data }) => {
-			return data.event === 'matchmaking' && data.data.action === 'match';
+			return isMatchmakingEvent(JSON.parse(data));
 		},
 	});
 
