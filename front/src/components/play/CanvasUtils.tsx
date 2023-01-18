@@ -50,12 +50,6 @@ export function drawBall(
 ) {
 	ctx.fillStyle = color;
 	ctx.beginPath();
-	ctx.arc(
-		ball.x + gameInfos.ballRadius / 2,
-		ball.y + gameInfos.ballRadius / 2,
-		gameInfos.ballRadius,
-		0,
-		2 * Math.PI,
-	);
+	ctx.arc(ball.x, ball.y, gameInfos.ballRadius, 0, 2 * Math.PI);
 	ctx.fill();
 }
