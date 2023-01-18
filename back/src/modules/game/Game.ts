@@ -31,16 +31,29 @@ interface IPlayerInfos {
 	event: 'up' | 'down' | null;
 }
 
+interface IBall {
+	position: IPosition;
+	direction: IPosition;
+	velocity: number;
+}
+
 interface IGameState {
 	gameInfos: IGameInfos;
 	player1: IPlayerInfos;
 	player2: IPlayerInfos;
-	ball: IPosition;
+	ball: IBall;
 }
 
 interface IKeyEvent {
 	action: 'release' | 'press';
 	direction: 'up' | 'down';
+}
+
+interface IRect {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }
 
 export class Game {
@@ -73,7 +86,7 @@ export class Game {
 			player1: {
 				infos: this._player1,
 				paddle: {
-					x: 10,
+					x: 50,
 					y: 390,
 				},
 				event: null,
@@ -81,14 +94,21 @@ export class Game {
 			player2: {
 				infos: this._player2,
 				paddle: {
-					x: 1580,
+					x: 1540,
 					y: 390,
 				},
 				event: null,
 			},
 			ball: {
-				x: 800,
-				y: 450,
+				position: {
+					x: 800,
+					y: 450,
+				},
+				direction: {
+					x: Math.random() * (Math.random() < 0.5 ? -1 : 1),
+					y: Math.random() / 3,
+				},
+				velocity: 10,
 			},
 		};
 	}
@@ -130,8 +150,8 @@ export class Game {
 				current: false,
 			},
 			ball: {
-				x: this._gameState.ball.x,
-				y: this._gameState.ball.y,
+				x: this._gameState.ball.position.x,
+				y: this._gameState.ball.position.y,
 			},
 		};
 		res.player1.current = true;
@@ -174,9 +194,103 @@ export class Game {
 		}
 	}
 
+	checkBallCollideWall(ball: IBall, ballRadius: number) {
+		if (ball.position.x < ballRadius) {
+			ball.position.x = this._gameState.gameInfos.width / 2;
+			ball.position.y = this._gameState.gameInfos.height / 2;
+			ball.direction.x = Math.random();
+			ball.direction.y = Math.random() * 0.5;
+			ball.velocity = 10;
+		}
+		if (ball.position.x > this._gameState.gameInfos.width - ballRadius) {
+			ball.direction.x = 0;
+			ball.direction.y = 0;
+			ball.position.x = this._gameState.gameInfos.width / 2;
+			ball.position.y = this._gameState.gameInfos.height / 2;
+			ball.direction.x = Math.random();
+			ball.direction.y = Math.random() * 0.5;
+			ball.velocity = 10;
+		}
+		if (ball.position.y < ballRadius) {
+			ball.position.y = ballRadius;
+			ball.direction.y *= -1;
+		}
+		if (ball.position.y > this._gameState.gameInfos.height - ballRadius) {
+			ball.position.y = this._gameState.gameInfos.height - ballRadius;
+			ball.direction.y *= -1;
+		}
+	}
+
+	checkColide(collide1: IRect, collide2: IRect) {
+		return (
+			collide1.x < collide2.x + collide2.width &&
+			collide1.x + collide1.width > collide2.x &&
+			collide1.y < collide2.y + collide2.height &&
+			collide1.y + collide1.height > collide2.y
+		);
+	}
+
+	checkBallCollidePaddle(
+		ball: IBall,
+		ballRadius: number,
+		paddle: IPosition,
+		paddleWidth: number,
+		paddleHeight: number,
+	) {
+		const ballColide: IRect = {
+			x: ball.position.x - ballRadius,
+			y: ball.position.y - ballRadius,
+			width: ballRadius * 2,
+			height: ballRadius * 2,
+		};
+		const paddleColide: IRect = {
+			x: paddle.x,
+			y: paddle.y,
+			width: paddleWidth,
+			height: paddleHeight,
+		};
+		if (this.checkColide(ballColide, paddleColide)) {
+			ball.direction.x *= -1;
+			ball.velocity += 1;
+		}
+	}
+
+	normalizeDirection(ball: IBall) {
+		const norm = Math.sqrt(
+			ball.direction.x * ball.direction.x +
+				ball.direction.y * ball.direction.y,
+		);
+		if (norm === 0) return;
+		ball.direction.x /= norm;
+		ball.direction.y /= norm;
+	}
+
+	updateBall(ball: IBall) {
+		this.normalizeDirection(ball);
+		const ballRadius: number = this._gameState.gameInfos.ballRadius;
+		ball.position.x += ball.direction.x * ball.velocity;
+		ball.position.y += ball.direction.y * ball.velocity;
+		this.checkBallCollideWall(ball, ballRadius);
+		this.checkBallCollidePaddle(
+			ball,
+			ballRadius,
+			this._gameState.player1.paddle,
+			this._gameState.gameInfos.paddleWidth,
+			this._gameState.gameInfos.paddleHeight,
+		);
+		this.checkBallCollidePaddle(
+			ball,
+			ballRadius,
+			this._gameState.player2.paddle,
+			this._gameState.gameInfos.paddleWidth,
+			this._gameState.gameInfos.paddleHeight,
+		);
+	}
+
 	updateState() {
 		this.updatePlayer(this._gameState.player1);
 		this.updatePlayer(this._gameState.player2);
+		this.updateBall(this._gameState.ball);
 	}
 
 	async game() {
