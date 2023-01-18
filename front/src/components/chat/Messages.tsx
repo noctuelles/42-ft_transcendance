@@ -26,10 +26,10 @@ export default function Messages({
 	function getMessages(): IMessage[] {
 		// TODO: Get messages from context and change messages according to selectedChannel
 		const messages = useRef<Record<string, IMessage[]>>({
-			'c-1': [],
-			'c-2': [{ user: 'Alice', channel: 'c-2', message: 'Salut !' }],
-			'c-3': [{ user: 'Bob', channel: 'c-3', message: 'Superbe !' }],
-			'c-4': [{ user: 'Carol', channel: 'c-4', message: 'Fuck !' }],
+			'1': [],
+			'2': [{ user: 'Alice', channel: 'c-2', message: 'Salut !' }],
+			'3': [{ user: 'Bob', channel: 'c-3', message: 'Superbe !' }],
+			'4': [{ user: 'Carol', channel: 'c-4', message: 'Fuck !' }],
 		});
 		useWebSocket(WS_URL, {
 			share: true,
@@ -38,10 +38,7 @@ export default function Messages({
 					return;
 				}
 				const newMessage = parseMessage(data);
-				messages.current['c-1'] = [
-					...messages.current['c-1'],
-					newMessage,
-				];
+				messages.current['1'] = [...messages.current['1'], newMessage];
 			},
 			filter: ({ data }: { data: string }) => {
 				return isChatMessage(data);

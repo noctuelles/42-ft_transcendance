@@ -2,25 +2,67 @@ import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 
 export class Message {
+	channel: string;
 	user: string;
 	message: string;
 	constructor(obj: IMessage) {
+		this.channel = obj.channel;
 		this.user = obj.user;
 		this.message = obj.message;
 	}
 }
 
 export interface IMessage {
+	channel: string;
 	user: string;
 	message: string;
 }
 
+interface Channel {
+	id: number;
+	users: string[];
+}
+
 @Injectable()
 export class ChatService {
+	private channels: any = {
+		1: { id: 1, users: ['jmaia'] },
+		2: { id: 2, users: ['jmaia'] },
+		3: { id: 3, users: ['jmaia'] },
+		4: { id: 4, users: ['not-jmaia'] },
+	};
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
 	broadcastMessage(message: Message) {
 		this.websocketsService.broadcast('chat', message);
+	}
+
+	canSendToChannel(user: string, channel: string): boolean {
+		return this.isUserInChannel(user, channel);
+	}
+
+	channelExists(channel: string) {
+		return channel in this.channels;
+	}
+
+	isUserInChannel(user: string, channel: string): boolean {
+		if (!this.channelExists(channel)) {
+			return false;
+		}
+		return this.channels[channel].users.some((cUser: string) => {
+			return cUser == user;
+		});
+	}
+
+	sendTo(channel: string, message: IMessage): void {
+		console.log('I am sending to', channel);
+		console.log('I am sending this message: ', message);
+		console.log('Here are all the users: ', this.channels[channel].users);
+		this.websocketsService.sendToAllUsers(
+			this.channels[channel].users,
+			'chat',
+			message,
+		);
 	}
 
 	isIMessage(data: any) {

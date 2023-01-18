@@ -13,10 +13,10 @@ export default function Channels({
 			value={selectedChannel}
 			onChange={(event) => setSelectedChannel(event.target.value)}
 		>
-			<option value="c-1">Channel 1</option>
-			<option value="c-2">Channel 2</option>
-			<option value="c-3">Channel 3</option>
-			<option value="c-4">Channel 4</option>
+			<option value="1">Channel 1</option>
+			<option value="2">Channel 2</option>
+			<option value="3">Channel 3</option>
+			<option value="4">Channel 4</option>
 		</select>
 	);
 }
