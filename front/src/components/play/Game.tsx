@@ -17,6 +17,12 @@ function Game(props: IGameProps) {
 		const height = canvas.height;
 		const paddle_height = 30;
 		const paddle_width = 4;
+
+		ctx.fillStyle = '#d9d9d9';
+		ctx.beginPath();
+		ctx.rect(0, 0, width, height);
+		ctx.fill();
+
 		ctx.fillStyle = '#000000';
 		ctx.beginPath();
 		ctx.arc(width / 2, height / 2, 3, 0, 2 * Math.PI);
