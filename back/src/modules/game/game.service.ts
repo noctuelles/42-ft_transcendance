@@ -42,4 +42,8 @@ export class GameService {
 			this.queue.splice(this.queue.indexOf(socket), 1);
 		}
 	}
+
+	getGameWherePlayerIs(userId: number) {
+		return this.games.find((game) => game.player(userId) != null);
+	}
 }

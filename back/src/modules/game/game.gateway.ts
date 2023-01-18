@@ -17,4 +17,12 @@ export class GameGateway {
 				break;
 		}
 	}
+
+	@SubscribeMessage('game-input')
+	async gameInput(socket: any, payload: any) {
+		if (!payload || !payload.action || !payload.direction) return;
+		const game = this.gameService.getGameWherePlayerIs(socket.user.id);
+		if (!game) return;
+		game.processInput(socket.user.id, payload);
+	}
 }

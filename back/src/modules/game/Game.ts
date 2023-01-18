@@ -28,6 +28,7 @@ interface IPosition {
 interface IPlayerInfos {
 	infos: IPlayer;
 	paddle: IPosition;
+	event: 'up' | 'down' | null;
 }
 
 interface IGameState {
@@ -35,6 +36,11 @@ interface IGameState {
 	player1: IPlayerInfos;
 	player2: IPlayerInfos;
 	ball: IPosition;
+}
+
+interface IKeyEvent {
+	action: 'release' | 'press';
+	direction: 'up' | 'down';
 }
 
 export class Game {
@@ -70,6 +76,7 @@ export class Game {
 					x: 10,
 					y: 390,
 				},
+				event: null,
 			},
 			player2: {
 				infos: this._player2,
@@ -77,6 +84,7 @@ export class Game {
 					x: 1580,
 					y: 390,
 				},
+				event: null,
 			},
 			ball: {
 				x: 800,
@@ -145,7 +153,67 @@ export class Game {
 		this.game();
 	}
 
-	game() {
-		this.sendStateToPlayers();
+	updatePlayer(player: IPlayerInfos) {
+		if (player.event == null) return;
+		if (player.event === 'up') {
+			player.paddle.y -= 10;
+			if (player.paddle.y < 0) player.paddle.y = 0;
+		}
+		if (player.event === 'down') {
+			player.paddle.y += 10;
+			if (
+				player.paddle.y >
+				this._gameState.gameInfos.height -
+					this._gameState.gameInfos.paddleHeight
+			)
+				player.paddle.y =
+					this._gameState.gameInfos.height -
+					this._gameState.gameInfos.paddleHeight;
+		}
+	}
+
+	updateState() {
+		this.updatePlayer(this._gameState.player1);
+		this.updatePlayer(this._gameState.player2);
+	}
+
+	async game() {
+		while (1) {
+			await this.wait(20);
+			this.updateState();
+			this.sendStateToPlayers();
+		}
+	}
+
+	player(userId: number): IPlayer | null {
+		if (!this._player1 || !this._player2) return null;
+		if (this._player1.user.id === userId) {
+			return this._player1;
+		} else if (this._player2.user.id === userId) {
+			return this._player2;
+		} else {
+			return null;
+		}
+	}
+
+	processInput(userId: number, data: IKeyEvent) {
+		const player = this.player(userId);
+		if (!player) return;
+		if (data.action === 'press') {
+			if (player.user.id === this._player1.user.id) {
+				this._gameState.player1.event = data.direction;
+			}
+			if (player.user.id === this._player2.user.id) {
+				this._gameState.player2.event = data.direction;
+			}
+		}
+		if (data.action === 'release') {
+			if (player.user.id === this._player1.user.id) {
+				this._gameState.player1.event = null;
+			}
+			if (player.user.id === this._player2.user.id) {
+				this._gameState.player2.event = null;
+			}
+		}
 	}
 }
