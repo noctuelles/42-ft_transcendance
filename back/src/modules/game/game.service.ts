@@ -33,11 +33,12 @@ export class GameService {
 				this.websocketsService,
 			);
 			this.games.push(game);
+			game.start();
 		}
 	}
 
 	cancelQueue(socket) {
-		if (this.queue.includes(socket.user)) {
+		if (this.queue.includes(socket)) {
 			this.queue.splice(this.queue.indexOf(socket), 1);
 		}
 	}
