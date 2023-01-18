@@ -77,11 +77,18 @@ export class UsersService {
 				() => {},
 			);
 		}
-		await this.prismaService.user.create({
+		return await this.prismaService.user.create({
 			data: {
 				login: user.login,
 				name: user.name,
-				profilePicture: `${process.env.SELF_URL}/cdn/user/${user.login}.jpg`,
+				profile: {
+					create: {
+						picture: `${process.env.SELF_URL}/cdn/user/${user.login}.jpg`,
+					},
+				},
+			},
+			include: {
+				profile: true,
 			},
 		});
 	}
@@ -92,8 +99,12 @@ export class UsersService {
 			data: {
 				login: name,
 				name: name,
-				profilePicture:
-					'https://cdn.discordapp.com/attachments/1052674310034182196/1064564672122077204/turret.png',
+				profile: {
+					create: {
+						picture:
+							'https://cdn.discordapp.com/attachments/1052674310034182196/1064564672122077204/turret.png',
+					},
+				},
 			},
 		});
 	}

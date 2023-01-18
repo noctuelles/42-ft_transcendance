@@ -5,6 +5,13 @@ import { User } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
+import { Prisma } from '@prisma/client';
+
+type UserWithProfile = Prisma.UserGetPayload<{
+	include: {
+		profile: true;
+	};
+}>;
 
 @Injectable()
 export class AuthService {
@@ -31,6 +38,9 @@ export class AuthService {
 			where: {
 				login: user42.login,
 			},
+			include: {
+				profile: true,
+			},
 		});
 		if (!user) throw new BadRequestException('User not found');
 		const tokens = await this.generateTokens(user);
@@ -45,12 +55,7 @@ export class AuthService {
 	 ** We create the user in the database and generate the tokens
 	 */
 	async createUser(user: CreateUserDTO) {
-		await this.userService.createUser(user);
-		const finalUser = await this.prismaService.user.findUnique({
-			where: {
-				login: user.login,
-			},
-		});
+		const finalUser = await this.userService.createUser(user);
 		if (!user) throw new BadRequestException('User not found');
 		const tokens = await this.generateTokens(finalUser);
 		return {
@@ -65,11 +70,17 @@ export class AuthService {
 			where: {
 				login: name,
 			},
+			include: {
+				profile: true,
+			},
 		});
 		if (!user) await this.userService.createDevUser(name);
 		user = await this.prismaService.user.findUnique({
 			where: {
 				login: name,
+			},
+			include: {
+				profile: true,
 			},
 		});
 		if (!user) throw new BadRequestException('User not found');
@@ -124,6 +135,9 @@ export class AuthService {
 				where: {
 					id: token.user.id,
 				},
+				include: {
+					profile: true,
+				},
 			});
 			if (!user) throw new BadRequestException('User not found');
 			return await this.generateTokens(user);
@@ -132,7 +146,7 @@ export class AuthService {
 		}
 	}
 
-	async generateTokens(user: User) {
+	async generateTokens(user: UserWithProfile) {
 		const access_token = this.generateAccessToken(user);
 		const new_refresh_token = await this.generateRefreshToken(user);
 		return {
@@ -147,18 +161,18 @@ export class AuthService {
 		};
 	}
 
-	generateAccessToken(user: User) {
+	generateAccessToken(user: UserWithProfile) {
 		return this.jwtService.sign({
 			type: 'access',
 			user: {
 				id: user.id,
 				name: user.name,
-				profilePicture: user.profilePicture,
+				profile_picture: user.profile.picture,
 			},
 		});
 	}
 
-	async generateRefreshToken(user: User) {
+	async generateRefreshToken(user: UserWithProfile) {
 		const identifier = crypto.randomUUID();
 		await this.prismaService.authIdentifier.create({
 			data: {

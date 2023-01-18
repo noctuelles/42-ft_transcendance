@@ -17,19 +17,16 @@ model User {
     id             Int              @id @unique @default(autoincrement())
     login          String           @unique
     name           String           @unique
-    profile        UserProfile?
-    profilePicture String
+    profile        UserProfile      @relation(fields: [profileId], references: [id])
+    profileId      Int              @unique
     status         UserStatus       @default(ONLINE)
     authIdentifier AuthIdentifier[]
-
-    // n-m self relation : an user can be have friends and an user can be friends of other users.
-    friends   User[] @relation("UserFriends")
-    friendsOf User[] @relation("UserFriends")
-
-    matchAsUserOne Match[] @relation("UserOne")
-    matchAsUserTwo Match[] @relation("UserTwo")
-    matchesWon     Match[] @relation("WinnerUser")
-    matchesLost    Match[] @relation("LooserUser")
+    friends        User[]           @relation("UserFriends")
+    friendsOf      User[]           @relation("UserFriends")
+    matchAsUserOne Match[]          @relation("UserOne")
+    matchAsUserTwo Match[]          @relation("UserTwo")
+    matchesWon     Match[]          @relation("WinnerUser")
+    matchesLost    Match[]          @relation("LooserUser")
 
     // Here i define an explicit many-to-many relations.
     // Three models defines this kind of relation :
@@ -58,16 +55,17 @@ model UserChannel {
     id           Int                   @id @unique @default(autoincrement())
     createdAt    DateTime              @default(now())
     visibility   UserChannelVisibility @default(PUBLIC)
+    password     String?
     name         String?
     participants UserOnChannel[]
 }
 
 model UserProfile {
-    id            Int  @id @unique @default(autoincrement())
-    playedMatches Int  @default(0)
-    wonMatches    Int  @default(0)
-    user          User @relation(fields: [userId], references: [id])
-    userId        Int  @unique
+    id            Int    @id @unique @default(autoincrement())
+    playedMatches Int    @default(0)
+    wonMatches    Int    @default(0)
+    picture       String
+    user          User?
 }
 
 model Match {
@@ -107,7 +105,6 @@ enum UserOnChannelStatus {
     REGULAR
     MUTED
     BANNED
-    KICKED
 }
 
 enum UserChannelVisibility {
