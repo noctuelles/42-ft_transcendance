@@ -81,7 +81,7 @@ export class UsersService {
 			data: {
 				login: user.login,
 				name: user.name,
-				profile_picture: `${process.env.SELF_URL}/cdn/user/${user.login}.jpg`,
+				profilePicture: `${process.env.SELF_URL}/cdn/user/${user.login}.jpg`,
 			},
 		});
 	}
@@ -92,7 +92,7 @@ export class UsersService {
 			data: {
 				login: name,
 				name: name,
-				profile_picture:
+				profilePicture:
 					'https://cdn.discordapp.com/attachments/1052674310034182196/1064564672122077204/turret.png',
 			},
 		});
