@@ -157,18 +157,20 @@ export class Game {
 		if (player.event == null) return;
 		if (player.event === 'up') {
 			player.paddle.y -= 10;
-			if (player.paddle.y < 0) player.paddle.y = 0;
+			if (player.paddle.y < 2) player.paddle.y = 2;
 		}
 		if (player.event === 'down') {
 			player.paddle.y += 10;
 			if (
 				player.paddle.y >
 				this._gameState.gameInfos.height -
-					this._gameState.gameInfos.paddleHeight
+					this._gameState.gameInfos.paddleHeight -
+					2
 			)
 				player.paddle.y =
 					this._gameState.gameInfos.height -
-					this._gameState.gameInfos.paddleHeight;
+					this._gameState.gameInfos.paddleHeight -
+					2;
 		}
 	}
 
