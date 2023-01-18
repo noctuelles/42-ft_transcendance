@@ -1,7 +1,7 @@
 import { IGamePlayer } from '../pages/Play';
 import PlayerCard, { PlayerCardType, PlayerPosition } from './PlayerCard';
 import '@/style/play/Game.css';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { drawBall, drawPaddle } from './CanvasUtils';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
@@ -59,7 +59,6 @@ function Game(props: IGameProps) {
 	}
 
 	function isGameStateEvent(data: any) {
-		console.log(data);
 		return data.event === 'game-state';
 	}
 
@@ -68,7 +67,6 @@ function Game(props: IGameProps) {
 		onMessage: ({ data }) => {
 			data = JSON.parse(data);
 			if (isGameStateEvent(data)) {
-				console.log(data.data);
 				drawState(data.data);
 			}
 		},
@@ -76,6 +74,45 @@ function Game(props: IGameProps) {
 			return isGameStateEvent(JSON.parse(data));
 		},
 	});
+
+	function onKey(event: KeyboardEvent, action: string) {
+		switch (event.key) {
+			case 'ArrowUp':
+				sendMessage(
+					JSON.stringify({
+						event: 'game-input',
+						data: { action: action, direction: 'up' },
+					}),
+				);
+				break;
+			case 'ArrowDown':
+				sendMessage(
+					JSON.stringify({
+						event: 'game-input',
+						data: { action: action, direction: 'down' },
+					}),
+				);
+				break;
+		}
+	}
+
+	function onKeyRelease(event: KeyboardEvent) {
+		onKey(event, 'release');
+	}
+
+	function onKeyPress(event: KeyboardEvent) {
+		onKey(event, 'press');
+	}
+
+	useEffect(() => {
+		window.addEventListener('keydown', onKeyPress);
+		window.addEventListener('keyup', onKeyRelease);
+
+		return () => {
+			window.removeEventListener('keydown', onKeyPress);
+			window.removeEventListener('keyup', onKeyRelease);
+		};
+	}, []);
 
 	return (
 		<div className="game">
