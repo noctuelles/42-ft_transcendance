@@ -108,4 +108,51 @@ export class UsersService {
 			},
 		});
 	}
+
+	/* Fetch a profile of a specified username */
+	async fetchProfileData(username: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				name: username,
+			},
+			select: {
+				matchesWon: {
+					include: {
+						userOne: {
+							select: {
+								name: true,
+							},
+						},
+						userTwo: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
+				matchesLost: {
+					include: {
+						userOne: {
+							select: {
+								name: true,
+							},
+						},
+						userTwo: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
+				profile: true,
+			},
+		});
+
+		const userProfile = {
+			matches: [...user.matchesLost, ...user.matchesWon],
+		};
+		console.log(userProfile.matches);
+		// is there a better and cleaner way ?
+		return user;
+	}
 }
