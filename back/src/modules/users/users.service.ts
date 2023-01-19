@@ -1,5 +1,6 @@
 import { LoggedUser } from '42.js/dist/structures/logged_user';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Match } from '@prisma/client';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
 const fs = require('fs');
@@ -117,13 +118,21 @@ export class UsersService {
 			},
 			select: {
 				matchesWon: {
-					include: {
+					select: {
+						createdAt: true,
+						finishedAt: true,
+						bounces: true,
 						userOne: {
 							select: {
 								name: true,
 							},
 						},
 						userTwo: {
+							select: {
+								name: true,
+							},
+						},
+						looser: {
 							select: {
 								name: true,
 							},
@@ -131,7 +140,10 @@ export class UsersService {
 					},
 				},
 				matchesLost: {
-					include: {
+					select: {
+						createdAt: true,
+						finishedAt: true,
+						bounces: true,
 						userOne: {
 							select: {
 								name: true,
@@ -142,17 +154,27 @@ export class UsersService {
 								name: true,
 							},
 						},
+						winner: {
+							select: {
+								name: true,
+							},
+						},
 					},
 				},
-				profile: true,
+				profile: {
+					select: {
+						achivements: true,
+					},
+				},
 			},
 		});
-
-		const userProfile = {
+		if (!user) return null;
+		return {
 			matches: [...user.matchesLost, ...user.matchesWon],
+			achievements: user.profile.achivements,
+			matches_count: user.matchesWon.length + user.matchesLost.length,
+			matches_won_count: user.matchesWon.length,
+			matches_lost_count: user.matchesLost.length,
 		};
-		console.log(userProfile.matches);
-		// is there a better and cleaner way ?
-		return user;
 	}
 }

@@ -61,11 +61,16 @@ model UserChannel {
 }
 
 model UserProfile {
-    id            Int    @id @unique @default(autoincrement())
-    playedMatches Int    @default(0)
-    wonMatches    Int    @default(0)
-    picture       String
-    user          User?
+    id          Int               @id @unique @default(autoincrement())
+    picture     String
+    achivements UserAchievement[]
+    user        User?
+}
+
+model UserAchievement {
+    id            Int         @id @unique @default(autoincrement())
+    UserProfile   UserProfile @relation(fields: [userProfileId], references: [id])
+    userProfileId Int
 }
 
 model Match {
