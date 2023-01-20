@@ -1,6 +1,7 @@
 import { WebsocketsService } from '../websockets/websockets.service';
 import {
 	convertStateToSendable,
+	GameParams,
 	GameStatus,
 	getDefaultGameState,
 	IBall,
@@ -20,6 +21,7 @@ export class Game {
 	private _status: GameStatus = GameStatus.STARTING;
 
 	private _startCounter: number = 10;
+	private _gameStartTime: Date | null = null;
 
 	private _gameState: IGameState;
 
@@ -43,6 +45,7 @@ export class Game {
 		}
 		this._sendToPlayers('match-starting', { time: this._startCounter });
 		this._status = GameStatus.PLAYING;
+		this._gameStartTime = new Date();
 		this._game();
 	}
 
@@ -92,7 +95,10 @@ export class Game {
 	}
 
 	private _sendStateToPlayers() {
-		const res = convertStateToSendable(this._gameState);
+		const res = convertStateToSendable(
+			this._gameState,
+			this._gameStartTime,
+		);
 		res.player1.current = true;
 		this.websocketsService.send(this._player1.socket, 'game-state', res);
 		res.player1.current = false;
@@ -126,7 +132,7 @@ export class Game {
 		ball.position.y = this._gameState.gameInfos.height / 2;
 		ball.direction.x = Math.random() * (Math.random() < 0.5 ? -1 : 1);
 		ball.direction.y = (Math.random() / 3) * (Math.random() < 0.5 ? -1 : 1);
-		ball.velocity = 10;
+		ball.velocity = GameParams.BALL_DEFAULT_SPEED;
 	}
 
 	private _checkBallCollideWall(ball: IBall, ballRadius: number) {
@@ -176,7 +182,7 @@ export class Game {
 		};
 		if (this._checkColide(ballColide, paddleColide)) {
 			ball.direction.x *= -1;
-			ball.velocity += 1;
+			ball.velocity += GameParams.BALL_SPEED_INCREASE;
 		}
 	}
 

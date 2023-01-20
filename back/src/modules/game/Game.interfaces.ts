@@ -55,49 +55,67 @@ export interface IRect {
 	height: number;
 }
 
+export const GameParams = {
+	GAME_WIDTH: 1600,
+	GAME_HEIGHT: 900,
+	PADDLE_OFFSET: 50,
+	PADDLE_HEIGHT: 120,
+	PADDLE_WIDTH: 10,
+	BALL_RADIUS: 15,
+	BALL_DEFAULT_SPEED: 10,
+	BALL_SPEED_INCREASE: 1,
+	GAME_TIME: 300,
+};
+
 export function getDefaultGameState(
 	player1: IPlayer,
 	player2: IPlayer,
 ): IGameState {
 	return {
 		gameInfos: {
-			width: 1600,
-			height: 900,
-			paddleHeight: 120,
-			paddleWidth: 10,
-			ballRadius: 15,
+			width: GameParams.GAME_WIDTH,
+			height: GameParams.GAME_HEIGHT,
+			paddleHeight: GameParams.PADDLE_HEIGHT,
+			paddleWidth: GameParams.PADDLE_WIDTH,
+			ballRadius: GameParams.BALL_RADIUS,
 		},
 		player1: {
 			infos: player1,
 			paddle: {
-				x: 50,
-				y: 390,
+				x: GameParams.PADDLE_OFFSET,
+				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
 			},
 			event: null,
 		},
 		player2: {
 			infos: player2,
 			paddle: {
-				x: 1540,
-				y: 390,
+				x:
+					GameParams.GAME_WIDTH -
+					GameParams.PADDLE_OFFSET -
+					GameParams.PADDLE_WIDTH,
+				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
 			},
 			event: null,
 		},
 		ball: {
 			position: {
-				x: 800,
-				y: 450,
+				x: GameParams.GAME_WIDTH / 2,
+				y: GameParams.GAME_HEIGHT / 2,
 			},
 			direction: {
 				x: Math.random() * (Math.random() < 0.5 ? -1 : 1),
 				y: (Math.random() / 3) * (Math.random() < 0.5 ? -1 : 1),
 			},
-			velocity: 10,
+			velocity: GameParams.BALL_DEFAULT_SPEED,
 		},
 	};
 }
 
-export function convertStateToSendable(state: any) {
+export function convertStateToSendable(state: any, startDate: Date) {
+	const now = new Date();
+	const timePlayed = now.getTime() - startDate.getTime();
+	const timeInSeconds = timePlayed / 1000;
 	return {
 		gameInfos: {
 			originalWidth: state.gameInfos.width,
@@ -105,6 +123,7 @@ export function convertStateToSendable(state: any) {
 			paddleWidth: state.gameInfos.paddleWidth,
 			paddleHeight: state.gameInfos.paddleHeight,
 			ballRadius: state.gameInfos.ballRadius,
+			time: GameParams.GAME_TIME - timeInSeconds,
 		},
 		player1: {
 			paddle: {
