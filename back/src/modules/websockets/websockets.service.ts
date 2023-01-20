@@ -64,7 +64,6 @@ export class WebsocketsService {
 
 	sendToAllUsers(users: string[], event: string, data: any) {
 		let receivers = this._sockets.filter((socket) => {
-			console.log('Testing', users, socket.user);
 			return users.includes(socket.user.login);
 		});
 		this.sendToAll(receivers, event, data);

@@ -53,9 +53,6 @@ export class ChatService {
 	}
 
 	sendTo(channel: number, message: IMessage): void {
-		console.log('I am sending to', channel);
-		console.log('I am sending this message: ', message);
-		console.log('Here are all the users: ', this.channels[channel].users);
 		this.websocketsService.sendToAllUsers(
 			this.channels[channel].users,
 			'chat',
