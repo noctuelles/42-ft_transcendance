@@ -1,64 +1,31 @@
-import { useRef } from 'react';
-import useWebSocket from 'react-use-websocket';
-import { ws_url as WS_URL } from '@/config.json';
+import { useContext } from 'react';
 import IMessage from './IMessage';
+import { MessagesContext } from '@/context/MessagesContext';
 
 // TODO: Add another interface. One without channel and one with. Maybe inheritence. Maybe commposition. Good luck !
 export default function Messages({
 	selectedChannel,
 }: {
-	selectedChannel: string;
+	selectedChannel: number;
 }) {
-	const messages: IMessage[] = getMessages();
+	const messages: IMessage[] = getMessages(selectedChannel);
 	return (
 		<div id="messages">
 			{messages.map((x: IMessage, i: number) => (
 				<Message
-					key={i}
+					key={selectedChannel + '-' + i}
 					user={x.user}
 					message={x.message}
 					channel={x.channel}
-				/> // TODO: Change key
+				/>
 			))}
 		</div>
 	);
 
-	function getMessages(): IMessage[] {
-		// TODO: Get messages from context and change messages according to selectedChannel
-		const messages = useRef<Record<string, IMessage[]>>({
-			'1': [],
-			'2': [{ user: 'Alice', channel: 'c-2', message: 'Salut !' }],
-			'3': [{ user: 'Bob', channel: 'c-3', message: 'Superbe !' }],
-			'4': [{ user: 'Carol', channel: 'c-4', message: 'Fuck !' }],
-		});
-		useWebSocket(WS_URL, {
-			share: true,
-			onMessage: ({ data }: { data?: string }) => {
-				if (!data || !isChatMessage(data)) {
-					return;
-				}
-				const newMessage = parseMessage(data);
-				messages.current['1'] = [...messages.current['1'], newMessage];
-			},
-			filter: ({ data }: { data: string }) => {
-				return isChatMessage(data);
-			},
-		});
-		return messages.current[selectedChannel];
-	}
-
-	function isChatMessage(rawMessage: string): boolean {
-		try {
-			var message = JSON.parse(rawMessage);
-		} catch (error) {
-			return false;
-		}
-		return message?.['event'] == 'chat';
-	}
-
-	function parseMessage(rawMessage: string): IMessage {
-		const jsonMessage = JSON.parse(rawMessage);
-		return jsonMessage['data'];
+	function getMessages(selectedChannel: number): IMessage[] {
+		const messages = useContext(MessagesContext)['data'];
+		const channelMessages = messages.get(selectedChannel);
+		return channelMessages === undefined ? [] : channelMessages;
 	}
 }
 

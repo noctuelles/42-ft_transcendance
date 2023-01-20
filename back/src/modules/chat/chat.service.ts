@@ -26,10 +26,10 @@ interface Channel {
 @Injectable()
 export class ChatService {
 	private channels: any = {
-		1: { id: 1, users: ['jmaia'] },
-		2: { id: 2, users: ['jmaia'] },
-		3: { id: 3, users: ['jmaia'] },
-		4: { id: 4, users: ['not-jmaia'] },
+		1: { id: 1, users: ['jmaia', 'bob'] },
+		2: { id: 2, users: ['jmaia', 'bob'] },
+		3: { id: 3, users: ['jmaia', 'bob'] },
+		4: { id: 4, users: ['not-jmaia', 'bob'] },
 	};
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
