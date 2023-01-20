@@ -49,9 +49,7 @@ export class ChatService {
 		if (!this.channelExists(channel)) {
 			return false;
 		}
-		return this.channels[channel].users.some((cUser: string) => {
-			return cUser == user;
-		});
+		return this.channels[channel].users.includes(user);
 	}
 
 	sendTo(channel: number, message: IMessage): void {
