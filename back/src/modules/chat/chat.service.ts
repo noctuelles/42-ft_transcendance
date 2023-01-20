@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 
 export class Message {
-	channel: string;
+	channel: number;
 	user: string;
 	message: string;
 	constructor(obj: IMessage) {
@@ -13,7 +13,7 @@ export class Message {
 }
 
 export interface IMessage {
-	channel: string;
+	channel: number;
 	user: string;
 	message: string;
 }
@@ -37,15 +37,15 @@ export class ChatService {
 		this.websocketsService.broadcast('chat', message);
 	}
 
-	canSendToChannel(user: string, channel: string): boolean {
+	canSendToChannel(user: string, channel: number): boolean {
 		return this.isUserInChannel(user, channel);
 	}
 
-	channelExists(channel: string) {
+	channelExists(channel: number) {
 		return channel in this.channels;
 	}
 
-	isUserInChannel(user: string, channel: string): boolean {
+	isUserInChannel(user: string, channel: number): boolean {
 		if (!this.channelExists(channel)) {
 			return false;
 		}
@@ -54,7 +54,7 @@ export class ChatService {
 		});
 	}
 
-	sendTo(channel: string, message: IMessage): void {
+	sendTo(channel: number, message: IMessage): void {
 		console.log('I am sending to', channel);
 		console.log('I am sending this message: ', message);
 		console.log('Here are all the users: ', this.channels[channel].users);

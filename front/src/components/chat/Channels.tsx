@@ -1,6 +1,6 @@
 interface ISelectedChannel {
-	selectedChannel: string;
-	setSelectedChannel: (selectedChannel: string) => void;
+	selectedChannel: number;
+	setSelectedChannel: (selectedChannel: number) => void;
 }
 
 export default function Channels({
@@ -11,7 +11,9 @@ export default function Channels({
 		<select
 			id="channels"
 			value={selectedChannel}
-			onChange={(event) => setSelectedChannel(event.target.value)}
+			onChange={(event) =>
+				setSelectedChannel(event.target.value as unknown as number)
+			}
 		>
 			<option value="1">Channel 1</option>
 			<option value="2">Channel 2</option>
