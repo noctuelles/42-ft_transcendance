@@ -35,7 +35,7 @@ function PlayerCard(props: IPlayerCardProps) {
 			{props.type === PlayerCardType.DURING_GAME && (
 				<div className="card-content">
 					<h3 className="card-name">{props.player.infos.name}</h3>
-					<h3 className="card-score">{props.player.points}</h3>
+					<h3 className="card-score">{props.player.score}</h3>
 				</div>
 			)}
 		</div>

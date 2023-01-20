@@ -21,7 +21,7 @@ export interface IPlayerInfo {
 
 export interface IGamePlayer {
 	infos: IPlayerInfo;
-	points: number;
+	score: number;
 }
 
 const Play = () => {
@@ -41,8 +41,8 @@ const Play = () => {
 
 	function joinMatch(player1: IPlayerInfo, player2: IPlayerInfo) {
 		setPlayers([
-			{ infos: player1, points: 0 },
-			{ infos: player2, points: 0 },
+			{ infos: player1, score: 0 },
+			{ infos: player2, score: 0 },
 		]);
 		setGameState(GameState.PREGAME);
 	}

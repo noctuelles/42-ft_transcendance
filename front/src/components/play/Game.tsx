@@ -14,6 +14,7 @@ interface IGameProps {
 function Game(props: IGameProps) {
 	const canvasRef = useRef(null);
 	const [time, setTime] = useState(300);
+	const [players, setPlayers] = useState([...props.players]);
 
 	function isGameStateEvent(data: any) {
 		return data.event === 'game-state';
@@ -25,6 +26,10 @@ function Game(props: IGameProps) {
 			data = JSON.parse(data);
 			if (isGameStateEvent(data)) {
 				setTime(data.data.gameInfos.time);
+				setPlayers([
+					{ ...players[0], score: data.data.player1.score },
+					{ ...players[1], score: data.data.player2.score },
+				]);
 				drawState(data.data, canvasRef);
 			}
 		},
@@ -76,13 +81,13 @@ function Game(props: IGameProps) {
 		<div className="game">
 			<div className="game-players">
 				<PlayerCard
-					player={props.players[0]}
+					player={players[0]}
 					position={PlayerPosition.LEFT}
 					type={PlayerCardType.DURING_GAME}
 				/>
 				<Timer time={time} />
 				<PlayerCard
-					player={props.players[1]}
+					player={players[1]}
 					position={PlayerPosition.RIGHT}
 					type={PlayerCardType.DURING_GAME}
 				/>
