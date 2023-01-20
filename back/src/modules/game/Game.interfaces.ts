@@ -55,7 +55,10 @@ export interface IRect {
 	height: number;
 }
 
-export function getDefaultGameState(): IGameState {
+export function getDefaultGameState(
+	player1: IPlayer,
+	player2: IPlayer,
+): IGameState {
 	return {
 		gameInfos: {
 			width: 1600,
@@ -65,7 +68,7 @@ export function getDefaultGameState(): IGameState {
 			ballRadius: 15,
 		},
 		player1: {
-			infos: this._player1,
+			infos: player1,
 			paddle: {
 				x: 50,
 				y: 390,
@@ -73,7 +76,7 @@ export function getDefaultGameState(): IGameState {
 			event: null,
 		},
 		player2: {
-			infos: this._player2,
+			infos: player2,
 			paddle: {
 				x: 1540,
 				y: 390,

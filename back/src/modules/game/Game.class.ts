@@ -31,7 +31,7 @@ export class Game {
 		this._player1 = player1;
 		this._player2 = player2;
 		this.websocketsService = websocketsService;
-		this._gameState = getDefaultGameState();
+		this._gameState = getDefaultGameState(player1, player2);
 	}
 
 	async start() {
