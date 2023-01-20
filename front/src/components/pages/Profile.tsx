@@ -1,6 +1,9 @@
 import ProfileHeader from './details/profile/ProfileHeader';
 import MatchHistoryTable from './details/profile/MatchHistoryTable';
 import '@/style/Profile.css';
+import { UserContext } from '@/context/UserContext';
+import React from 'react';
+import ProfileSummary from './details/profile/ProfileSummary';
 
 const Matches = [
 	{
@@ -27,11 +30,14 @@ const Matches = [
 ];
 
 const Profile = (props: any) => {
+	const userContext = React.useContext(UserContext);
+
 	return (
 		<div className="container">
-			<ProfileHeader username="plouvel" />
+			<ProfileHeader username={userContext.user.name} />
 			<hr />
 			<MatchHistoryTable matches={Matches} />
+			<ProfileSummary win={12} />
 		</div>
 	);
 };
