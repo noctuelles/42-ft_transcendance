@@ -1,10 +1,11 @@
 import { IGamePlayer } from '../pages/Play';
 import PlayerCard, { PlayerCardType, PlayerPosition } from './PlayerCard';
 import '@/style/play/Game.css';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import { drawState } from './CanvasUtils';
+import Timer from './Timer';
 
 interface IGameProps {
 	players: IGamePlayer[];
@@ -12,6 +13,7 @@ interface IGameProps {
 
 function Game(props: IGameProps) {
 	const canvasRef = useRef(null);
+	const [time, setTime] = useState(300);
 
 	function isGameStateEvent(data: any) {
 		return data.event === 'game-state';
@@ -22,6 +24,7 @@ function Game(props: IGameProps) {
 		onMessage: ({ data }) => {
 			data = JSON.parse(data);
 			if (isGameStateEvent(data)) {
+				setTime(data.data.gameInfos.time);
 				drawState(data.data, canvasRef);
 			}
 		},
@@ -77,7 +80,7 @@ function Game(props: IGameProps) {
 					position={PlayerPosition.LEFT}
 					type={PlayerCardType.DURING_GAME}
 				/>
-				<p className="game-timer">04:45</p>
+				<Timer time={time} />
 				<PlayerCard
 					player={props.players[1]}
 					position={PlayerPosition.RIGHT}

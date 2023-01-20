@@ -6,6 +6,7 @@ export interface IGameInfos {
 	paddleHeight: number;
 	paddleWidth: number;
 	ballRadius: number;
+	time: number;
 }
 
 export interface IPosition {
