@@ -27,6 +27,7 @@ export interface IPosition {
 export interface IPlayerInfos {
 	infos: IPlayer;
 	paddle: IPosition;
+	score: number;
 	event: 'up' | 'down' | null;
 }
 
@@ -85,6 +86,7 @@ export function getDefaultGameState(
 				x: GameParams.PADDLE_OFFSET,
 				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
 			},
+			score: 0,
 			event: null,
 		},
 		player2: {
@@ -96,6 +98,7 @@ export function getDefaultGameState(
 					GameParams.PADDLE_WIDTH,
 				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
 			},
+			score: 0,
 			event: null,
 		},
 		ball: {
@@ -130,6 +133,7 @@ export function convertStateToSendable(state: any, startDate: Date) {
 				x: state.player1.paddle.x,
 				y: state.player1.paddle.y,
 			},
+			score: state.player1.score,
 			current: false,
 		},
 		player2: {
@@ -137,6 +141,7 @@ export function convertStateToSendable(state: any, startDate: Date) {
 				x: state.player2.paddle.x,
 				y: state.player2.paddle.y,
 			},
+			score: state.player2.score,
 			current: false,
 		},
 		ball: {

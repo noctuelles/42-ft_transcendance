@@ -137,9 +137,11 @@ export class Game {
 
 	private _checkBallCollideWall(ball: IBall, ballRadius: number) {
 		if (ball.position.x < ballRadius) {
+			this._gameState.player2.score++;
 			this._resetBall(ball);
 		}
 		if (ball.position.x > this._gameState.gameInfos.width - ballRadius) {
+			this._gameState.player1.score++;
 			this._resetBall(ball);
 		}
 		if (ball.position.y < ballRadius) {
