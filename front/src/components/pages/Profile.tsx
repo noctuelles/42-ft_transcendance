@@ -7,6 +7,7 @@ import ProfileSummary from './details/profile/ProfileSummary';
 
 const Matches = [
 	{
+		id: 0,
 		playerOne: 'dhubleur',
 		playerTwo: 'plouvel',
 		winner: 'plouvel',
@@ -14,6 +15,7 @@ const Matches = [
 		nbrOfBounce: 423,
 	},
 	{
+		id: 1,
 		playerOne: 'jmaia',
 		playerTwo: 'bsavinel',
 		winner: 'jmaia',
@@ -21,6 +23,7 @@ const Matches = [
 		nbrOfBounce: 301,
 	},
 	{
+		id: 2,
 		playerOne: 'jmaia',
 		playerTwo: 'plouvel',
 		winner: 'jmaia',
@@ -37,7 +40,7 @@ const Profile = (props: any) => {
 			<ProfileHeader username={userContext.user.name} />
 			<hr />
 			<MatchHistoryTable matches={Matches} />
-			<ProfileSummary win={12} />
+			<ProfileSummary matches={15} win={12} />
 		</div>
 	);
 };

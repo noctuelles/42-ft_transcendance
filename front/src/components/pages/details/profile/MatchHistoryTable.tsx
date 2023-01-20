@@ -2,6 +2,7 @@ import '@/style/details/profile/MatchHistoryTable.css';
 import MatchHistoryRow from './MatchHistoryRow';
 
 interface Match {
+	id: number;
 	playerOne: string;
 	playerTwo: string;
 	winner: string;
@@ -10,18 +11,16 @@ interface Match {
 }
 
 const MatchHistoryTable = (props: any) => {
-	const rows: JSX.Element = [];
-
-	props.matches.forEach((match: Match) => {
-		rows.push(<MatchHistoryRow match={match} />);
-	});
-
 	return (
 		<table>
 			<thead>
 				<p>Match History:</p>
 			</thead>
-			<tbody>{rows}</tbody>
+			<tbody>
+				{props.matches.map((m: Match) => (
+					<MatchHistoryRow key={m.id} match={m} />
+				))}
+			</tbody>
 		</table>
 	);
 };
