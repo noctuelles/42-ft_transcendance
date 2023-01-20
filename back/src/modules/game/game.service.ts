@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
-import { Game } from './Game';
+import { Game } from './Game.class';
 
 @Injectable()
 export class GameService {
@@ -44,6 +44,6 @@ export class GameService {
 	}
 
 	getGameWherePlayerIs(userId: number) {
-		return this.games.find((game) => game.player(userId) != null);
+		return this.games.find((game: Game) => game.getPlayer(userId) != null);
 	}
 }
