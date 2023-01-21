@@ -25,6 +25,8 @@ export class Game {
 
 	private _gameState: IGameState;
 
+	private onEnd: () => void;
+
 	constructor(
 		player1: IPlayer,
 		player2: IPlayer,
@@ -36,7 +38,8 @@ export class Game {
 		this._gameState = getDefaultGameState(player1, player2);
 	}
 
-	async start() {
+	async start(onEnd: () => void) {
+		this.onEnd = onEnd;
 		while (this._startCounter > 0) {
 			//TODO: Change to 1000 ms
 			await this._wait(100);
@@ -272,5 +275,6 @@ export class Game {
 			duration: timeInSeconds,
 		};
 		this._sendToPlayers('game-result', res);
+		this.onEnd();
 	}
 }
