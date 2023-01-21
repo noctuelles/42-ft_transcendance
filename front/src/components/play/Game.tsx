@@ -9,6 +9,7 @@ import Timer from './Timer';
 
 interface IGameProps {
 	players: IGamePlayer[];
+	endMatch: (result: IGameResult) => void;
 }
 
 function Game(props: IGameProps) {
@@ -18,6 +19,10 @@ function Game(props: IGameProps) {
 
 	function isGameStateEvent(data: any) {
 		return data.event === 'game-state';
+	}
+
+	function isGameResultMessage(data: any) {
+		return data.event === 'game-result';
 	}
 
 	const { sendMessage } = useWebSocket(WS_URL, {
@@ -32,9 +37,15 @@ function Game(props: IGameProps) {
 				]);
 				drawState(data.data, canvasRef);
 			}
+			if (isGameResultMessage(data)) {
+				props.endMatch(data.data);
+			}
 		},
 		filter: ({ data }) => {
-			return isGameStateEvent(JSON.parse(data));
+			return (
+				isGameStateEvent(JSON.parse(data)) ||
+				isGameResultMessage(JSON.parse(data))
+			);
 		},
 	});
 

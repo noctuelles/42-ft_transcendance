@@ -26,3 +26,21 @@ export interface IGameState {
 	player2: IPlayer;
 	ball: IPosition;
 }
+
+export interface IGameResult {
+	player1: {
+		id: number;
+		name: string;
+		profile_picture: string;
+		score: number;
+		result: 'win' | 'lose';
+	};
+	player2: {
+		id: number;
+		name: string;
+		profile_picture: string;
+		score: number;
+		result: 'win' | 'lose';
+	};
+	duration: number;
+}
