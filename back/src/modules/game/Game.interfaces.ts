@@ -65,7 +65,8 @@ export const GameParams = {
 	BALL_RADIUS: 15,
 	BALL_DEFAULT_SPEED: 10,
 	BALL_SPEED_INCREASE: 1,
-	GAME_TIME: 300,
+	//TODO: change to 300
+	GAME_TIME: 5,
 };
 
 export function getDefaultGameState(
@@ -115,10 +116,7 @@ export function getDefaultGameState(
 	};
 }
 
-export function convertStateToSendable(state: any, startDate: Date) {
-	const now = new Date();
-	const timePlayed = now.getTime() - startDate.getTime();
-	const timeInSeconds = timePlayed / 1000;
+export function convertStateToSendable(state: any, timeInSeconds: number) {
 	return {
 		gameInfos: {
 			originalWidth: state.gameInfos.width,

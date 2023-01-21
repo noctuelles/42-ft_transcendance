@@ -94,11 +94,8 @@ export class Game {
 		this.websocketsService.send(this._player2.socket, event, data);
 	}
 
-	private _sendStateToPlayers() {
-		const res = convertStateToSendable(
-			this._gameState,
-			this._gameStartTime,
-		);
+	private _sendStateToPlayers(timeInSeconds: number) {
+		const res = convertStateToSendable(this._gameState, timeInSeconds);
 		res.player1.current = true;
 		this.websocketsService.send(this._player1.socket, 'game-state', res);
 		res.player1.current = false;
@@ -227,10 +224,53 @@ export class Game {
 	}
 
 	private async _game() {
-		while (1) {
+		while (this._status === GameStatus.PLAYING) {
 			await this._wait(20);
+			const now = new Date();
+			const timePlayed = now.getTime() - this._gameStartTime.getTime();
+			const timeInSeconds = Math.floor(timePlayed / 1000);
 			this._updateState();
-			this._sendStateToPlayers();
+			this._sendStateToPlayers(timeInSeconds);
+			if (timeInSeconds >= GameParams.GAME_TIME) {
+				if (
+					this._gameState.player1.score !=
+					this._gameState.player2.score
+				)
+					this._status = GameStatus.ENDED;
+			}
 		}
+		this._result();
+	}
+
+	private _result() {
+		const now = new Date();
+		const timePlayed = now.getTime() - this._gameStartTime.getTime();
+		const timeInSeconds = Math.floor(timePlayed / 1000);
+		const res = {
+			player1: {
+				id: this._player1.user.id,
+				name: this._player1.user.name,
+				profile_picture: this._player1.user.profile_picture,
+				score: this._gameState.player1.score,
+				result:
+					this._gameState.player1.score >
+					this._gameState.player2.score
+						? 'win'
+						: 'lose',
+			},
+			player2: {
+				id: this._player2.user.id,
+				name: this._player2.user.name,
+				profile_picture: this._player2.user.profile_picture,
+				score: this._gameState.player2.score,
+				result:
+					this._gameState.player2.score >
+					this._gameState.player1.score
+						? 'win'
+						: 'lose',
+			},
+			duration: timeInSeconds,
+		};
+		this._sendToPlayers('game-result', res);
 	}
 }
