@@ -3,10 +3,9 @@ import ProfileSummaryItem from './ProfileSummaryItem';
 function ProfileSummary(props: any) {
 	return (
 		<div className="profile-summary">
-			<ProfileSummaryItem type="match_won" />
-			<ProfileSummaryItem type="match_played" />
-			<ProfileSummaryItem type="match_lost" />
-			<p>blabla</p>
+			<ProfileSummaryItem type="won" count={props.win} />
+			<ProfileSummaryItem type="played" count={props.matches} />
+			<ProfileSummaryItem type="lost" count={props.lost} />
 		</div>
 	);
 }
