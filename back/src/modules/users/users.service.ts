@@ -125,11 +125,21 @@ export class UsersService {
 						userOne: {
 							select: {
 								name: true,
+								profile: {
+									select: {
+										picture: true,
+									},
+								},
 							},
 						},
 						userTwo: {
 							select: {
 								name: true,
+								profile: {
+									select: {
+										picture: true,
+									},
+								},
 							},
 						},
 						looser: {
@@ -147,10 +157,20 @@ export class UsersService {
 						userOne: {
 							select: {
 								name: true,
+								profile: {
+									select: {
+										picture: true,
+									},
+								},
 							},
 						},
 						userTwo: {
 							select: {
+								profile: {
+									select: {
+										picture: true,
+									},
+								},
 								name: true,
 							},
 						},

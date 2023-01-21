@@ -1,14 +1,6 @@
 import '@/style/details/profile/MatchHistoryTable.css';
 import MatchHistoryRow from './MatchHistoryRow';
-
-interface Match {
-	id: number;
-	playerOne: string;
-	playerTwo: string;
-	winner: string;
-	duration: string;
-	nbrOfBounce: number;
-}
+import Match from '@/types';
 
 const MatchHistoryTable = (props: any) => {
 	return (
@@ -16,11 +8,15 @@ const MatchHistoryTable = (props: any) => {
 			<thead>
 				<p>Match History:</p>
 			</thead>
-			<tbody>
-				{props.matches.map((m: Match) => (
-					<MatchHistoryRow key={m.id} match={m} />
-				))}
-			</tbody>
+			{!props.matches ? (
+				<p>You haven't played any match yet.</p>
+			) : (
+				<tbody>
+					{props.matches.map((m: Match) => (
+						<MatchHistoryRow key={m.id} match={m} />
+					))}
+				</tbody>
+			)}
 		</table>
 	);
 };
