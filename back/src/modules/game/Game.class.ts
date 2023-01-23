@@ -249,28 +249,36 @@ export class Game {
 		const now = new Date();
 		const timePlayed = now.getTime() - this._gameStartTime.getTime();
 		const timeInSeconds = Math.floor(timePlayed / 1000);
+		const winner =
+			this._gameState.player1.score > this._gameState.player2.score
+				? this._gameState.player1
+				: this._gameState.player2;
+		const loser =
+			winner == this._gameState.player1
+				? this._gameState.player2
+				: this._gameState.player1;
 		const res = {
-			player1: {
-				id: this._player1.user.id,
-				name: this._player1.user.name,
-				profile_picture: this._player1.user.profile_picture,
-				score: this._gameState.player1.score,
-				result:
-					this._gameState.player1.score >
-					this._gameState.player2.score
-						? 'win'
-						: 'lose',
+			winner: {
+				id: winner.infos.user.id,
+				name: winner.infos.user.name,
+				profile_picture: winner.infos.user.profile_picture,
+				score: winner.score,
+				position:
+					winner.infos.user.id ===
+					this._gameState.player1.infos.user.id
+						? 1
+						: 2,
 			},
-			player2: {
-				id: this._player2.user.id,
-				name: this._player2.user.name,
-				profile_picture: this._player2.user.profile_picture,
-				score: this._gameState.player2.score,
-				result:
-					this._gameState.player2.score >
-					this._gameState.player1.score
-						? 'win'
-						: 'lose',
+			loser: {
+				id: loser.infos.user.id,
+				name: loser.infos.user.name,
+				profile_picture: loser.infos.user.profile_picture,
+				score: loser.score,
+				position:
+					loser.infos.user.id ===
+					this._gameState.player1.infos.user.id
+						? 1
+						: 2,
 			},
 			duration: timeInSeconds,
 		};
