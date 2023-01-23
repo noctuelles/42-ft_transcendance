@@ -12,23 +12,44 @@ interface ProfileData {
 	matches_count: number;
 	matches_won_count: number;
 	matches_lost_count: number;
+	name: string;
+	picture: string;
 }
 
 const Profile = (props: any) => {
 	const userContext = React.useContext(UserContext);
 	const [profile, setProfile] = useState<ProfileData | null>(null);
 
+	function handleSearch(searchValue: string) {
+		fetch(back_url + `/users/profile/${searchValue}`)
+			.then((response) => {
+				if (response.ok) return response.json();
+				return Promise.reject(response);
+			})
+			.then((data) => setProfile(data))
+			.catch((response) => {
+				console.log(response);
+				/* TODO */
+			});
+	}
+
 	useEffect(() => {
 		fetch(back_url + `/users/profile/${userContext.user.name}`)
-			.then((response) => response.json())
+			.then((response) => {
+				return response.json();
+			})
 			.then((data) => setProfile(data));
-	}, []);
+		//TODO: catch
+	}, [userContext]);
 
 	if (!profile) return <p>Profile loading...</p>;
-	console.log(profile);
 	return (
 		<div className="container">
-			<ProfileHeader username={userContext.user.name} />
+			<ProfileHeader
+				username={profile.name}
+				picture={profile.picture}
+				onSearchClick={handleSearch}
+			/>
 			<hr />
 			<MatchHistoryTable matches={profile.matches} />
 			<ProfileSummary

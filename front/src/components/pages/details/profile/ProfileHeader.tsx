@@ -4,13 +4,11 @@ import React from 'react';
 import ProfileHeaderSearchBar from './ProfileHeaderSearchBar';
 
 const ProfileHeader = (props: any) => {
-	const userContext = React.useContext(UserContext);
-
 	return (
 		<div className="profile-header">
 			<p>{props.username}</p>
-			<ProfileHeaderSearchBar />
-			<img src={userContext.user.profile_picture} />
+			<ProfileHeaderSearchBar onSearchClick={props.onSearchClick} />
+			<img src={props.picture} />
 		</div>
 	);
 };
