@@ -57,6 +57,7 @@ export interface IRect {
 export const GameParams = {
 	GAME_WIDTH: 1600,
 	GAME_HEIGHT: 900,
+	PADDLE_MOVE_SPEED: 10,
 	PADDLE_OFFSET: 50,
 	PADDLE_HEIGHT: 120,
 	PADDLE_WIDTH: 10,

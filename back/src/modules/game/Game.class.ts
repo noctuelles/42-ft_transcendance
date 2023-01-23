@@ -108,21 +108,22 @@ export class Game {
 	private _updatePlayer(player: IPlayer) {
 		if (player.event == null) return;
 		if (player.event === 'up') {
-			player.paddle.y -= 10;
-			if (player.paddle.y < 2) player.paddle.y = 2;
+			player.paddle.y -= GameParams.PADDLE_MOVE_SPEED;
+			if (player.paddle.y < GameParams.PADDLE_OFFSET)
+				player.paddle.y = GameParams.PADDLE_OFFSET;
 		}
 		if (player.event === 'down') {
-			player.paddle.y += 10;
+			player.paddle.y += GameParams.PADDLE_MOVE_SPEED;
 			if (
 				player.paddle.y >
 				this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					2
+					GameParams.PADDLE_OFFSET
 			)
 				player.paddle.y =
 					this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					2;
+					GameParams.PADDLE_OFFSET;
 		}
 	}
 
