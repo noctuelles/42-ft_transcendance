@@ -40,6 +40,7 @@ export class GameService {
 				{ socket: player1, user: player1.user },
 				{ socket: player2, user: player2.user },
 				this.websocketsService,
+				this.prismaService,
 			);
 			this.games.push(game);
 			game.start(() => {

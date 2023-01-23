@@ -1,3 +1,4 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { WebsocketsService } from '../websockets/websockets.service';
 import {
 	convertStateToSendable,
@@ -15,6 +16,7 @@ import {
 
 export class Game {
 	private _websocketsService: WebsocketsService;
+	private _prismaService: PrismaService;
 
 	private _player1Profile: IProfile;
 	private _player2Profile: IProfile;
@@ -25,16 +27,20 @@ export class Game {
 
 	private _gameState: IGameState;
 
+	private _bounce: number = 0;
+
 	private onEnd: () => void;
 
 	constructor(
 		player1Profile: IProfile,
 		player2Profile: IProfile,
 		_websocketsService: WebsocketsService,
+		_prismaService: PrismaService,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
 		this._websocketsService = _websocketsService;
+		this._prismaService = _prismaService;
 		this._gameState = getDefaultGameState(player1Profile, player2Profile);
 		this._resetBall(this._gameState.ball);
 	}
@@ -147,10 +153,12 @@ export class Game {
 		if (ball.position.y < ballRadius) {
 			ball.position.y = ballRadius;
 			ball.direction.y *= -1;
+			this._bounce++;
 		}
 		if (ball.position.y > this._gameState.gameInfos.height - ballRadius) {
 			ball.position.y = this._gameState.gameInfos.height - ballRadius;
 			ball.direction.y *= -1;
+			this._bounce++;
 		}
 	}
 
@@ -185,6 +193,7 @@ export class Game {
 		if (this._checkColide(ballColide, paddleColide)) {
 			ball.direction.x *= -1;
 			ball.velocity += GameParams.BALL_SPEED_INCREASE;
+			this._bounce++;
 		}
 	}
 
@@ -257,6 +266,7 @@ export class Game {
 			winner == this._gameState.player1
 				? this._gameState.player2
 				: this._gameState.player1;
+		this._registerGame(winner, loser);
 		const res = {
 			winner: {
 				id: winner.profile.user.id,
@@ -284,5 +294,19 @@ export class Game {
 		};
 		this._sendToPlayers('game-result', res);
 		this.onEnd();
+	}
+
+	private async _registerGame(winner: IPlayer, loser: IPlayer) {
+		await this._prismaService.match.create({
+			data: {
+				createdAt: this._gameStartTime.toISOString(),
+				finishedAt: new Date().toISOString(),
+				bounces: this._bounce,
+				userOneId: this._player1Profile.user.id,
+				userTwoId: this._player2Profile.user.id,
+				winnerId: winner.profile.user.id,
+				looserId: loser.profile.user.id,
+			},
+		});
 	}
 }
