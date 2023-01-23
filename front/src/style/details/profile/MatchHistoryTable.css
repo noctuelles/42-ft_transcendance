@@ -1,4 +1,6 @@
 table {
+	text-align: center;
+	float: left;
 	width: 45%;
 	border: 2px solid;
 	border-radius: 8px;
@@ -10,8 +12,8 @@ tbody {
 	display: block;
 }
 
-thead {
-	text-align: center;
+thead tr th {
+	width: 100%;
 	text-decoration: underline;
 }
 

@@ -1,17 +1,21 @@
 import { useRef, useState } from 'react';
 
 const ProfileHeaderSearchBar = (props: any) => {
-	const searchInput = useRef(null);
+	const searchInput = useRef<HTMLInputElement>(null);
+	const [isBtnCliked, setIsBtnClicked] = useState(false);
 
 	function handleSearchButtonClick() {
-		props.onSearchClick(searchInput.current.value);
+		if (!isBtnCliked) {
+			props.onSearchClick(searchInput.current?.value);
+			setIsBtnClicked(true);
+			setTimeout(() => setIsBtnClicked(false), 3000);
+		}
 	}
 
 	return (
 		<div className="profile-header-searchbar">
 			<input
 				type="search"
-				name=""
 				ref={searchInput}
 				placeholder="Search for a profile..."
 			/>

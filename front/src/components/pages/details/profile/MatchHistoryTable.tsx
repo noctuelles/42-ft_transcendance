@@ -6,14 +6,27 @@ const MatchHistoryTable = (props: any) => {
 	return (
 		<table>
 			<thead>
-				<p>Match History:</p>
+				<tr>
+					<th scope="col">Match history:</th>
+				</tr>
 			</thead>
-			{!props.matches ? (
-				<p>You haven't played any match yet.</p>
+			{!props.matches || props.matches.length == 0 ? (
+				<tbody>
+					<tr>
+						<td>
+							You haven't played any match yet. Don't delay, play
+							today.
+						</td>
+					</tr>
+				</tbody>
 			) : (
 				<tbody>
 					{props.matches.map((m: Match) => (
-						<MatchHistoryRow key={m.id} match={m} />
+						<tr>
+							<td>
+								<MatchHistoryRow key={m.id} match={m} />
+							</td>
+						</tr>
 					))}
 				</tbody>
 			)}

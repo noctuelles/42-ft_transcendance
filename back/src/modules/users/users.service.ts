@@ -195,8 +195,8 @@ export class UsersService {
 			matches_count: user.matchesWon.length + user.matchesLost.length,
 			matches_won_count: user.matchesWon.length,
 			matches_lost_count: user.matchesLost.length,
-			name: username,
 			picture: `${process.env.SELF_URL}/cdn/user/${username}.jpg`,
+			name: username,
 		};
 	}
 }
