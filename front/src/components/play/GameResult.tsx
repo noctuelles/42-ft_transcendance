@@ -1,6 +1,6 @@
 import { IGameResult } from './GameInterfaces';
 import '@/style/play/GameResult.css';
-import PlayerResult from '@/style/play/PlayerResult';
+import PlayerResult from '@/components/play/PlayerResult';
 
 interface IGameResultProps {
 	result: IGameResult;

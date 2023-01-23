@@ -1,4 +1,4 @@
-import { IGamePlayer, IPlayerInfo } from '../pages/Play';
+import { IGamePlayer } from '../pages/Play';
 import '@/style/play/PlayerCard.css';
 
 export enum PlayerPosition {

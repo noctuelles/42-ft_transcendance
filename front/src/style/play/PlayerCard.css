@@ -37,17 +37,12 @@
 
 .card-name {
 	font-size: 30px;
+	margin-left: 20px;
+	margin-right: 20px;
 }
 
 .card-score {
 	font-size: 30px;
-}
-
-.card-left .card-name .card-before-game {
-	margin-left: 20px;
-}
-.card-right .card-name .card-before-game {
-	margin-right: 20px;
 }
 
 .card-img {
