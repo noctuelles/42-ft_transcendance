@@ -12,7 +12,7 @@ export default function Channels({
 			id="channels"
 			value={selectedChannel}
 			onChange={(event) =>
-				setSelectedChannel(event.target.value as unknown as number)
+				setSelectedChannel(parseInt(event.target.value))
 			}
 		>
 			<option value="1">Channel 1</option>
