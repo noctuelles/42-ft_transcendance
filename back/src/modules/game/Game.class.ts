@@ -297,16 +297,49 @@ export class Game {
 	}
 
 	private async _registerGame(winner: IPlayer, loser: IPlayer) {
-		await this._prismaService.match.create({
-			data: {
-				createdAt: this._gameStartTime.toISOString(),
-				finishedAt: new Date().toISOString(),
-				bounces: this._bounce,
-				userOneId: this._player1Profile.user.id,
-				userTwoId: this._player2Profile.user.id,
-				winnerId: winner.profile.user.id,
-				looserId: loser.profile.user.id,
-			},
-		});
+		await Promise.all([
+			this._prismaService.match.create({
+				data: {
+					createdAt: this._gameStartTime.toISOString(),
+					finishedAt: new Date().toISOString(),
+					bounces: this._bounce,
+					userOneId: this._player1Profile.user.id,
+					userTwoId: this._player2Profile.user.id,
+					winnerId: winner.profile.user.id,
+					looserId: loser.profile.user.id,
+				},
+			}),
+			this._prismaService.user.update({
+				where: {
+					id: winner.profile.user.id,
+				},
+				data: {
+					profile: {
+						update: {
+							wonMatches: {
+								increment: 1,
+							},
+							playedMatches: {
+								increment: 1,
+							},
+						},
+					},
+				},
+			}),
+			this._prismaService.user.update({
+				where: {
+					id: loser.profile.user.id,
+				},
+				data: {
+					profile: {
+						update: {
+							playedMatches: {
+								increment: 1,
+							},
+						},
+					},
+				},
+			}),
+		]);
 	}
 }
