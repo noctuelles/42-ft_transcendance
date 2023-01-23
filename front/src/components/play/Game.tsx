@@ -6,6 +6,7 @@ import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import { drawState } from './CanvasUtils';
 import Timer from './Timer';
+import { IGameResult } from './GameInterfaces';
 
 interface IGameProps {
 	players: IGamePlayer[];

@@ -28,19 +28,19 @@ export interface IGameState {
 }
 
 export interface IGameResult {
-	player1: {
+	winner: {
 		id: number;
 		name: string;
 		profile_picture: string;
 		score: number;
-		result: 'win' | 'lose';
+		position: 1 | 2;
 	};
-	player2: {
+	loser: {
 		id: number;
 		name: string;
 		profile_picture: string;
 		score: number;
-		result: 'win' | 'lose';
+		position: 1 | 2;
 	};
 	duration: number;
 }
