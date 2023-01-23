@@ -258,24 +258,24 @@ export class Game {
 				: this._gameState.player1;
 		const res = {
 			winner: {
-				id: winner.infos.user.id,
-				name: winner.infos.user.name,
-				profile_picture: winner.infos.user.profile_picture,
+				id: winner.profile.user.id,
+				name: winner.profile.user.name,
+				profile_picture: winner.profile.user.profile.picture,
 				score: winner.score,
 				position:
-					winner.infos.user.id ===
-					this._gameState.player1.infos.user.id
+					winner.profile.user.id ===
+					this._gameState.player1.profile.user.id
 						? 1
 						: 2,
 			},
 			loser: {
-				id: loser.infos.user.id,
-				name: loser.infos.user.name,
-				profile_picture: loser.infos.user.profile_picture,
+				id: loser.profile.user.id,
+				name: loser.profile.user.name,
+				profile_picture: loser.profile.user.profile.picture,
 				score: loser.score,
 				position:
-					loser.infos.user.id ===
-					this._gameState.player1.infos.user.id
+					loser.profile.user.id ===
+					this._gameState.player1.profile.user.id
 						? 1
 						: 2,
 			},

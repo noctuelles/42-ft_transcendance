@@ -1,8 +1,6 @@
-import { User } from '@prisma/client';
-
 export interface IProfile {
 	socket: any;
-	user: User;
+	user: any;
 }
 
 export enum GameStatus {
