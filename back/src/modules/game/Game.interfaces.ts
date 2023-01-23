@@ -89,8 +89,8 @@ export function getDefaultGameState(
 				y: 450,
 			},
 			direction: {
-				x: Math.random() * (Math.random() < 0.5 ? -1 : 1),
-				y: (Math.random() / 3) * (Math.random() < 0.5 ? -1 : 1),
+				x: 0,
+				y: 0,
 			},
 			velocity: 10,
 		},

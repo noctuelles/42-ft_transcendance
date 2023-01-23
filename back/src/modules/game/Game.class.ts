@@ -32,6 +32,7 @@ export class Game {
 		this._player2Profile = player2Profile;
 		this._websocketsService = _websocketsService;
 		this._gameState = getDefaultGameState(player1Profile, player2Profile);
+		this._resetBall(this._gameState.ball);
 	}
 
 	async start() {
@@ -61,20 +62,10 @@ export class Game {
 		const player = this.getPlayer(userId);
 		if (!player) return;
 		if (data.action === 'press') {
-			if (player.profile.user.id === this._player1Profile.user.id) {
-				this._gameState.player1.event = data.direction;
-			}
-			if (player.profile.user.id === this._player2Profile.user.id) {
-				this._gameState.player2.event = data.direction;
-			}
+			player.event = data.direction;
 		}
 		if (data.action === 'release') {
-			if (player.profile.user.id === this._player1Profile.user.id) {
-				this._gameState.player1.event = null;
-			}
-			if (player.profile.user.id === this._player2Profile.user.id) {
-				this._gameState.player2.event = null;
-			}
+			player.event = null;
 		}
 	}
 
