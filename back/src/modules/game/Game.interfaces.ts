@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 
-export interface IPlayer {
+export interface IProfile {
 	socket: any;
 	user: User;
 }
@@ -24,8 +24,8 @@ export interface IPosition {
 	y: number;
 }
 
-export interface IPlayerInfos {
-	infos: IPlayer;
+export interface IPlayer {
+	profile: IProfile;
 	paddle: IPosition;
 	event: 'up' | 'down' | null;
 }
@@ -38,8 +38,8 @@ export interface IBall {
 
 export interface IGameState {
 	gameInfos: IGameInfos;
-	player1: IPlayerInfos;
-	player2: IPlayerInfos;
+	player1: IPlayer;
+	player2: IPlayer;
 	ball: IBall;
 }
 
@@ -56,8 +56,8 @@ export interface IRect {
 }
 
 export function getDefaultGameState(
-	player1: IPlayer,
-	player2: IPlayer,
+	profile1: IProfile,
+	profile2: IProfile,
 ): IGameState {
 	return {
 		gameInfos: {
@@ -68,7 +68,7 @@ export function getDefaultGameState(
 			ballRadius: 15,
 		},
 		player1: {
-			infos: player1,
+			profile: profile1,
 			paddle: {
 				x: 50,
 				y: 390,
@@ -76,7 +76,7 @@ export function getDefaultGameState(
 			event: null,
 		},
 		player2: {
-			infos: player2,
+			profile: profile2,
 			paddle: {
 				x: 1540,
 				y: 390,
