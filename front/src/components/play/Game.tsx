@@ -2,6 +2,9 @@ import { IGamePlayer } from '../pages/Play';
 import PlayerCard, { PlayerCardType, PlayerPosition } from './PlayerCard';
 import '@/style/play/Game.css';
 import { useEffect, useRef } from 'react';
+import { ws_url as WS_URL } from '@/config.json';
+import useWebSocket from 'react-use-websocket';
+import { drawState } from './CanvasUtils';
 
 interface IGameProps {
 	players: IGamePlayer[];
@@ -10,43 +13,60 @@ interface IGameProps {
 function Game(props: IGameProps) {
 	const canvasRef = useRef(null);
 
+	function isGameStateEvent(data: any) {
+		return data.event === 'game-state';
+	}
+
+	const { sendMessage } = useWebSocket(WS_URL, {
+		share: true,
+		onMessage: ({ data }) => {
+			data = JSON.parse(data);
+			if (isGameStateEvent(data)) {
+				drawState(data.data, canvasRef);
+			}
+		},
+		filter: ({ data }) => {
+			return isGameStateEvent(JSON.parse(data));
+		},
+	});
+
+	function onKey(event: KeyboardEvent, action: string) {
+		switch (event.key) {
+			case 'ArrowUp':
+				sendMessage(
+					JSON.stringify({
+						event: 'game-input',
+						data: { action: action, direction: 'up' },
+					}),
+				);
+				break;
+			case 'ArrowDown':
+				sendMessage(
+					JSON.stringify({
+						event: 'game-input',
+						data: { action: action, direction: 'down' },
+					}),
+				);
+				break;
+		}
+	}
+
+	function onKeyRelease(event: KeyboardEvent) {
+		onKey(event, 'release');
+	}
+
+	function onKeyPress(event: KeyboardEvent) {
+		onKey(event, 'press');
+	}
+
 	useEffect(() => {
-		const canvas: any = canvasRef.current;
-		const ctx = canvas.getContext('2d');
-		const width = canvas.width;
-		const height = canvas.height;
-		const paddle_height = 30;
-		const paddle_width = 4;
+		window.addEventListener('keydown', onKeyPress);
+		window.addEventListener('keyup', onKeyRelease);
 
-		ctx.fillStyle = '#d9d9d9';
-		ctx.beginPath();
-		ctx.rect(0, 0, width, height);
-		ctx.fill();
-
-		ctx.fillStyle = '#000000';
-		ctx.beginPath();
-		ctx.arc(width / 2, height / 2, 3, 0, 2 * Math.PI);
-		ctx.fill();
-
-		ctx.fillStyle = '#ffb800';
-		ctx.beginPath();
-		ctx.rect(
-			5,
-			height / 2 - paddle_height / 2,
-			paddle_width,
-			paddle_height,
-		);
-		ctx.fill();
-
-		ctx.fillStyle = '#17c0e9';
-		ctx.beginPath();
-		ctx.rect(
-			width - 5 - paddle_width,
-			height / 2 - paddle_height / 2,
-			paddle_width,
-			paddle_height,
-		);
-		ctx.fill();
+		return () => {
+			window.removeEventListener('keydown', onKeyPress);
+			window.removeEventListener('keyup', onKeyRelease);
+		};
 	}, []);
 
 	return (
