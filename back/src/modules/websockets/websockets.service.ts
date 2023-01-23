@@ -58,13 +58,24 @@ export class WebsocketsService {
 		}
 	}
 
-	send(client, event: string, data: any) {
+	send(client: any, event: string, data: any) {
 		client.send(JSON.stringify({ event: event, data: data }));
 	}
 
-	broadcast(event: string, data: any) {
-		this._sockets.forEach((socket) => {
+	sendToAllUsers(users: string[], event: string, data: any) {
+		const receivers = this._sockets.filter((socket) => {
+			return users.includes(socket.user.login);
+		});
+		this.sendToAll(receivers, event, data);
+	}
+
+	sendToAll(sockets: any[], event: string, data: any) {
+		sockets.forEach((socket) => {
 			this.send(socket, event, data);
 		});
+	}
+
+	broadcast(event: string, data: any) {
+		this.sendToAll(this._sockets, event, data);
 	}
 }
