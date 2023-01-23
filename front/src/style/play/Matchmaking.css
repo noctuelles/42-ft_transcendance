@@ -1,0 +1,30 @@
+.play-state-matchmaking {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transform: translateY(-10%);
+}
+
+.matchmaking {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.matchmaking-btn {
+	background-color: #ffb800;
+	border: 2px solid transparent;
+	border-radius: 15px;
+	color: #000;
+	cursor: pointer;
+	cursor: pointer;
+	width: 200px;
+	height: 70px;
+	font-size: 30px;
+	font-weight: 600;
+	margin-top: 20px;
+}
+
+.matchmaking-btn:hover {
+	border: solid 2px black;
+}
