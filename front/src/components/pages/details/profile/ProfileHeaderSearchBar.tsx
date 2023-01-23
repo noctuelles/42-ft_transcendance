@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import Button from '@/components/global/Button';
 
 const ProfileHeaderSearchBar = (props: any) => {
 	const searchInput = useRef<HTMLInputElement>(null);
@@ -19,9 +20,11 @@ const ProfileHeaderSearchBar = (props: any) => {
 				ref={searchInput}
 				placeholder="Search for a profile..."
 			/>
-			<button type="submit" onClick={handleSearchButtonClick}>
-				Search
-			</button>
+			<Button
+				type="submit"
+				onBtnClick={handleSearchButtonClick}
+				children="Search"
+			/>
 		</div>
 	);
 };
