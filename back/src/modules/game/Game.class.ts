@@ -7,17 +7,17 @@ import {
 	IBall,
 	IGameState,
 	IKeyEvent,
-	IPlayer,
-	IPlayerInfos,
+	IProfile,
 	IPosition,
 	IRect,
+	IPlayer,
 } from './Game.interfaces';
 
 export class Game {
-	private websocketsService: WebsocketsService;
+	private _websocketsService: WebsocketsService;
 
-	private _player1: IPlayer;
-	private _player2: IPlayer;
+	private _player1Profile: IProfile;
+	private _player2Profile: IProfile;
 	private _status: GameStatus = GameStatus.STARTING;
 
 	private _startCounter: number = 10;
@@ -28,14 +28,15 @@ export class Game {
 	private onEnd: () => void;
 
 	constructor(
-		player1: IPlayer,
-		player2: IPlayer,
-		websocketsService: WebsocketsService,
+		player1Profile: IProfile,
+		player2Profile: IProfile,
+		_websocketsService: WebsocketsService,
 	) {
-		this._player1 = player1;
-		this._player2 = player2;
-		this.websocketsService = websocketsService;
-		this._gameState = getDefaultGameState(player1, player2);
+		this._player1Profile = player1Profile;
+		this._player2Profile = player2Profile;
+		this._websocketsService = _websocketsService;
+		this._gameState = getDefaultGameState(player1Profile, player2Profile);
+		this._resetBall(this._gameState.ball);
 	}
 
 	async start(onEnd: () => void) {
@@ -53,11 +54,11 @@ export class Game {
 	}
 
 	getPlayer(userId: number): IPlayer | null {
-		if (!this._player1 || !this._player2) return null;
-		if (this._player1.user.id === userId) {
-			return this._player1;
-		} else if (this._player2.user.id === userId) {
-			return this._player2;
+		if (!this._player1Profile || !this._player2Profile) return null;
+		if (this._player1Profile.user.id === userId) {
+			return this._gameState.player1;
+		} else if (this._player2Profile.user.id === userId) {
+			return this._gameState.player2;
 		} else {
 			return null;
 		}
@@ -67,20 +68,10 @@ export class Game {
 		const player = this.getPlayer(userId);
 		if (!player) return;
 		if (data.action === 'press') {
-			if (player.user.id === this._player1.user.id) {
-				this._gameState.player1.event = data.direction;
-			}
-			if (player.user.id === this._player2.user.id) {
-				this._gameState.player2.event = data.direction;
-			}
+			player.event = data.direction;
 		}
 		if (data.action === 'release') {
-			if (player.user.id === this._player1.user.id) {
-				this._gameState.player1.event = null;
-			}
-			if (player.user.id === this._player2.user.id) {
-				this._gameState.player2.event = null;
-			}
+			player.event = null;
 		}
 	}
 
@@ -93,20 +84,28 @@ export class Game {
 	}
 
 	private _sendToPlayers(event: string, data: any) {
-		this.websocketsService.send(this._player1.socket, event, data);
-		this.websocketsService.send(this._player2.socket, event, data);
+		this._websocketsService.send(this._player1Profile.socket, event, data);
+		this._websocketsService.send(this._player2Profile.socket, event, data);
 	}
 
 	private _sendStateToPlayers(timeInSeconds: number) {
 		const res = convertStateToSendable(this._gameState, timeInSeconds);
 		res.player1.current = true;
-		this.websocketsService.send(this._player1.socket, 'game-state', res);
+		this._websocketsService.send(
+			this._player1Profile.socket,
+			'game-state',
+			res,
+		);
 		res.player1.current = false;
 		res.player2.current = true;
-		this.websocketsService.send(this._player2.socket, 'game-state', res);
+		this._websocketsService.send(
+			this._player2Profile.socket,
+			'game-state',
+			res,
+		);
 	}
 
-	private _updatePlayer(player: IPlayerInfos) {
+	private _updatePlayer(player: IPlayer) {
 		if (player.event == null) return;
 		if (player.event === 'up') {
 			player.paddle.y -= 10;

@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 
-export interface IPlayer {
+export interface IProfile {
 	socket: any;
 	user: User;
 }
@@ -24,8 +24,8 @@ export interface IPosition {
 	y: number;
 }
 
-export interface IPlayerInfos {
-	infos: IPlayer;
+export interface IPlayer {
+	profile: IProfile;
 	paddle: IPosition;
 	score: number;
 	event: 'up' | 'down' | null;
@@ -39,8 +39,8 @@ export interface IBall {
 
 export interface IGameState {
 	gameInfos: IGameInfos;
-	player1: IPlayerInfos;
-	player2: IPlayerInfos;
+	player1: IPlayer;
+	player2: IPlayer;
 	ball: IBall;
 }
 
@@ -70,8 +70,8 @@ export const GameParams = {
 };
 
 export function getDefaultGameState(
-	player1: IPlayer,
-	player2: IPlayer,
+	profile1: IProfile,
+	profile2: IProfile,
 ): IGameState {
 	return {
 		gameInfos: {
@@ -82,7 +82,7 @@ export function getDefaultGameState(
 			ballRadius: GameParams.BALL_RADIUS,
 		},
 		player1: {
-			infos: player1,
+			profile: profile1,
 			paddle: {
 				x: GameParams.PADDLE_OFFSET,
 				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
@@ -91,7 +91,7 @@ export function getDefaultGameState(
 			event: null,
 		},
 		player2: {
-			infos: player2,
+			profile: profile2,
 			paddle: {
 				x:
 					GameParams.GAME_WIDTH -
@@ -108,8 +108,8 @@ export function getDefaultGameState(
 				y: GameParams.GAME_HEIGHT / 2,
 			},
 			direction: {
-				x: Math.random() * (Math.random() < 0.5 ? -1 : 1),
-				y: (Math.random() / 3) * (Math.random() < 0.5 ? -1 : 1),
+				x: 0,
+				y: 0,
 			},
 			velocity: GameParams.BALL_DEFAULT_SPEED,
 		},

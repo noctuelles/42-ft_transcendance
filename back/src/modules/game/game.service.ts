@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { Game } from './Game.class';
 
@@ -7,9 +8,17 @@ export class GameService {
 	queue = [];
 	games = [];
 
-	constructor(private readonly websocketsService: WebsocketsService) {}
+	constructor(
+		private readonly websocketsService: WebsocketsService,
+		private readonly prismaService: PrismaService,
+	) {}
 
-	joinQueue(socket) {
+	async joinQueue(socket) {
+		const user = await this.prismaService.user.findUnique({
+			where: { id: socket.user.id },
+			include: { profile: true },
+		});
+		socket.user.profile = user.profile;
 		this.queue.push(socket);
 		if (this.queue.length >= 2) {
 			const player1 = this.queue.shift();
@@ -18,11 +27,11 @@ export class GameService {
 				action: 'match',
 				player1: {
 					name: player1.user.name,
-					profile_picture: player1.user.profile_picture,
+					profile_picture: player1.user.profile.picture,
 				},
 				player2: {
 					name: player2.user.name,
-					profile_picture: player2.user.profile_picture,
+					profile_picture: player2.user.profile.picture,
 				},
 			};
 			this.websocketsService.send(player1, 'matchmaking', msg);
