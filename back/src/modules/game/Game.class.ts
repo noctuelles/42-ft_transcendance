@@ -100,17 +100,21 @@ export class Game {
 			},
 		);
 		this._status = GameStatus.ABORTED;
-		await this._prismaService.match.create({
-			data: {
-				createdAt: this._gameStartTime.toISOString(),
-				finishedAt: new Date().toISOString(),
-				bounces: this._bounce,
-				userOneId: this._player1Profile.user.id,
-				userTwoId: this._player2Profile.user.id,
-				winnerId: otherPlayer.profile.user.id,
-				looserId: leaved.profile.user.id,
-			},
-		});
+		if (this._gameStartTime) {
+			await this._prismaService.match.create({
+				data: {
+					createdAt:
+						this._gameStartTime.toISOString() ||
+						new Date().toISOString(),
+					finishedAt: new Date().toISOString(),
+					bounces: this._bounce,
+					userOneId: this._player1Profile.user.id,
+					userTwoId: this._player2Profile.user.id,
+					winnerId: otherPlayer.profile.user.id,
+					looserId: leaved.profile.user.id,
+				},
+			});
+		}
 		this.onEnd();
 	}
 
