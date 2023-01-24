@@ -81,6 +81,39 @@ export class Game {
 		}
 	}
 
+	async leave(userId: number) {
+		const leaved = this.getPlayer(userId);
+		const otherPlayer =
+			this._gameState.player1.profile.user.id === leaved.profile.user.id
+				? this._gameState.player2
+				: this._gameState.player1;
+		this._websocketsService.send(leaved.profile.socket, 'game-aborted', {
+			reason: 'player-left',
+			result: 'lose',
+		});
+		this._websocketsService.send(
+			otherPlayer.profile.socket,
+			'game-aborted',
+			{
+				reason: 'player-left',
+				result: 'win',
+			},
+		);
+		this._status = GameStatus.ABORTED;
+		await this._prismaService.match.create({
+			data: {
+				createdAt: this._gameStartTime.toISOString(),
+				finishedAt: new Date().toISOString(),
+				bounces: this._bounce,
+				userOneId: this._player1Profile.user.id,
+				userTwoId: this._player2Profile.user.id,
+				winnerId: otherPlayer.profile.user.id,
+				looserId: leaved.profile.user.id,
+			},
+		});
+		this.onEnd();
+	}
+
 	private async _wait(ms: number) {
 		return new Promise<void>((resolve) => {
 			setTimeout(() => {
@@ -251,6 +284,10 @@ export class Game {
 					this._status = GameStatus.ENDED;
 			}
 		}
+		if (this._status === GameStatus.ABORTED) {
+			this.onEnd();
+			return;
+		}
 		this._result();
 	}
 
@@ -297,18 +334,16 @@ export class Game {
 	}
 
 	private async _registerGame(winner: IPlayer, loser: IPlayer) {
-		await Promise.all([
-			this._prismaService.match.create({
-				data: {
-					createdAt: this._gameStartTime.toISOString(),
-					finishedAt: new Date().toISOString(),
-					bounces: this._bounce,
-					userOneId: this._player1Profile.user.id,
-					userTwoId: this._player2Profile.user.id,
-					winnerId: winner.profile.user.id,
-					looserId: loser.profile.user.id,
-				},
-			}),
-		]);
+		await this._prismaService.match.create({
+			data: {
+				createdAt: this._gameStartTime.toISOString(),
+				finishedAt: new Date().toISOString(),
+				bounces: this._bounce,
+				userOneId: this._player1Profile.user.id,
+				userTwoId: this._player2Profile.user.id,
+				winnerId: winner.profile.user.id,
+				looserId: loser.profile.user.id,
+			},
+		});
 	}
 }

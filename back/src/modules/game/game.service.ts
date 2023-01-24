@@ -58,4 +58,10 @@ export class GameService {
 	getGameWherePlayerIs(userId: number) {
 		return this.games.find((game: Game) => game.getPlayer(userId) != null);
 	}
+
+	leaveGame(socket) {
+		const game = this.getGameWherePlayerIs(socket.user.id);
+		if (!game) return;
+		game.leave(socket.user.id);
+	}
 }

@@ -7,6 +7,7 @@ export enum GameStatus {
 	STARTING = 'starting',
 	PLAYING = 'playing',
 	ENDED = 'ended',
+	ABORTED = 'aborted',
 }
 
 export interface IGameInfos {
