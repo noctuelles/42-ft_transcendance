@@ -44,11 +44,12 @@ function InfoBoxContextProvider(props: any) {
 	}
 
 	async function addInfo(info: IInfoBuilder) {
-		let inf = [...infos];
-		if (inf.length >= 5) {
-			inf = inf.slice(1, inf.length);
-		}
-		setInfos([...inf, { ...info, id: id, visible: true }]);
+		setInfos((inf: IInfo[]) => {
+			if (inf.length >= 5) {
+				inf = inf.slice(1, inf.length);
+			}
+			return [...inf, { ...info, id: id, visible: true }];
+		});
 		const save = id;
 		setId((id) => id + 1);
 		setTimeout(() => {

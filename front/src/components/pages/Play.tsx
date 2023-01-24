@@ -10,6 +10,7 @@ import { IGameResult } from '../play/GameInterfaces';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 export enum GameState {
+	NO_GAME = 'no-game',
 	LOBBY = 'lobby',
 	MATCHMAKING = 'matchmaking',
 	PREGAME = 'pregame',
@@ -29,7 +30,7 @@ export interface IGamePlayer {
 
 const Play = () => {
 	const [gameState, setGameState] = useState(GameState.LOBBY);
-	const stateRef = useRef(gameState);
+	const stateRef = useRef(GameState.LOBBY);
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
 	const [result, setResult] = useState<IGameResult | null>(null);
 	const infoBoxContext = useContext(InfoBoxContext);
@@ -62,9 +63,11 @@ const Play = () => {
 	useEffect(() => {
 		return () => {
 			if (
-				stateRef.current != GameState.LOBBY &&
-				stateRef.current != GameState.RESULTS
+				stateRef.current == GameState.MATCHMAKING ||
+				stateRef.current == GameState.PREGAME ||
+				stateRef.current == GameState.PLAYING
 			) {
+				stateRef.current = GameState.NO_GAME;
 				infoBoxContext.addInfo({
 					type: InfoType.ERROR,
 					message: 'You left the game and lost',
