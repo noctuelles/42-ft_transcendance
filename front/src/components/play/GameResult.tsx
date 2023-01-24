@@ -18,8 +18,8 @@ function GameResult(props: IGameResultProps) {
 					winner={true}
 					color={
 						props.result.winner.position == 1
-							? '#ffb800'
-							: '#17c0e9'
+							? 'var(--yellow-primary-color)'
+							: 'var(--blue-primary-color)'
 					}
 				/>
 				<PlayerResult
@@ -28,7 +28,9 @@ function GameResult(props: IGameResultProps) {
 					score={props.result.loser.score}
 					winner={true}
 					color={
-						props.result.loser.position == 1 ? '#ffb800' : '#17c0e9'
+						props.result.loser.position == 1
+							? 'var(--yellow-primary-color)'
+							: 'var(--blue-primary-color)'
 					}
 				/>
 			</div>

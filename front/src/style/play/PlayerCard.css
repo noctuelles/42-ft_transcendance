@@ -12,11 +12,11 @@
 }
 
 .card-left {
-	background-color: #ffb800;
+	background-color: var(--yellow-primary-color);
 }
 
 .card-right {
-	background-color: #17c0e9;
+	background-color: var(--blue-primary-color);
 }
 
 .card-content {
