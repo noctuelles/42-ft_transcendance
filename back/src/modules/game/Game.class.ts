@@ -1,6 +1,7 @@
 import { WebsocketsService } from '../websockets/websockets.service';
 import {
 	convertStateToSendable,
+	GameParams,
 	GameStatus,
 	getDefaultGameState,
 	IBall,
@@ -20,8 +21,11 @@ export class Game {
 	private _status: GameStatus = GameStatus.STARTING;
 
 	private _startCounter: number = 10;
+	private _gameStartTime: Date | null = null;
 
 	private _gameState: IGameState;
+
+	private onEnd: () => void;
 
 	constructor(
 		player1Profile: IProfile,
@@ -35,7 +39,8 @@ export class Game {
 		this._resetBall(this._gameState.ball);
 	}
 
-	async start() {
+	async start(onEnd: () => void) {
+		this.onEnd = onEnd;
 		while (this._startCounter > 0) {
 			//TODO: Change to 1000 ms
 			await this._wait(100);
@@ -44,6 +49,7 @@ export class Game {
 		}
 		this._sendToPlayers('match-starting', { time: this._startCounter });
 		this._status = GameStatus.PLAYING;
+		this._gameStartTime = new Date();
 		this._game();
 	}
 
@@ -82,8 +88,8 @@ export class Game {
 		this._websocketsService.send(this._player2Profile.socket, event, data);
 	}
 
-	private _sendStateToPlayers() {
-		const res = convertStateToSendable(this._gameState);
+	private _sendStateToPlayers(timeInSeconds: number) {
+		const res = convertStateToSendable(this._gameState, timeInSeconds);
 		res.player1.current = true;
 		this._websocketsService.send(
 			this._player1Profile.socket,
@@ -102,21 +108,22 @@ export class Game {
 	private _updatePlayer(player: IPlayer) {
 		if (player.event == null) return;
 		if (player.event === 'up') {
-			player.paddle.y -= 10;
-			if (player.paddle.y < 2) player.paddle.y = 2;
+			player.paddle.y -= GameParams.PADDLE_MOVE_SPEED;
+			if (player.paddle.y < GameParams.PADDLE_OFFSET)
+				player.paddle.y = GameParams.PADDLE_OFFSET;
 		}
 		if (player.event === 'down') {
-			player.paddle.y += 10;
+			player.paddle.y += GameParams.PADDLE_MOVE_SPEED;
 			if (
 				player.paddle.y >
 				this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					2
+					GameParams.PADDLE_OFFSET
 			)
 				player.paddle.y =
 					this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					2;
+					GameParams.PADDLE_OFFSET;
 		}
 	}
 
@@ -125,14 +132,16 @@ export class Game {
 		ball.position.y = this._gameState.gameInfos.height / 2;
 		ball.direction.x = Math.random() * (Math.random() < 0.5 ? -1 : 1);
 		ball.direction.y = (Math.random() / 3) * (Math.random() < 0.5 ? -1 : 1);
-		ball.velocity = 10;
+		ball.velocity = GameParams.BALL_DEFAULT_SPEED;
 	}
 
 	private _checkBallCollideWall(ball: IBall, ballRadius: number) {
 		if (ball.position.x < ballRadius) {
+			this._gameState.player2.score++;
 			this._resetBall(ball);
 		}
 		if (ball.position.x > this._gameState.gameInfos.width - ballRadius) {
+			this._gameState.player1.score++;
 			this._resetBall(ball);
 		}
 		if (ball.position.y < ballRadius) {
@@ -175,7 +184,7 @@ export class Game {
 		};
 		if (this._checkColide(ballColide, paddleColide)) {
 			ball.direction.x *= -1;
-			ball.velocity += 1;
+			ball.velocity += GameParams.BALL_SPEED_INCREASE;
 		}
 	}
 
@@ -218,10 +227,62 @@ export class Game {
 	}
 
 	private async _game() {
-		while (1) {
+		while (this._status === GameStatus.PLAYING) {
 			await this._wait(20);
+			const now = new Date();
+			const timePlayed = now.getTime() - this._gameStartTime.getTime();
+			const timeInSeconds = Math.floor(timePlayed / 1000);
 			this._updateState();
-			this._sendStateToPlayers();
+			this._sendStateToPlayers(timeInSeconds);
+			if (timeInSeconds >= GameParams.GAME_TIME) {
+				if (
+					this._gameState.player1.score !=
+					this._gameState.player2.score
+				)
+					this._status = GameStatus.ENDED;
+			}
 		}
+		this._result();
+	}
+
+	private _result() {
+		const now = new Date();
+		const timePlayed = now.getTime() - this._gameStartTime.getTime();
+		const timeInSeconds = Math.floor(timePlayed / 1000);
+		const winner =
+			this._gameState.player1.score > this._gameState.player2.score
+				? this._gameState.player1
+				: this._gameState.player2;
+		const loser =
+			winner == this._gameState.player1
+				? this._gameState.player2
+				: this._gameState.player1;
+		const res = {
+			winner: {
+				id: winner.profile.user.id,
+				name: winner.profile.user.name,
+				profile_picture: winner.profile.user.profile.picture,
+				score: winner.score,
+				position:
+					winner.profile.user.id ===
+					this._gameState.player1.profile.user.id
+						? 1
+						: 2,
+			},
+			loser: {
+				id: loser.profile.user.id,
+				name: loser.profile.user.name,
+				profile_picture: loser.profile.user.profile.picture,
+				score: loser.score,
+				position:
+					loser.profile.user.id ===
+					this._gameState.player1.profile.user.id
+						? 1
+						: 2,
+			},
+			duration: timeInSeconds,
+		};
+		this._sendToPlayers('game-result', res);
+		this.onEnd();
 	}
 }

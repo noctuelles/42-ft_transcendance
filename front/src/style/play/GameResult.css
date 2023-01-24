@@ -1,0 +1,13 @@
+.game-result {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.result-title {
+	font-size: 60px;
+}
+
+.result-profiles {
+	width: 40%;
+}

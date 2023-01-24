@@ -5,6 +5,8 @@ import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import PreGame from '../play/PreGame';
 import Game from '../play/Game';
+import GameResult from '../play/GameResult';
+import { IGameResult } from '../play/GameInterfaces';
 
 export enum GameState {
 	LOBBY = 'lobby',
@@ -21,16 +23,22 @@ export interface IPlayerInfo {
 
 export interface IGamePlayer {
 	infos: IPlayerInfo;
-	points: number;
+	score: number;
 }
 
 const Play = () => {
 	const [gameState, setGameState] = useState(GameState.LOBBY);
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
+	const [result, setResult] = useState<IGameResult | null>(null);
 
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
 	});
+
+	function endMatch(result: IGameResult) {
+		setResult(result);
+		setGameState(GameState.RESULTS);
+	}
 
 	function joinMatchmaking() {
 		setGameState(GameState.MATCHMAKING);
@@ -41,8 +49,8 @@ const Play = () => {
 
 	function joinMatch(player1: IPlayerInfo, player2: IPlayerInfo) {
 		setPlayers([
-			{ infos: player1, points: 0 },
-			{ infos: player2, points: 0 },
+			{ infos: player1, score: 0 },
+			{ infos: player2, score: 0 },
 		]);
 		setGameState(GameState.PREGAME);
 	}
@@ -63,7 +71,10 @@ const Play = () => {
 			{gameState === GameState.PREGAME && (
 				<PreGame players={players} setGameState={setGameState} />
 			)}
-			{gameState === GameState.PLAYING && <Game players={players} />}
+			{gameState === GameState.PLAYING && (
+				<Game players={players} endMatch={endMatch} />
+			)}
+			{gameState === GameState.RESULTS && <GameResult result={result} />}
 		</div>
 	);
 };

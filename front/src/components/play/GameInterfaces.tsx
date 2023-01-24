@@ -6,6 +6,7 @@ export interface IGameInfos {
 	paddleHeight: number;
 	paddleWidth: number;
 	ballRadius: number;
+	time: number;
 }
 
 export interface IPosition {
@@ -24,4 +25,22 @@ export interface IGameState {
 	player1: IPlayer;
 	player2: IPlayer;
 	ball: IPosition;
+}
+
+export interface IGameResult {
+	winner: {
+		id: number;
+		name: string;
+		profile_picture: string;
+		score: number;
+		position: 1 | 2;
+	};
+	loser: {
+		id: number;
+		name: string;
+		profile_picture: string;
+		score: number;
+		position: 1 | 2;
+	};
+	duration: number;
 }

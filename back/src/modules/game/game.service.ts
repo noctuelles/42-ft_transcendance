@@ -42,7 +42,9 @@ export class GameService {
 				this.websocketsService,
 			);
 			this.games.push(game);
-			game.start();
+			game.start(() => {
+				this.games.splice(this.games.indexOf(game), 1);
+			});
 		}
 	}
 

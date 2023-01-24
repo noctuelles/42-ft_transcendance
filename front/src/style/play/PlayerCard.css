@@ -12,11 +12,11 @@
 }
 
 .card-left {
-	background-color: #ffb800;
+	background-color: var(--yellow-primary-color);
 }
 
 .card-right {
-	background-color: #17c0e9;
+	background-color: var(--blue-primary-color);
 }
 
 .card-content {
@@ -37,17 +37,12 @@
 
 .card-name {
 	font-size: 30px;
+	margin-left: 20px;
+	margin-right: 20px;
 }
 
 .card-score {
 	font-size: 30px;
-}
-
-.card-left .card-name .card-before-game {
-	margin-left: 20px;
-}
-.card-right .card-name .card-before-game {
-	margin-right: 20px;
 }
 
 .card-img {

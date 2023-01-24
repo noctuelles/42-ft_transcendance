@@ -24,7 +24,7 @@
 	width: 600px;
 	height: auto;
 	transform: rotate(15deg);
-	fill: #17c0e9;
+	fill: var(--blue-primary-color);
 	animation: glow 2s ease-in-out infinite alternate;
 }
 

@@ -1,8 +1,6 @@
-import { User } from '@prisma/client';
-
 export interface IProfile {
 	socket: any;
-	user: User;
+	user: any;
 }
 
 export enum GameStatus {
@@ -27,6 +25,7 @@ export interface IPosition {
 export interface IPlayer {
 	profile: IProfile;
 	paddle: IPosition;
+	score: number;
 	event: 'up' | 'down' | null;
 }
 
@@ -55,49 +54,68 @@ export interface IRect {
 	height: number;
 }
 
+export const GameParams = {
+	GAME_WIDTH: 1600,
+	GAME_HEIGHT: 900,
+	PADDLE_MOVE_SPEED: 10,
+	PADDLE_OFFSET: 50,
+	PADDLE_HEIGHT: 120,
+	PADDLE_WIDTH: 10,
+	BALL_RADIUS: 15,
+	BALL_DEFAULT_SPEED: 10,
+	BALL_SPEED_INCREASE: 1,
+	//TODO: change to 300
+	GAME_TIME: 5,
+};
+
 export function getDefaultGameState(
 	profile1: IProfile,
 	profile2: IProfile,
 ): IGameState {
 	return {
 		gameInfos: {
-			width: 1600,
-			height: 900,
-			paddleHeight: 120,
-			paddleWidth: 10,
-			ballRadius: 15,
+			width: GameParams.GAME_WIDTH,
+			height: GameParams.GAME_HEIGHT,
+			paddleHeight: GameParams.PADDLE_HEIGHT,
+			paddleWidth: GameParams.PADDLE_WIDTH,
+			ballRadius: GameParams.BALL_RADIUS,
 		},
 		player1: {
 			profile: profile1,
 			paddle: {
-				x: 50,
-				y: 390,
+				x: GameParams.PADDLE_OFFSET,
+				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
 			},
+			score: 0,
 			event: null,
 		},
 		player2: {
 			profile: profile2,
 			paddle: {
-				x: 1540,
-				y: 390,
+				x:
+					GameParams.GAME_WIDTH -
+					GameParams.PADDLE_OFFSET -
+					GameParams.PADDLE_WIDTH,
+				y: GameParams.GAME_HEIGHT / 2 - GameParams.PADDLE_HEIGHT / 2,
 			},
+			score: 0,
 			event: null,
 		},
 		ball: {
 			position: {
-				x: 800,
-				y: 450,
+				x: GameParams.GAME_WIDTH / 2,
+				y: GameParams.GAME_HEIGHT / 2,
 			},
 			direction: {
 				x: 0,
 				y: 0,
 			},
-			velocity: 10,
+			velocity: GameParams.BALL_DEFAULT_SPEED,
 		},
 	};
 }
 
-export function convertStateToSendable(state: any) {
+export function convertStateToSendable(state: any, timeInSeconds: number) {
 	return {
 		gameInfos: {
 			originalWidth: state.gameInfos.width,
@@ -105,12 +123,14 @@ export function convertStateToSendable(state: any) {
 			paddleWidth: state.gameInfos.paddleWidth,
 			paddleHeight: state.gameInfos.paddleHeight,
 			ballRadius: state.gameInfos.ballRadius,
+			time: GameParams.GAME_TIME - timeInSeconds,
 		},
 		player1: {
 			paddle: {
 				x: state.player1.paddle.x,
 				y: state.player1.paddle.y,
 			},
+			score: state.player1.score,
 			current: false,
 		},
 		player2: {
@@ -118,6 +138,7 @@ export function convertStateToSendable(state: any) {
 				x: state.player2.paddle.x,
 				y: state.player2.paddle.y,
 			},
+			score: state.player2.score,
 			current: false,
 		},
 		ball: {
