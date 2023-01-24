@@ -152,8 +152,8 @@ export class Game {
 		if (player.event == null) return;
 		if (player.event === 'up') {
 			player.paddle.y -= GameParams.PADDLE_MOVE_SPEED;
-			if (player.paddle.y < GameParams.PADDLE_OFFSET)
-				player.paddle.y = GameParams.PADDLE_OFFSET;
+			if (player.paddle.y < GameParams.PADDLE_BORDER)
+				player.paddle.y = GameParams.PADDLE_BORDER;
 		}
 		if (player.event === 'down') {
 			player.paddle.y += GameParams.PADDLE_MOVE_SPEED;
@@ -161,12 +161,12 @@ export class Game {
 				player.paddle.y >
 				this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					GameParams.PADDLE_OFFSET
+					GameParams.PADDLE_BORDER
 			)
 				player.paddle.y =
 					this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					GameParams.PADDLE_OFFSET;
+					GameParams.PADDLE_BORDER;
 		}
 	}
 
@@ -208,6 +208,12 @@ export class Game {
 		);
 	}
 
+	private async _disableCollision(ball: IBall) {
+		ball.collidable = false;
+		await this._wait(200);
+		ball.collidable = true;
+	}
+
 	private _checkBallCollidePaddle(
 		ball: IBall,
 		ballRadius: number,
@@ -215,22 +221,77 @@ export class Game {
 		paddleWidth: number,
 		paddleHeight: number,
 	) {
-		const ballColide: IRect = {
-			x: ball.position.x - ballRadius,
-			y: ball.position.y - ballRadius,
-			width: ballRadius * 2,
-			height: ballRadius * 2,
-		};
-		const paddleColide: IRect = {
-			x: paddle.x,
-			y: paddle.y,
-			width: paddleWidth,
-			height: paddleHeight,
-		};
-		if (this._checkColide(ballColide, paddleColide)) {
-			ball.direction.x *= -1;
-			ball.velocity += GameParams.BALL_SPEED_INCREASE;
-			this._bounce++;
+		if (ball.collidable) {
+			const ballColide: IRect = {
+				x: ball.position.x - ballRadius,
+				y: ball.position.y - ballRadius,
+				width: ballRadius * 2,
+				height: ballRadius * 2,
+			};
+			const paddleFrontUpCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y,
+				width: 2,
+				height: paddleHeight / 3,
+			};
+			const paddleFrontMiddleCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y + paddleHeight / 3,
+				width: 2,
+				height: paddleHeight / 3,
+			};
+			const paddleFrontDownCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y + (paddleHeight / 3) * 2,
+				width: 2,
+				height: paddleHeight / 3,
+			};
+			const paddleTopCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y,
+				width: paddleWidth,
+				height: 2,
+			};
+			const paddleBottomCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y + paddleHeight - 2,
+				width: paddleWidth,
+				height: 2,
+			};
+			if (this._checkColide(ballColide, paddleFrontUpCollideZone)) {
+				ball.direction.x *= -1;
+				ball.direction.y -= GameParams.BALL_PERTURBATOR;
+				this._bounce++;
+				ball.velocity += GameParams.BALL_SPEED_INCREASE;
+				this._disableCollision(ball);
+			} else if (
+				this._checkColide(ballColide, paddleFrontMiddleCollideZone)
+			) {
+				ball.direction.x *= -1;
+				this._bounce++;
+				ball.velocity += GameParams.BALL_SPEED_INCREASE;
+				this._disableCollision(ball);
+			} else if (
+				this._checkColide(ballColide, paddleFrontDownCollideZone)
+			) {
+				ball.direction.x *= -1;
+				ball.direction.y += GameParams.BALL_PERTURBATOR;
+				this._bounce++;
+				ball.velocity += GameParams.BALL_SPEED_INCREASE;
+				this._disableCollision(ball);
+			} else if (this._checkColide(ballColide, paddleTopCollideZone)) {
+				ball.direction.x *= -1;
+				ball.direction.y *= -1;
+				this._bounce++;
+				this._disableCollision(ball);
+			} else if (this._checkColide(ballColide, paddleBottomCollideZone)) {
+				ball.direction.x *= -1;
+				ball.direction.y *= -1;
+				this._bounce++;
+				this._disableCollision(ball);
+			} else if (ball.velocity > GameParams.BALL_MAX_SPEED) {
+				ball.velocity = GameParams.BALL_MAX_SPEED;
+			}
 		}
 	}
 
