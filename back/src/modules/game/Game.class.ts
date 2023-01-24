@@ -309,37 +309,6 @@ export class Game {
 					looserId: loser.profile.user.id,
 				},
 			}),
-			this._prismaService.user.update({
-				where: {
-					id: winner.profile.user.id,
-				},
-				data: {
-					profile: {
-						update: {
-							wonMatches: {
-								increment: 1,
-							},
-							playedMatches: {
-								increment: 1,
-							},
-						},
-					},
-				},
-			}),
-			this._prismaService.user.update({
-				where: {
-					id: loser.profile.user.id,
-				},
-				data: {
-					profile: {
-						update: {
-							playedMatches: {
-								increment: 1,
-							},
-						},
-					},
-				},
-			}),
 		]);
 	}
 }
