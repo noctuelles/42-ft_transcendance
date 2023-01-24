@@ -1,13 +1,14 @@
-import Trophee from '@/assets/trophee.svg';
 import Cross from '@/assets/cross.svg';
 import TableTennis from '@/assets/table-tennis.svg';
 import '@/style/details/profile/ProfileSummaryItem.css';
+import { bounceImg, tropheeImg } from './Data';
 
 function ProfileSummaryItem(props: any) {
 	const item = new Map([
-		['won', { img: Trophee, text: 'Win' }],
+		['won', { img: tropheeImg, text: 'Win' }],
 		['played', { img: TableTennis, text: 'Played' }],
 		['lost', { img: Cross, text: 'Loose' }],
+		['bounce', { img: bounceImg, text: 'Bounce' }],
 	]);
 	const selectedItem = item.get(props.type);
 

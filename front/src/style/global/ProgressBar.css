@@ -1,0 +1,21 @@
+.progress-bar-container {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+
+	background-color: darkgray;
+	border-radius: 15px;
+	box-shadow: inset 0px 0px 15px 1px rgba(0, 0, 0, 0.92);
+}
+
+.progress-bar-inner {
+	box-shadow: inset 0px 0px 10px 0px #000000;
+	background-color: #3399ff;
+	border-radius: 15px;
+}
+
+.progress-bar-text {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}

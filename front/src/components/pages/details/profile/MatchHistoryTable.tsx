@@ -1,8 +1,12 @@
 import '@/style/details/profile/MatchHistoryTable.css';
 import MatchHistoryRow from './MatchHistoryRow';
-import Match from '@/types';
+import { Match, MatchHistoryTableProps } from '@/types';
+import { useContext } from 'react';
+import { UserContext } from '@/context/UserContext';
 
-const MatchHistoryTable = (props: any) => {
+const MatchHistoryTable = (props: MatchHistoryTableProps) => {
+	const userContext = useContext(UserContext);
+
 	return (
 		<table>
 			<thead>
@@ -14,8 +18,10 @@ const MatchHistoryTable = (props: any) => {
 				<tbody>
 					<tr>
 						<td>
-							You haven't played any match yet. Don't delay, play
-							today.
+							{props.name == userContext.user.name
+								? 'You '
+								: `${props.name} `}
+							haven't played any match...
 						</td>
 					</tr>
 				</tbody>

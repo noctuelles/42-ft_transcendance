@@ -7,6 +7,7 @@ function ProfileSummary(props: any) {
 			<ProfileSummaryItem type="played" count={props.matches} />
 			<ProfileSummaryItem type="won" count={props.win} />
 			<ProfileSummaryItem type="lost" count={props.lost} />
+			<ProfileSummaryItem type="bounce" count={props.bounces} />
 		</div>
 	);
 }

@@ -30,8 +30,7 @@ const Profile = (props: any) => {
 				return Promise.reject(response);
 			})
 			.then((data) => setProfile(data))
-			.catch((response) => {
-				console.log(response);
+			.catch(() => {
 				infoContext.addInfo({
 					type: InfoType.ERROR,
 					message: `Cannot find or load profile '${searchValue}'`,
@@ -48,12 +47,16 @@ const Profile = (props: any) => {
 		<div className="container">
 			<ProfileHeader
 				username={profile.name}
+				total_xp={42}
 				picture={profile.picture}
 				onSearchClick={handleSearch}
 			/>
 			<hr />
 			<div className="profile-top-summary">
-				<MatchHistoryTable matches={profile.matches} />
+				<MatchHistoryTable
+					matches={profile.matches}
+					name={profile.name}
+				/>
 				<ProfileSummary
 					matches={profile.matches_count}
 					win={profile.matches_won_count}
