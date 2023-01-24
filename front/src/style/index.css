@@ -60,6 +60,9 @@ body {
 	padding: 0;
 	height: 100%;
 	overflow: hidden;
+
+	--blue-primary-color: #17c0e9;
+	--yellow-primary-color: #ffb800;
 }
 
 #root {
