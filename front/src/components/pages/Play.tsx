@@ -1,5 +1,5 @@
 import '@/style/play/Play.css';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Matchmaking from '../play/Matchmaking';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
@@ -28,12 +28,33 @@ export interface IGamePlayer {
 
 const Play = () => {
 	const [gameState, setGameState] = useState(GameState.LOBBY);
+	const stateRef = useRef(gameState);
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
 	const [result, setResult] = useState<IGameResult | null>(null);
 
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
 	});
+
+	useEffect(() => {
+		return () => {
+			if (
+				stateRef.current != GameState.LOBBY &&
+				stateRef.current != GameState.RESULTS
+			) {
+				sendMessage(
+					JSON.stringify({
+						event: 'matchmaking',
+						data: { action: 'leave' },
+					}),
+				);
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		stateRef.current = gameState;
+	}, [gameState]);
 
 	function endMatch(result: IGameResult) {
 		setResult(result);
@@ -74,7 +95,9 @@ const Play = () => {
 			{gameState === GameState.PLAYING && (
 				<Game players={players} endMatch={endMatch} />
 			)}
-			{gameState === GameState.RESULTS && <GameResult result={result} />}
+			{gameState === GameState.RESULTS && result && (
+				<GameResult result={result} />
+			)}
 		</div>
 	);
 };
