@@ -1,5 +1,5 @@
 import '@/style/play/Play.css';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Matchmaking from '../play/Matchmaking';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
@@ -7,6 +7,7 @@ import PreGame from '../play/PreGame';
 import Game from '../play/Game';
 import GameResult from '../play/GameResult';
 import { IGameResult } from '../play/GameInterfaces';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 export enum GameState {
 	LOBBY = 'lobby',
@@ -31,9 +32,31 @@ const Play = () => {
 	const stateRef = useRef(gameState);
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
 	const [result, setResult] = useState<IGameResult | null>(null);
+	const infoBoxContext = useContext(InfoBoxContext);
+
+	function isGameAbortedEvent(data: any): boolean {
+		return data.event === 'game-aborted';
+	}
 
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
+		onMessage: ({ data }) => {
+			data = JSON.parse(data);
+			if (data.data.reason === 'player-left') {
+				if (data.data.result === 'win') {
+					infoBoxContext.addInfo({
+						type: InfoType.SUCCESS,
+						message: 'Your opponent left the game and you won',
+					});
+				}
+			}
+			if (isGameAbortedEvent(data)) {
+				setGameState(GameState.LOBBY);
+			}
+		},
+		filter: ({ data }) => {
+			return isGameAbortedEvent(JSON.parse(data));
+		},
 	});
 
 	useEffect(() => {
@@ -42,6 +65,10 @@ const Play = () => {
 				stateRef.current != GameState.LOBBY &&
 				stateRef.current != GameState.RESULTS
 			) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'You left the game and lost',
+				});
 				sendMessage(
 					JSON.stringify({
 						event: 'matchmaking',
