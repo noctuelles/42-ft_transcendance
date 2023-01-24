@@ -248,13 +248,13 @@ export class Game {
 			};
 			const paddleTopCollideZone: IRect = {
 				x: paddle.x,
-				y: paddle.y,
+				y: paddle.y - 2,
 				width: paddleWidth,
 				height: 2,
 			};
 			const paddleBottomCollideZone: IRect = {
 				x: paddle.x,
-				y: paddle.y + paddleHeight - 2,
+				y: paddle.y + paddleHeight + 2,
 				width: paddleWidth,
 				height: 2,
 			};
