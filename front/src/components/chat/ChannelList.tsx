@@ -12,6 +12,11 @@ export default function ChannelList({
 	selectedChannel: number;
 }) {
 	const channels = getChannels();
+	useEffect(() => {
+		if (selectedChannel === 0 && channels.length > 0) {
+			setSelectedChannel(channels[0].id);
+		}
+	});
 	return (
 		<>
 			{channels.map((channel) => {

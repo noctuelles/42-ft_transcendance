@@ -5,7 +5,7 @@ import UserInput from './UserInput';
 import Channels from './Channels';
 
 export default function Chat() {
-	const [selectedChannel, setSelectedChannel] = useState<number>(1); // TODO: Remove mock
+	const [selectedChannel, setSelectedChannel] = useState<number>(0);
 	return (
 		<div className="chat">
 			<Channels
