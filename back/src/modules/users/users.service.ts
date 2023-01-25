@@ -1,5 +1,6 @@
 import { LoggedUser } from '42.js/dist/structures/logged_user';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Match } from '@prisma/client';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
 const fs = require('fs');
@@ -107,5 +108,106 @@ export class UsersService {
 				},
 			},
 		});
+	}
+
+	matchInclude = {};
+
+	/* Fetch a profile of a specified username */
+	async fetchProfileData(username: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				name: username,
+			},
+			select: {
+				matchesWon: {
+					select: {
+						id: true,
+						createdAt: true,
+						finishedAt: true,
+						bounces: true,
+						userOne: {
+							select: {
+								name: true,
+								profile: {
+									select: {
+										picture: true,
+										xp: true,
+									},
+								},
+							},
+						},
+						userTwo: {
+							select: {
+								name: true,
+								profile: {
+									select: {
+										picture: true,
+										xp: true,
+									},
+								},
+							},
+						},
+						looser: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
+				matchesLost: {
+					select: {
+						id: true,
+						createdAt: true,
+						finishedAt: true,
+						bounces: true,
+						userOne: {
+							select: {
+								name: true,
+								profile: {
+									select: {
+										picture: true,
+										xp: true,
+									},
+								},
+							},
+						},
+						userTwo: {
+							select: {
+								profile: {
+									select: {
+										picture: true,
+										xp: true,
+									},
+								},
+								name: true,
+							},
+						},
+						winner: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
+				profile: {
+					select: {
+						xp: true,
+						achivements: true,
+						picture: true,
+					},
+				},
+			},
+		});
+		if (!user) return null;
+		return {
+			matches: [...user.matchesLost, ...user.matchesWon],
+			achievements: user.profile.achivements,
+			matchesCount: user.matchesWon.length + user.matchesLost.length,
+			matchesWonCount: user.matchesWon.length,
+			matchesLostCount: user.matchesLost.length,
+			picture: user.profile.picture,
+			name: username,
+			xp: user.profile.xp,
+		};
 	}
 }
