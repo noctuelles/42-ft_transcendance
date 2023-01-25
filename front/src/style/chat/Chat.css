@@ -16,3 +16,16 @@
 .content {
 	color: gray;
 }
+
+.channel {
+	background-color: yellow; /* TODO: Better color than that */
+	cursor: pointer;
+}
+
+.channel:hover {
+	background-color: red; /* TODO: Better color than that */
+}
+
+.selectedChannel {
+	background-color: red; /* TODO: Better color than that */
+}
