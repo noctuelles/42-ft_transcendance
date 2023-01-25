@@ -61,3 +61,7 @@
 .info-item-error {
 	background-color: rgba(255, 0, 0, 0.3);
 }
+
+.info-item-clickable {
+	cursor: pointer;
+}

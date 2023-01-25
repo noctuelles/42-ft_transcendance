@@ -11,11 +11,13 @@ export interface IInfo {
 	type: InfoType;
 	message: string;
 	visible: boolean;
+	onClick?: (event?: any) => void;
 }
 
 export interface IInfoBuilder {
 	type: InfoType;
 	message: string;
+	onClick?: (event?: any) => void;
 }
 
 interface IInfoBoxContext {
@@ -66,7 +68,10 @@ function InfoBoxContextProvider(props: any) {
 			inf = inf.slice(1, inf.length);
 		}
 		console.log('after', inf.length);
-		setInfos([...inf, { ...info, id: id, visible: true }]);
+		setInfos([
+			...inf,
+			{ ...info, id: id, visible: true, onClick: info.onClick },
+		]);
 		const save = id;
 		setId((id) => id + 1);
 		setTimeout(() => {
