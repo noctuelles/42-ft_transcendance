@@ -34,19 +34,19 @@ export default function Messages({
 		</div>
 	);
 
-	function scrollToBottom(element: HTMLElement) {
-		element.scrollTop = getMaxScrollTop(element);
-	}
-
-	function getMaxScrollTop(element: HTMLElement) {
-		return element.scrollHeight - element.clientHeight;
-	}
-
 	function getMessages(selectedChannel: number): IMessage[] {
 		const messages = useContext(MessagesContext)['data'];
 		const channelMessages = messages.get(selectedChannel);
 		return channelMessages === undefined ? [] : channelMessages;
 	}
+}
+
+export function scrollToBottom(element: HTMLElement) {
+	element.scrollTop = getMaxScrollTop(element);
+}
+
+function getMaxScrollTop(element: HTMLElement) {
+	return element.scrollHeight - element.clientHeight;
 }
 
 function Message(props: IMessage) {

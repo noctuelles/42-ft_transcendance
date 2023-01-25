@@ -112,8 +112,8 @@ export class ChatService {
 		);
 	}
 
-	sendChannelListTo(users: number[]): void {
-		this.websocketsService.sendToAllUsers(users, 'channels', [
+	sendChannelListToSocket(socket: any): void {
+		this.websocketsService.send(socket, 'channels', [
 			...this.channels.values(),
 		]);
 	}

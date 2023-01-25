@@ -1,9 +1,8 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import IChannel from './IChannel';
 import Channel from './Channel';
-import { ChannelType } from './IChannel';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -33,37 +32,8 @@ export default function ChannelList({
 }
 
 function getChannels(): IChannel[] {
-	const channels = useRef<IChannel[]>([
-		{
-			id: 1,
-			name: 'Channel one',
-			type: ChannelType.PUBLIC,
-			owner_id: 4,
-			members: [],
-		},
-		{
-			id: 2,
-			name: 'Channel two',
-			type: ChannelType.PUBLIC,
-			owner_id: 4,
-			members: [],
-		},
-		{
-			id: 3,
-			name: 'Channel three',
-			type: ChannelType.PUBLIC,
-			owner_id: 4,
-			members: [],
-		},
-		{
-			id: 4,
-			name: 'Channel four',
-			type: ChannelType.PUBLIC,
-			owner_id: 4,
-			members: [],
-		},
-	]); // TODO: Remove theses mock channels and get them from the back
-	useWebSocket(WS_URL, {
+	const channels = useRef<IChannel[]>([]);
+	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
 			if (!data || !isChannelsMessage(data)) {
@@ -75,6 +45,10 @@ function getChannels(): IChannel[] {
 			return isChannelsMessage(data);
 		},
 	});
+	useEffect(() => {
+		const jsonMessage = { event: 'channels', data: {} };
+		sendMessage(JSON.stringify(jsonMessage));
+	}, []);
 	return channels.current;
 }
 
