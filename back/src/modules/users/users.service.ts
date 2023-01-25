@@ -52,7 +52,7 @@ export class UsersService {
 		const user = {
 			login: user42.login,
 			name: user42.login,
-			profile_picture: `${process.env.SELF_URL}/cdn/user/${user42.login}.jpg`,
+			profile_picture: user42.image.link,
 		};
 		this.creatingUsers.push(user);
 		return user;
