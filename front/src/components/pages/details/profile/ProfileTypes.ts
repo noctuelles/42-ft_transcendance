@@ -27,7 +27,7 @@ export interface ProfileMatchData {
 
 export interface ProfileData {
 	matches: ProfileMatchData[];
-	achivements: ProfileAchievementData[];
+	achievements: ProfileAchievementData[];
 	matchesCount: number;
 	matchesWonCount: number;
 	matchesLostCount: number;

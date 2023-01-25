@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import ProfileSummary from './details/profile/ProfileSummary';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
-import { MatchData, ProfileData } from './details/profile/ProfileTypes';
+import { ProfileData, ProfileMatchData } from './details/profile/ProfileTypes';
 
 const Profile = () => {
 	const userContext = React.useContext(UserContext);
@@ -22,9 +22,8 @@ const Profile = () => {
 				}
 				return Promise.reject(response);
 			})
-			.then((data) => {
+			.then((data: ProfileData) => {
 				setProfile(data);
-				console.log(data);
 			})
 			.catch(() => {
 				infoContext.addInfo({
@@ -60,15 +59,16 @@ const Profile = () => {
 					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
-			<p>lol</p>
 		</div>
 	);
 };
 
-function getTotalNbrBounces(matches: MatchData[]): number {
+function getTotalNbrBounces(matches: ProfileMatchData[]): number {
 	let totalNbrBounces = 0;
 
-	matches.forEach((match: MatchData) => (totalNbrBounces += match.bounces));
+	matches.forEach(
+		(match: ProfileMatchData) => (totalNbrBounces += match.bounces),
+	);
 	return totalNbrBounces;
 }
 
