@@ -13,11 +13,12 @@ interface ProfileData {
 	matches_count: number;
 	matches_won_count: number;
 	matches_lost_count: number;
-	name: string;
 	picture: string;
+	name: string;
+	xp: number;
 }
 
-const Profile = (props: any) => {
+const Profile = () => {
 	const userContext = React.useContext(UserContext);
 	const infoContext = React.useContext(InfoBoxContext);
 	const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -26,10 +27,15 @@ const Profile = (props: any) => {
 		if (profile?.name === searchValue || searchValue.length == 0) return;
 		fetch(back_url + `/users/profile/${searchValue}`)
 			.then((response) => {
-				if (response.ok) return response.json();
+				if (response.ok) {
+					return response.json();
+				}
 				return Promise.reject(response);
 			})
-			.then((data) => setProfile(data))
+			.then((data) => {
+				setProfile(data);
+				console.log(data);
+			})
 			.catch(() => {
 				infoContext.addInfo({
 					type: InfoType.ERROR,
@@ -47,7 +53,7 @@ const Profile = (props: any) => {
 		<div className="container">
 			<ProfileHeader
 				username={profile.name}
-				total_xp={42}
+				total_xp={profile.xp}
 				picture={profile.picture}
 				onSearchClick={handleSearch}
 			/>

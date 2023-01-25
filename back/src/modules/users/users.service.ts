@@ -110,6 +110,8 @@ export class UsersService {
 		});
 	}
 
+	matchInclude = {};
+
 	/* Fetch a profile of a specified username */
 	async fetchProfileData(username: string) {
 		const user = await this.prismaService.user.findUnique({
@@ -128,6 +130,7 @@ export class UsersService {
 								profile: {
 									select: {
 										picture: true,
+										xp: true,
 									},
 								},
 							},
@@ -138,6 +141,7 @@ export class UsersService {
 								profile: {
 									select: {
 										picture: true,
+										xp: true,
 									},
 								},
 							},
@@ -160,6 +164,7 @@ export class UsersService {
 								profile: {
 									select: {
 										picture: true,
+										xp: true,
 									},
 								},
 							},
@@ -169,6 +174,7 @@ export class UsersService {
 								profile: {
 									select: {
 										picture: true,
+										xp: true,
 									},
 								},
 								name: true,
@@ -183,7 +189,9 @@ export class UsersService {
 				},
 				profile: {
 					select: {
+						xp: true,
 						achivements: true,
+						picture: true,
 					},
 				},
 			},
@@ -195,8 +203,9 @@ export class UsersService {
 			matches_count: user.matchesWon.length + user.matchesLost.length,
 			matches_won_count: user.matchesWon.length,
 			matches_lost_count: user.matchesLost.length,
-			picture: `${process.env.SELF_URL}/cdn/user/${username}.jpg`,
+			picture: user.profile.picture,
 			name: username,
+			xp: user.profile.xp,
 		};
 	}
 }
