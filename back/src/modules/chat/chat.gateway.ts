@@ -12,10 +12,10 @@ export class ChatGateway {
 	@WebSocketServer() server;
 	@SubscribeMessage('chat')
 	async handleMessage(socket: any, data: any) {
-		data.user = socket.user.name;
+		data.username = socket.user.name;
 		if (
 			!this.chatService.isIMessage(data) ||
-			!this.chatService.canSendToChannel(data.user, data.channel)
+			!this.chatService.canSendToChannel(socket.user.id, data.channel)
 		) {
 			return;
 		}

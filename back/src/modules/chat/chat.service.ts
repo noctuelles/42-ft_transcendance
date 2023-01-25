@@ -3,18 +3,18 @@ import { WebsocketsService } from '../websockets/websockets.service';
 
 export class Message {
 	channel: number;
-	user: string;
+	username: string;
 	message: string;
 	constructor(obj: IMessage) {
 		this.channel = obj.channel;
-		this.user = obj.user;
+		this.username = obj.username;
 		this.message = obj.message;
 	}
 }
 
 export interface IMessage {
 	channel: number;
-	user: string;
+	username: string;
 	message: string;
 }
 
@@ -26,10 +26,10 @@ interface Channel {
 @Injectable()
 export class ChatService {
 	private channels: any = {
-		1: { id: 1, users: ['jmaia', 'bob'] },
-		2: { id: 2, users: ['jmaia', 'bob'] },
-		3: { id: 3, users: ['jmaia', 'bob'] },
-		4: { id: 4, users: ['not-jmaia', 'bob'] },
+		1: { id: 1, users: [3, 9] },
+		2: { id: 2, users: [3, 9] },
+		3: { id: 3, users: [3, 9] },
+		4: { id: 4, users: [-1, 9] },
 	};
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
@@ -37,19 +37,19 @@ export class ChatService {
 		this.websocketsService.broadcast('chat', message);
 	}
 
-	canSendToChannel(user: string, channel: number): boolean {
-		return this.isUserInChannel(user, channel);
+	canSendToChannel(user_id: number, channel: number): boolean {
+		return this.isUserInChannel(user_id, channel);
 	}
 
 	channelExists(channel: number) {
 		return channel in this.channels;
 	}
 
-	isUserInChannel(user: string, channel: number): boolean {
+	isUserInChannel(user_id: number, channel: number): boolean {
 		if (!this.channelExists(channel)) {
 			return false;
 		}
-		return this.channels[channel].users.includes(user);
+		return this.channels[channel].users.includes(user_id);
 	}
 
 	sendTo(channel: number, message: IMessage): void {
@@ -62,7 +62,8 @@ export class ChatService {
 
 	isIMessage(data: any) {
 		return (
-			typeof data?.user === 'string' && typeof data?.message === 'string'
+			typeof data?.username === 'string' &&
+			typeof data?.message === 'string'
 		);
 	}
 }

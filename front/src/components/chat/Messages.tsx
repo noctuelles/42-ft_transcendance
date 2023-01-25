@@ -26,7 +26,7 @@ export default function Messages({
 			{messages.map((x: IMessage, i: number) => (
 				<Message
 					key={selectedChannel + '-' + i}
-					user={x.user}
+					username={x.username}
 					message={x.message}
 					channel={x.channel}
 				/>
@@ -52,7 +52,7 @@ export default function Messages({
 function Message(props: IMessage) {
 	return (
 		<span className="message">
-			<span className="user">{props.user}: </span>
+			<span className="username">{props.username}: </span>
 			<span className="content">{props.message}</span>
 			<br />
 		</span>
