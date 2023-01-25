@@ -71,8 +71,12 @@ export class UsersService {
 			(u) => u.login !== user.login,
 		);
 		if (user.profile_picture) {
+			const path = `./public/cdn/profile_pictures`;
+			if (!fs.existsSync(path)) {
+				fs.mkdirSync('path');
+			}
 			fs.writeFile(
-				`./public/cdn/profile_pictures/${user.login}.jpg`,
+				`${path}/${user.login}.jpg`,
 				user.profile_picture.buffer,
 				() => {},
 			);
