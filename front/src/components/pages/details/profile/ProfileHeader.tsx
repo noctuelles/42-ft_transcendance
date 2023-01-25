@@ -2,7 +2,14 @@ import '@/style/details/profile/ProfileHeader.css';
 import ProfileHeaderSearchBar from './ProfileHeaderSearchBar';
 import ProgressBar from '@/components/global/ProgressBar';
 
-const ProfileHeader = (props: any) => {
+interface ProfileHeaderProps {
+	onSearchClick: object;
+	picture: string;
+	total_xp: number;
+	username: string;
+}
+
+const ProfileHeader = (props: ProfileHeaderProps) => {
 	let [level, percentCompleted] = getLevelByXP(props.total_xp);
 
 	return (

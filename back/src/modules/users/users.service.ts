@@ -121,6 +121,7 @@ export class UsersService {
 			select: {
 				matchesWon: {
 					select: {
+						id: true,
 						createdAt: true,
 						finishedAt: true,
 						bounces: true,
@@ -155,6 +156,7 @@ export class UsersService {
 				},
 				matchesLost: {
 					select: {
+						id: true,
 						createdAt: true,
 						finishedAt: true,
 						bounces: true,
@@ -200,9 +202,9 @@ export class UsersService {
 		return {
 			matches: [...user.matchesLost, ...user.matchesWon],
 			achievements: user.profile.achivements,
-			matches_count: user.matchesWon.length + user.matchesLost.length,
-			matches_won_count: user.matchesWon.length,
-			matches_lost_count: user.matchesLost.length,
+			matchesCount: user.matchesWon.length + user.matchesLost.length,
+			matchesWonCount: user.matchesWon.length,
+			matchesLostCount: user.matchesLost.length,
 			picture: user.profile.picture,
 			name: username,
 			xp: user.profile.xp,

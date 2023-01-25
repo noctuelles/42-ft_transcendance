@@ -61,11 +61,11 @@ model UserChannel {
 }
 
 model UserProfile {
-    id          Int               @id @unique @default(autoincrement())
-    xp          Int               @default(0)
-    picture     String
-    achivements UserAchievement[]
-    user        User?
+    id           Int               @id @unique @default(autoincrement())
+    xp           Int               @default(0)
+    picture      String
+    achievements UserAchievement[]
+    user         User?
 }
 
 model UserAchievement {

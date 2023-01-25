@@ -6,17 +6,7 @@ import React, { useEffect, useState } from 'react';
 import ProfileSummary from './details/profile/ProfileSummary';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
-
-interface ProfileData {
-	matches: object;
-	achivements: object;
-	matches_count: number;
-	matches_won_count: number;
-	matches_lost_count: number;
-	picture: string;
-	name: string;
-	xp: number;
-}
+import { MatchData, ProfileData } from './details/profile/ProfileTypes';
 
 const Profile = () => {
 	const userContext = React.useContext(UserContext);
@@ -64,13 +54,22 @@ const Profile = () => {
 					name={profile.name}
 				/>
 				<ProfileSummary
-					matches={profile.matches_count}
-					win={profile.matches_won_count}
-					lost={profile.matches_lost_count}
+					matches={profile.matchesCount}
+					win={profile.matchesWonCount}
+					lost={profile.matchesLostCount}
+					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
+			<p>lol</p>
 		</div>
 	);
 };
+
+function getTotalNbrBounces(matches: MatchData[]): number {
+	let totalNbrBounces = 0;
+
+	matches.forEach((match: MatchData) => (totalNbrBounces += match.bounces));
+	return totalNbrBounces;
+}
 
 export default Profile;

@@ -1,8 +1,13 @@
 import '@/style/details/profile/MatchHistoryRow.css';
 import Fight from '@/assets/fight.svg';
 import FightFlipped from '@/assets/fight_flipped.svg';
+import { ProfileMatchData } from './ProfileTypes';
 
-const MatchHistoryRow = (props: any) => {
+interface MatchHistoryRowProps {
+	match: ProfileMatchData;
+}
+
+const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 	let fightIcon = null;
 	let diff =
 		new Date(props.match.finishedAt).getTime() -
@@ -12,7 +17,7 @@ const MatchHistoryRow = (props: any) => {
 		minutes: Math.floor((diff / (1000 * 60)) % 60),
 	};
 
-	if (props.match.playerOne === props.match.winner) fightIcon = Fight;
+	if (props.match.userOne !== props.match.looser) fightIcon = Fight;
 	else fightIcon = FightFlipped;
 
 	return (

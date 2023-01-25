@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import Button from '@/components/global/Button';
 
+//TODO: interface here, but this is subject to changes.
+
 const ProfileHeaderSearchBar = (props: any) => {
 	const searchInput = useRef<HTMLInputElement>(null);
 	const [isBtnCliked, setIsBtnClicked] = useState(false);

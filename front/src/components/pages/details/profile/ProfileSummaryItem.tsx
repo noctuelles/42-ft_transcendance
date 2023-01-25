@@ -3,7 +3,12 @@ import TableTennis from '@/assets/table-tennis.svg';
 import '@/style/details/profile/ProfileSummaryItem.css';
 import { bounceImg, tropheeImg } from './Data';
 
-function ProfileSummaryItem(props: any) {
+interface ProfileSummaryItemProps {
+	type: string;
+	count: number;
+}
+
+function ProfileSummaryItem(props: ProfileSummaryItemProps) {
 	const item = new Map([
 		['won', { img: tropheeImg, text: 'Win' }],
 		['played', { img: TableTennis, text: 'Played' }],
