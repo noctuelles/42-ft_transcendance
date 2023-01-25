@@ -20,17 +20,62 @@ export interface IMessage {
 
 interface Channel {
 	id: number;
-	users: string[];
+	name: string;
+	type: ChannelType;
+	owner_id: number;
+	members: number[];
+}
+
+enum ChannelType {
+	PUBLIC,
+	PROTECTED,
+	PRIVATE,
 }
 
 @Injectable()
 export class ChatService {
-	private channels: any = {
-		1: { id: 1, users: [3, 9] },
-		2: { id: 2, users: [3, 9] },
-		3: { id: 3, users: [3, 9] },
-		4: { id: 4, users: [-1, 9] },
-	};
+	private channels: Map<number, Channel> = new Map([
+		[
+			1,
+			{
+				id: 1,
+				name: 'Channel 1',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [3, 9],
+			},
+		],
+		[
+			2,
+			{
+				id: 2,
+				name: 'Channel 2',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [3, 9],
+			},
+		],
+		[
+			3,
+			{
+				id: 3,
+				name: 'Channel 3',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [3, 9],
+			},
+		],
+		[
+			4,
+			{
+				id: 4,
+				name: 'Channel 4',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [-1, 9],
+			},
+		],
+	]);
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
 	broadcastMessage(message: Message) {
@@ -42,19 +87,19 @@ export class ChatService {
 	}
 
 	channelExists(channel: number) {
-		return channel in this.channels;
+		return channel in [...this.channels.keys()];
 	}
 
 	isUserInChannel(user_id: number, channel: number): boolean {
 		if (!this.channelExists(channel)) {
 			return false;
 		}
-		return this.channels[channel].users.includes(user_id);
+		return this.channels.get(channel).members.includes(user_id);
 	}
 
 	sendTo(channel: number, message: IMessage): void {
 		this.websocketsService.sendToAllUsers(
-			this.channels[channel].users,
+			this.channels.get(channel).members,
 			'chat',
 			message,
 		);
@@ -65,5 +110,11 @@ export class ChatService {
 			typeof data?.username === 'string' &&
 			typeof data?.message === 'string'
 		);
+	}
+
+	sendChannelListTo(users: number[]): void {
+		this.websocketsService.sendToAllUsers(users, 'channels', [
+			...this.channels.values(),
+		]);
 	}
 }

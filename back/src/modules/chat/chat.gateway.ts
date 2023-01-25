@@ -13,6 +13,7 @@ export class ChatGateway {
 	@SubscribeMessage('chat')
 	async handleMessage(socket: any, data: any) {
 		data.username = socket.user.name;
+		this.chatService.sendChannelListTo([3]);
 		if (
 			!this.chatService.isIMessage(data) ||
 			!this.chatService.canSendToChannel(socket.user.id, data.channel)
