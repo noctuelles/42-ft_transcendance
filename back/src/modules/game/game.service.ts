@@ -20,6 +20,7 @@ export class GameService {
 		});
 		socket.user.profile = user.profile;
 		this.queue.push(socket);
+		this.registerQuit(socket);
 		if (this.queue.length >= 2) {
 			const player1 = this.queue.shift();
 			const player2 = this.queue.shift();
@@ -47,6 +48,13 @@ export class GameService {
 				this.games.splice(this.games.indexOf(game), 1);
 			});
 		}
+	}
+
+	registerQuit(socket) {
+		this.websocketsService.registerOnClose(socket, () => {
+			this.cancelQueue(socket);
+			this.leaveGame(socket);
+		});
 	}
 
 	cancelQueue(socket) {
