@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { Game } from './Game.class';
+import { GameType } from './Game.interfaces';
 
 @Injectable()
 export class GameService {
-	queue = [];
+	private _rankedQueue = [];
+	private _funQueue = [];
 	games = [];
 
 	constructor(
@@ -13,17 +15,10 @@ export class GameService {
 		private readonly prismaService: PrismaService,
 	) {}
 
-	async joinQueue(socket) {
-		const user = await this.prismaService.user.findUnique({
-			where: { id: socket.user.id },
-			include: { profile: true },
-		});
-		socket.user.profile = user.profile;
-		this.queue.push(socket);
-		this.registerQuit(socket);
-		if (this.queue.length >= 2) {
-			const player1 = this.queue.shift();
-			const player2 = this.queue.shift();
+	private _treatQueue(queue, type: GameType) {
+		if (queue.length >= 2) {
+			const player1 = queue.shift();
+			const player2 = queue.shift();
 			const msg = {
 				action: 'match',
 				player1: {
@@ -42,11 +37,28 @@ export class GameService {
 				{ socket: player2, user: player2.user },
 				this.websocketsService,
 				this.prismaService,
+				type,
 			);
 			this.games.push(game);
 			game.start(() => {
 				this.games.splice(this.games.indexOf(game), 1);
 			});
+		}
+	}
+
+	async joinQueue(socket, type: GameType) {
+		const user = await this.prismaService.user.findUnique({
+			where: { id: socket.user.id },
+			include: { profile: true },
+		});
+		socket.user.profile = user.profile;
+		this.registerQuit(socket);
+		if (type === GameType.RANKED) {
+			this._rankedQueue.push(socket);
+			this._treatQueue(this._rankedQueue, type);
+		} else if (type === GameType.FUN) {
+			this._funQueue.push(socket);
+			this._treatQueue(this._funQueue, type);
 		}
 	}
 
@@ -58,8 +70,11 @@ export class GameService {
 	}
 
 	cancelQueue(socket) {
-		if (this.queue.includes(socket)) {
-			this.queue.splice(this.queue.indexOf(socket), 1);
+		if (this._rankedQueue.includes(socket)) {
+			this._rankedQueue.splice(this._rankedQueue.indexOf(socket), 1);
+		}
+		if (this._funQueue.includes(socket)) {
+			this._funQueue.splice(this._funQueue.indexOf(socket), 1);
 		}
 	}
 

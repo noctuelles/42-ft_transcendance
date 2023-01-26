@@ -10,6 +10,11 @@ export enum GameStatus {
 	ABORTED = 'aborted',
 }
 
+export enum GameType {
+	RANKED = 'ranked',
+	FUN = 'fun',
+}
+
 export interface IGameInfos {
 	width: number;
 	height: number;

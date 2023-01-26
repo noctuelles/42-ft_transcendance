@@ -12,6 +12,7 @@ import {
 	IPosition,
 	IRect,
 	IPlayer,
+	GameType,
 } from './Game.interfaces';
 
 export class Game {
@@ -21,6 +22,7 @@ export class Game {
 	private _player1Profile: IProfile;
 	private _player2Profile: IProfile;
 	private _status: GameStatus = GameStatus.STARTING;
+	private _type: GameType;
 
 	private _startCounter: number = 10;
 	private _gameStartTime: Date | null = null;
@@ -34,13 +36,15 @@ export class Game {
 	constructor(
 		player1Profile: IProfile,
 		player2Profile: IProfile,
-		_websocketsService: WebsocketsService,
-		_prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		prismaService: PrismaService,
+		type: GameType,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
-		this._websocketsService = _websocketsService;
-		this._prismaService = _prismaService;
+		this._websocketsService = websocketsService;
+		this._prismaService = prismaService;
+		this._type = type;
 		this._gameState = getDefaultGameState(player1Profile, player2Profile);
 		this._resetBall(this._gameState.ball);
 	}
