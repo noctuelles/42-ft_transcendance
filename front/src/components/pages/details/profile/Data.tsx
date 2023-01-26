@@ -8,8 +8,9 @@ export const tropheeImg: string =
 
 export const achievementList: ProfileAchievement[] = [
 	{
+		title: 'Newborn'
 		img: 'toto',
-		description: "c'est un super achievement ca toto",
+		description: "Win your first match",
 	},
 	{
 		img: 'tata',

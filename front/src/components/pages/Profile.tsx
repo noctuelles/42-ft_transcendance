@@ -40,7 +40,7 @@ const Profile = () => {
 
 	if (!profile) return <h2>Profile loading...</h2>;
 	return (
-		<div className="container">
+		<div className="profile-container">
 			<ProfileHeader
 				username={profile.name}
 				total_xp={profile.xp}
@@ -69,6 +69,7 @@ const Profile = () => {
 				unlocked={true}
 				unlockedDate={new Date('2023-01-26T14:05:13.728Z')}
 			/>
+		</div>
 	);
 };
 

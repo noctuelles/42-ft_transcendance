@@ -1,11 +1,11 @@
-.container {
+.profile-container {
 	border-radius: 20px;
 	background-color: lightgray;
 	padding: 1rem;
 	border: 2px solid;
 }
 
-.container hr {
+.profile-container hr {
 	border-top: 3px solid black;
 	border-radius: 8px;
 	margin-top: 15px;
