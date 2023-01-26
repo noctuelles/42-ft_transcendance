@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 export enum InfoType {
 	ERROR = 'error',
@@ -11,22 +11,39 @@ export interface IInfo {
 	type: InfoType;
 	message: string;
 	visible: boolean;
+	onClick?: (event?: any) => void;
 }
 
 export interface IInfoBuilder {
 	type: InfoType;
 	message: string;
+	onClick?: (event?: any) => void;
 }
 
-export const InfoBoxContext = React.createContext({
-	infos: [] as IInfo[],
-	addInfo: (info: IInfoBuilder) => {},
-	removeInfo: (id: number) => {},
-});
+interface IInfoBoxContext {
+	infos: IInfo[];
+	addInfo: (info: IInfoBuilder) => void;
+	removeInfo: (id: number) => void;
+	enableInfoBox: () => void;
+	disableInfoBox: () => void;
+}
+
+export const InfoBoxContext = React.createContext<IInfoBoxContext>(
+	{} as IInfoBoxContext,
+);
 
 function InfoBoxContextProvider(props: any) {
 	const [infos, setInfos] = useState<IInfo[]>([]);
 	const [id, setId] = useState(0);
+	const enable = useRef(true);
+
+	function enableInfoBox() {
+		enable.current = true;
+	}
+
+	function disableInfoBox() {
+		enable.current = false;
+	}
 
 	async function removeInfo(id: number) {
 		setInfos((infos) =>
@@ -44,13 +61,17 @@ function InfoBoxContextProvider(props: any) {
 	}
 
 	async function addInfo(info: IInfoBuilder) {
+		if (!enable.current) return;
 		let inf = [...infos];
 		console.log('before', inf.length);
 		if (inf.length >= 5) {
 			inf = inf.slice(1, inf.length);
 		}
 		console.log('after', inf.length);
-		setInfos([...inf, { ...info, id: id, visible: true }]);
+		setInfos([
+			...inf,
+			{ ...info, id: id, visible: true, onClick: info.onClick },
+		]);
 		const save = id;
 		setId((id) => id + 1);
 		setTimeout(() => {
@@ -58,7 +79,15 @@ function InfoBoxContextProvider(props: any) {
 		}, 5000);
 	}
 	return (
-		<InfoBoxContext.Provider value={{ infos, addInfo, removeInfo }}>
+		<InfoBoxContext.Provider
+			value={{
+				infos,
+				addInfo,
+				removeInfo,
+				enableInfoBox,
+				disableInfoBox,
+			}}
+		>
 			{props.children}
 		</InfoBoxContext.Provider>
 	);
