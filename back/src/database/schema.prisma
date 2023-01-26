@@ -61,13 +61,20 @@ model UserChannel {
 }
 
 model UserProfile {
-    id            Int    @id @unique @default(autoincrement())
-    playedMatches Int    @default(0)
-    wonMatches    Int    @default(0)
-    picture       String
-    xp            Int    @default(0)
-    elo           Int    @default(1000)
-    user          User?
+    id           Int               @id @unique @default(autoincrement())
+    xp           Int               @default(0)
+    elo          Int               @default(1000)
+    picture      String
+    achievements UserAchievement[]
+    user         User?
+}
+
+model UserAchievement {
+    id            Int             @id @unique @default(autoincrement())
+    unlockedAt    DateTime
+    type          AchievementType
+    UserProfile   UserProfile     @relation(fields: [userProfileId], references: [id])
+    userProfileId Int
 }
 
 model Match {
@@ -95,6 +102,14 @@ enum UserStatus {
     ONLINE
     OFFLINE
     PLAYING
+}
+
+enum AchievementType {
+    BOUNCE_NOVICE
+    BOUNCE_REGULAR
+    BOUNCE_MASTER
+    DEADLY_CONTENDER
+    FAST_WINNER
 }
 
 enum UserOnChannelRole {

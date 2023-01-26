@@ -28,7 +28,7 @@
 		"@nestjs/websockets": "^9.2.1",
 		"@prisma/client": "^4.8.1",
 		"@types/passport-jwt": "^3.0.8",
-		"42.js": "^1.2.4",
+		"42.js": "^1.2.5",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.0",
 		"nestjs-form-data": "^1.8.7",

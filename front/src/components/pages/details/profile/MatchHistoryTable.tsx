@@ -1,27 +1,46 @@
 import '@/style/details/profile/MatchHistoryTable.css';
 import MatchHistoryRow from './MatchHistoryRow';
+import { useContext } from 'react';
+import { UserContext } from '@/context/UserContext';
+import { ProfileMatchData } from './ProfileTypes';
 
-interface Match {
-	playerOne: string;
-	playerTwo: string;
-	winner: string;
-	duration: string;
-	nbrOfBounce: number;
+interface MatchHistoryTableProps {
+	matches: ProfileMatchData[];
+	name: string;
 }
 
-const MatchHistoryTable = (props: any) => {
-	const rows: JSX.Element = [];
-
-	props.matches.forEach((match: Match) => {
-		rows.push(<MatchHistoryRow match={match} />);
-	});
+const MatchHistoryTable = (props: MatchHistoryTableProps) => {
+	const userContext = useContext(UserContext);
 
 	return (
 		<table>
 			<thead>
-				<p>Match History:</p>
+				<tr>
+					<th scope="col">Match history:</th>
+				</tr>
 			</thead>
-			<tbody>{rows}</tbody>
+			{!props.matches || props.matches.length == 0 ? (
+				<tbody>
+					<tr>
+						<td>
+							{props.name == userContext.user.name
+								? 'You '
+								: `${props.name} `}
+							haven't played any match...
+						</td>
+					</tr>
+				</tbody>
+			) : (
+				<tbody>
+					{props.matches.map((m: ProfileMatchData) => (
+						<tr>
+							<td>
+								<MatchHistoryRow key={m.id} match={m} />
+							</td>
+						</tr>
+					))}
+				</tbody>
+			)}
 		</table>
 	);
 };

@@ -63,7 +63,6 @@ const Play = () => {
 	useEffect(() => {
 		return () => {
 			if (
-				stateRef.current == GameState.MATCHMAKING ||
 				stateRef.current == GameState.PREGAME ||
 				stateRef.current == GameState.PLAYING
 			) {
