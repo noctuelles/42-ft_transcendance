@@ -192,7 +192,7 @@ export class UsersService {
 				profile: {
 					select: {
 						xp: true,
-						achivements: true,
+						achievements: true,
 						picture: true,
 					},
 				},
@@ -201,7 +201,7 @@ export class UsersService {
 		if (!user) return null;
 		return {
 			matches: [...user.matchesLost, ...user.matchesWon],
-			achievements: user.profile.achivements,
+			achievements: user.profile.achievements,
 			matchesCount: user.matchesWon.length + user.matchesLost.length,
 			matchesWonCount: user.matchesWon.length,
 			matchesLostCount: user.matchesLost.length,

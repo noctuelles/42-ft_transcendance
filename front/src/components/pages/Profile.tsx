@@ -7,6 +7,7 @@ import ProfileSummary from './details/profile/ProfileSummary';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { ProfileData, ProfileMatchData } from './details/profile/ProfileTypes';
+import AchievementItem from './details/profile/AchievementItem';
 
 const Profile = () => {
 	const userContext = React.useContext(UserContext);
@@ -59,7 +60,15 @@ const Profile = () => {
 					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
-		</div>
+			<AchievementItem
+				achievement={{
+					img: 'blabla',
+					title: 'Butcher',
+					description: 'Lojrtioje.',
+				}}
+				unlocked={true}
+				unlockedDate={new Date('2023-01-26T14:05:13.728Z')}
+			/>
 	);
 };
 
