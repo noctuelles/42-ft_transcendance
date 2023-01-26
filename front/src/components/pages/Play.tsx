@@ -1,5 +1,5 @@
 import '@/style/play/Play.css';
-import { useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Matchmaking from '../play/Matchmaking';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
@@ -7,8 +7,10 @@ import PreGame from '../play/PreGame';
 import Game from '../play/Game';
 import GameResult from '../play/GameResult';
 import { IGameResult } from '../play/GameInterfaces';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 export enum GameState {
+	NO_GAME = 'no-game',
 	LOBBY = 'lobby',
 	MATCHMAKING = 'matchmaking',
 	PREGAME = 'pregame',
@@ -28,12 +30,60 @@ export interface IGamePlayer {
 
 const Play = () => {
 	const [gameState, setGameState] = useState(GameState.LOBBY);
+	const stateRef = useRef(GameState.LOBBY);
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
 	const [result, setResult] = useState<IGameResult | null>(null);
+	const infoBoxContext = useContext(InfoBoxContext);
+
+	function isGameAbortedEvent(data: any): boolean {
+		return data.event === 'game-aborted';
+	}
 
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
+		onMessage: ({ data }) => {
+			data = JSON.parse(data);
+			if (data.data.reason === 'player-left') {
+				if (data.data.result === 'win') {
+					infoBoxContext.addInfo({
+						type: InfoType.SUCCESS,
+						message: 'Your opponent left the game and you won',
+					});
+				}
+			}
+			if (isGameAbortedEvent(data)) {
+				setGameState(GameState.LOBBY);
+			}
+		},
+		filter: ({ data }) => {
+			return isGameAbortedEvent(JSON.parse(data));
+		},
 	});
+
+	useEffect(() => {
+		return () => {
+			if (
+				stateRef.current == GameState.PREGAME ||
+				stateRef.current == GameState.PLAYING
+			) {
+				stateRef.current = GameState.NO_GAME;
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'You left the game and lost',
+				});
+				sendMessage(
+					JSON.stringify({
+						event: 'matchmaking',
+						data: { action: 'leave' },
+					}),
+				);
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		stateRef.current = gameState;
+	}, [gameState]);
 
 	function endMatch(result: IGameResult) {
 		setResult(result);
@@ -74,7 +124,9 @@ const Play = () => {
 			{gameState === GameState.PLAYING && (
 				<Game players={players} endMatch={endMatch} />
 			)}
-			{gameState === GameState.RESULTS && <GameResult result={result} />}
+			{gameState === GameState.RESULTS && result && (
+				<GameResult result={result} />
+			)}
 		</div>
 	);
 };

@@ -15,6 +15,9 @@ export class GameGateway {
 			case 'cancel':
 				this.gameService.cancelQueue(socket);
 				break;
+			case 'leave':
+				this.gameService.leaveGame(socket);
+				break;
 		}
 	}
 

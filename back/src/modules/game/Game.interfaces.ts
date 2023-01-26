@@ -7,6 +7,7 @@ export enum GameStatus {
 	STARTING = 'starting',
 	PLAYING = 'playing',
 	ENDED = 'ended',
+	ABORTED = 'aborted',
 }
 
 export interface IGameInfos {
@@ -33,6 +34,7 @@ export interface IBall {
 	position: IPosition;
 	direction: IPosition;
 	velocity: number;
+	collidable: boolean;
 }
 
 export interface IGameState {
@@ -59,13 +61,16 @@ export const GameParams = {
 	GAME_HEIGHT: 900,
 	PADDLE_MOVE_SPEED: 10,
 	PADDLE_OFFSET: 50,
+	PADDLE_BORDER: 2,
 	PADDLE_HEIGHT: 120,
 	PADDLE_WIDTH: 10,
 	BALL_RADIUS: 15,
 	BALL_DEFAULT_SPEED: 10,
-	BALL_SPEED_INCREASE: 1,
+	BALL_SPEED_INCREASE: 0.3,
+	BALL_MAX_SPEED: 15,
+	BALL_PERTURBATOR: 0.2,
 	//TODO: change to 300
-	GAME_TIME: 5,
+	GAME_TIME: 300,
 };
 
 export function getDefaultGameState(
@@ -110,6 +115,7 @@ export function getDefaultGameState(
 				x: 0,
 				y: 0,
 			},
+			collidable: true,
 			velocity: GameParams.BALL_DEFAULT_SPEED,
 		},
 	};

@@ -1,3 +1,4 @@
+import { PrismaService } from '../prisma/prisma.service';
 import { WebsocketsService } from '../websockets/websockets.service';
 import {
 	convertStateToSendable,
@@ -15,6 +16,7 @@ import {
 
 export class Game {
 	private _websocketsService: WebsocketsService;
+	private _prismaService: PrismaService;
 
 	private _player1Profile: IProfile;
 	private _player2Profile: IProfile;
@@ -25,16 +27,20 @@ export class Game {
 
 	private _gameState: IGameState;
 
+	private _bounce: number = 0;
+
 	private onEnd: () => void;
 
 	constructor(
 		player1Profile: IProfile,
 		player2Profile: IProfile,
 		_websocketsService: WebsocketsService,
+		_prismaService: PrismaService,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
 		this._websocketsService = _websocketsService;
+		this._prismaService = _prismaService;
 		this._gameState = getDefaultGameState(player1Profile, player2Profile);
 		this._resetBall(this._gameState.ball);
 	}
@@ -75,6 +81,43 @@ export class Game {
 		}
 	}
 
+	async leave(userId: number) {
+		const leaved = this.getPlayer(userId);
+		const otherPlayer =
+			this._gameState.player1.profile.user.id === leaved.profile.user.id
+				? this._gameState.player2
+				: this._gameState.player1;
+		this._websocketsService.send(leaved.profile.socket, 'game-aborted', {
+			reason: 'player-left',
+			result: 'lose',
+		});
+		this._websocketsService.send(
+			otherPlayer.profile.socket,
+			'game-aborted',
+			{
+				reason: 'player-left',
+				result: 'win',
+			},
+		);
+		this._status = GameStatus.ABORTED;
+		if (this._gameStartTime) {
+			await this._prismaService.match.create({
+				data: {
+					createdAt:
+						this._gameStartTime.toISOString() ||
+						new Date().toISOString(),
+					finishedAt: new Date().toISOString(),
+					bounces: this._bounce,
+					userOneId: this._player1Profile.user.id,
+					userTwoId: this._player2Profile.user.id,
+					winnerId: otherPlayer.profile.user.id,
+					looserId: leaved.profile.user.id,
+				},
+			});
+		}
+		this.onEnd();
+	}
+
 	private async _wait(ms: number) {
 		return new Promise<void>((resolve) => {
 			setTimeout(() => {
@@ -109,8 +152,8 @@ export class Game {
 		if (player.event == null) return;
 		if (player.event === 'up') {
 			player.paddle.y -= GameParams.PADDLE_MOVE_SPEED;
-			if (player.paddle.y < GameParams.PADDLE_OFFSET)
-				player.paddle.y = GameParams.PADDLE_OFFSET;
+			if (player.paddle.y < GameParams.PADDLE_BORDER)
+				player.paddle.y = GameParams.PADDLE_BORDER;
 		}
 		if (player.event === 'down') {
 			player.paddle.y += GameParams.PADDLE_MOVE_SPEED;
@@ -118,12 +161,12 @@ export class Game {
 				player.paddle.y >
 				this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					GameParams.PADDLE_OFFSET
+					GameParams.PADDLE_BORDER
 			)
 				player.paddle.y =
 					this._gameState.gameInfos.height -
 					this._gameState.gameInfos.paddleHeight -
-					GameParams.PADDLE_OFFSET;
+					GameParams.PADDLE_BORDER;
 		}
 	}
 
@@ -147,10 +190,12 @@ export class Game {
 		if (ball.position.y < ballRadius) {
 			ball.position.y = ballRadius;
 			ball.direction.y *= -1;
+			this._bounce++;
 		}
 		if (ball.position.y > this._gameState.gameInfos.height - ballRadius) {
 			ball.position.y = this._gameState.gameInfos.height - ballRadius;
 			ball.direction.y *= -1;
+			this._bounce++;
 		}
 	}
 
@@ -163,6 +208,12 @@ export class Game {
 		);
 	}
 
+	private async _disableCollision(ball: IBall) {
+		ball.collidable = false;
+		await this._wait(200);
+		ball.collidable = true;
+	}
+
 	private _checkBallCollidePaddle(
 		ball: IBall,
 		ballRadius: number,
@@ -170,21 +221,77 @@ export class Game {
 		paddleWidth: number,
 		paddleHeight: number,
 	) {
-		const ballColide: IRect = {
-			x: ball.position.x - ballRadius,
-			y: ball.position.y - ballRadius,
-			width: ballRadius * 2,
-			height: ballRadius * 2,
-		};
-		const paddleColide: IRect = {
-			x: paddle.x,
-			y: paddle.y,
-			width: paddleWidth,
-			height: paddleHeight,
-		};
-		if (this._checkColide(ballColide, paddleColide)) {
-			ball.direction.x *= -1;
-			ball.velocity += GameParams.BALL_SPEED_INCREASE;
+		if (ball.collidable) {
+			const ballColide: IRect = {
+				x: ball.position.x - ballRadius,
+				y: ball.position.y - ballRadius,
+				width: ballRadius * 2,
+				height: ballRadius * 2,
+			};
+			const paddleFrontUpCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y,
+				width: 2,
+				height: paddleHeight / 3,
+			};
+			const paddleFrontMiddleCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y + paddleHeight / 3,
+				width: 2,
+				height: paddleHeight / 3,
+			};
+			const paddleFrontDownCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y + (paddleHeight / 3) * 2,
+				width: 2,
+				height: paddleHeight / 3,
+			};
+			const paddleTopCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y - 2,
+				width: paddleWidth,
+				height: 2,
+			};
+			const paddleBottomCollideZone: IRect = {
+				x: paddle.x,
+				y: paddle.y + paddleHeight + 2,
+				width: paddleWidth,
+				height: 2,
+			};
+			if (this._checkColide(ballColide, paddleFrontUpCollideZone)) {
+				ball.direction.x *= -1;
+				ball.direction.y -= GameParams.BALL_PERTURBATOR;
+				this._bounce++;
+				ball.velocity += GameParams.BALL_SPEED_INCREASE;
+				this._disableCollision(ball);
+			} else if (
+				this._checkColide(ballColide, paddleFrontMiddleCollideZone)
+			) {
+				ball.direction.x *= -1;
+				this._bounce++;
+				ball.velocity += GameParams.BALL_SPEED_INCREASE;
+				this._disableCollision(ball);
+			} else if (
+				this._checkColide(ballColide, paddleFrontDownCollideZone)
+			) {
+				ball.direction.x *= -1;
+				ball.direction.y += GameParams.BALL_PERTURBATOR;
+				this._bounce++;
+				ball.velocity += GameParams.BALL_SPEED_INCREASE;
+				this._disableCollision(ball);
+			} else if (this._checkColide(ballColide, paddleTopCollideZone)) {
+				ball.direction.x *= -1;
+				ball.direction.y *= -1;
+				this._bounce++;
+				this._disableCollision(ball);
+			} else if (this._checkColide(ballColide, paddleBottomCollideZone)) {
+				ball.direction.x *= -1;
+				ball.direction.y *= -1;
+				this._bounce++;
+				this._disableCollision(ball);
+			} else if (ball.velocity > GameParams.BALL_MAX_SPEED) {
+				ball.velocity = GameParams.BALL_MAX_SPEED;
+			}
 		}
 	}
 
@@ -242,6 +349,10 @@ export class Game {
 					this._status = GameStatus.ENDED;
 			}
 		}
+		if (this._status === GameStatus.ABORTED) {
+			this.onEnd();
+			return;
+		}
 		this._result();
 	}
 
@@ -257,6 +368,7 @@ export class Game {
 			winner == this._gameState.player1
 				? this._gameState.player2
 				: this._gameState.player1;
+		this._registerGame(winner, loser);
 		const res = {
 			winner: {
 				id: winner.profile.user.id,
@@ -284,5 +396,19 @@ export class Game {
 		};
 		this._sendToPlayers('game-result', res);
 		this.onEnd();
+	}
+
+	private async _registerGame(winner: IPlayer, loser: IPlayer) {
+		await this._prismaService.match.create({
+			data: {
+				createdAt: this._gameStartTime.toISOString(),
+				finishedAt: new Date().toISOString(),
+				bounces: this._bounce,
+				userOneId: this._player1Profile.user.id,
+				userTwoId: this._player2Profile.user.id,
+				winnerId: winner.profile.user.id,
+				looserId: loser.profile.user.id,
+			},
+		});
 	}
 }

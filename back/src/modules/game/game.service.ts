@@ -40,6 +40,7 @@ export class GameService {
 				{ socket: player1, user: player1.user },
 				{ socket: player2, user: player2.user },
 				this.websocketsService,
+				this.prismaService,
 			);
 			this.games.push(game);
 			game.start(() => {
@@ -56,5 +57,11 @@ export class GameService {
 
 	getGameWherePlayerIs(userId: number) {
 		return this.games.find((game: Game) => game.getPlayer(userId) != null);
+	}
+
+	leaveGame(socket) {
+		const game = this.getGameWherePlayerIs(socket.user.id);
+		if (!game) return;
+		game.leave(socket.user.id);
 	}
 }
