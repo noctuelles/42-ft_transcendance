@@ -1,5 +1,5 @@
 function ProfileInfo(props: any) {
-	return <p>{props.username}</p>;
+	return <p>weriujweuir</p>;
 }
 
 export default ProfileInfo;

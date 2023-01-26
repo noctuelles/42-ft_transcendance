@@ -1,31 +1,41 @@
 import '@/style/details/profile/MatchHistoryRow.css';
 import Fight from '@/assets/fight.svg';
 import FightFlipped from '@/assets/fight_flipped.svg';
+import { ProfileMatchData } from './ProfileTypes';
 
-const MatchHistoryRow = (props: any) => {
+interface MatchHistoryRowProps {
+	match: ProfileMatchData;
+}
+
+const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 	let fightIcon = null;
+	let diff =
+		new Date(props.match.finishedAt).getTime() -
+		new Date(props.match.createdAt).getTime();
+	let timeInfo = {
+		seconds: Math.floor((diff / 1000) % 60),
+		minutes: Math.floor((diff / (1000 * 60)) % 60),
+	};
 
-	if (props.match.playerOne === props.match.winner) fightIcon = Fight;
+	if (props.match.userOne !== props.match.looser) fightIcon = Fight;
 	else fightIcon = FightFlipped;
 
 	return (
 		<div className="match-container">
-			<h4>Duration - {props.match.duration}</h4>
-			<hr></hr>
+			<h4>{`Duration - ${timeInfo.minutes}m${timeInfo.seconds}s`}</h4>
 			<div className="match-summary">
 				<img
 					className="profile-pic"
-					src="https://cdn.intra.42.fr/users/96f4621e2d6017c093b97002c72ffbd9/dhubleur.jpg"
+					src={props.match.userOne.profile.picture}
 				/>
-				{props.match.playerOne}
+				{props.match.userOne.name}
 				<img id="fight" src={fightIcon} />
-				{props.match.playerTwo}
+				{props.match.userTwo.name}
 				<img
 					className="profile-pic"
-					src="https://cdn.intra.42.fr/users/1022f4b45a249d0c6cea0572d68baab8/plouvel.jpg"
+					src={props.match.userTwo.profile.picture}
 				/>
 			</div>
-			<hr></hr>
 		</div>
 	);
 };

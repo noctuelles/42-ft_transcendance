@@ -4,7 +4,12 @@ import '@/style/InfoBox.css';
 import crossIcon from '@/assets/cross.svg';
 import { useContext, useRef } from 'react';
 
-function Info(props: any) {
+interface IInfoProps {
+	info: IInfo;
+	infoBoxContext: any;
+}
+
+function Info(props: IInfoProps) {
 	const nodeRef = useRef(null);
 	return (
 		<CSSTransition
@@ -22,7 +27,10 @@ function Info(props: any) {
 		>
 			<div
 				ref={nodeRef}
-				className={`info-item info-item-${props.info.type}`}
+				className={`info-item info-item-${props.info.type} ${
+					props.info.onClick && 'info-item-clickable'
+				}`}
+				onClick={props.info.onClick}
 			>
 				<img
 					src={crossIcon}

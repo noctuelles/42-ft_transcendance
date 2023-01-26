@@ -6,6 +6,8 @@ import { UserContext } from '@/context/UserContext';
 function NavBar(props: any) {
 	const userContext = React.useContext(UserContext);
 
+	console.log(userContext.user.profile_picture);
+
 	return (
 		<nav className="navBar">
 			<ul className="navLinks">
