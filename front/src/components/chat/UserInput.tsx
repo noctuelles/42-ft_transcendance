@@ -28,7 +28,7 @@ export default function UserInput({
 			return;
 		}
 		const message: IMessage = {
-			user: '', // TODO: We don't trust front anymore, so user field is going to be removed
+			username: '', // TODO: We don't trust front anymore, so user field is going to be removed
 			channel: selectedChannel,
 			message: userInput,
 		};

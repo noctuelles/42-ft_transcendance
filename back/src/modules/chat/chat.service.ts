@@ -3,58 +3,103 @@ import { WebsocketsService } from '../websockets/websockets.service';
 
 export class Message {
 	channel: number;
-	user: string;
+	username: string;
 	message: string;
 	constructor(obj: IMessage) {
 		this.channel = obj.channel;
-		this.user = obj.user;
+		this.username = obj.username;
 		this.message = obj.message;
 	}
 }
 
 export interface IMessage {
 	channel: number;
-	user: string;
+	username: string;
 	message: string;
 }
 
 interface Channel {
 	id: number;
-	users: string[];
+	name: string;
+	type: ChannelType;
+	owner_id: number;
+	members: number[];
+}
+
+enum ChannelType {
+	PUBLIC,
+	PROTECTED,
+	PRIVATE,
 }
 
 @Injectable()
 export class ChatService {
-	private channels: any = {
-		1: { id: 1, users: ['jmaia', 'bob'] },
-		2: { id: 2, users: ['jmaia', 'bob'] },
-		3: { id: 3, users: ['jmaia', 'bob'] },
-		4: { id: 4, users: ['not-jmaia', 'bob'] },
-	};
+	private channels: Map<number, Channel> = new Map([
+		[
+			1,
+			{
+				id: 1,
+				name: 'Channel 1',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [3, 9],
+			},
+		],
+		[
+			2,
+			{
+				id: 2,
+				name: 'Channel 2',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [3, 9],
+			},
+		],
+		[
+			3,
+			{
+				id: 3,
+				name: 'Channel 3',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [3, 9],
+			},
+		],
+		[
+			4,
+			{
+				id: 4,
+				name: 'Channel 4',
+				type: ChannelType.PUBLIC,
+				owner_id: 3,
+				members: [-1, 9],
+			},
+		],
+	]);
 	constructor(private readonly websocketsService: WebsocketsService) {}
 
 	broadcastMessage(message: Message) {
 		this.websocketsService.broadcast('chat', message);
 	}
 
-	canSendToChannel(user: string, channel: number): boolean {
-		return this.isUserInChannel(user, channel);
+	canSendToChannel(user_id: number, channel: number): boolean {
+		return this.isUserInChannel(user_id, channel);
 	}
 
 	channelExists(channel: number) {
-		return channel in this.channels;
+		return channel in [...this.channels.keys()];
 	}
 
-	isUserInChannel(user: string, channel: number): boolean {
+	isUserInChannel(user_id: number, channel: number): boolean {
 		if (!this.channelExists(channel)) {
 			return false;
 		}
-		return this.channels[channel].users.includes(user);
+		return this.channels.get(channel).members.includes(user_id);
 	}
 
 	sendTo(channel: number, message: IMessage): void {
 		this.websocketsService.sendToAllUsers(
-			this.channels[channel].users,
+			this.channels.get(channel).members,
 			'chat',
 			message,
 		);
@@ -62,7 +107,14 @@ export class ChatService {
 
 	isIMessage(data: any) {
 		return (
-			typeof data?.user === 'string' && typeof data?.message === 'string'
+			typeof data?.username === 'string' &&
+			typeof data?.message === 'string'
 		);
+	}
+
+	sendChannelListToSocket(socket: any): void {
+		this.websocketsService.send(socket, 'channels', [
+			...this.channels.values(),
+		]);
 	}
 }

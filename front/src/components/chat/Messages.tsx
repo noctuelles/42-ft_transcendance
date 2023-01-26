@@ -26,21 +26,13 @@ export default function Messages({
 			{messages.map((x: IMessage, i: number) => (
 				<Message
 					key={selectedChannel + '-' + i}
-					user={x.user}
+					username={x.username}
 					message={x.message}
 					channel={x.channel}
 				/>
 			))}
 		</div>
 	);
-
-	function scrollToBottom(element: HTMLElement) {
-		element.scrollTop = getMaxScrollTop(element);
-	}
-
-	function getMaxScrollTop(element: HTMLElement) {
-		return element.scrollHeight - element.clientHeight;
-	}
 
 	function getMessages(selectedChannel: number): IMessage[] {
 		const messages = useContext(MessagesContext)['data'];
@@ -49,10 +41,18 @@ export default function Messages({
 	}
 }
 
+export function scrollToBottom(element: HTMLElement) {
+	element.scrollTop = getMaxScrollTop(element);
+}
+
+function getMaxScrollTop(element: HTMLElement) {
+	return element.scrollHeight - element.clientHeight;
+}
+
 function Message(props: IMessage) {
 	return (
 		<span className="message">
-			<span className="user">{props.user}: </span>
+			<span className="username">{props.username}: </span>
 			<span className="content">{props.message}</span>
 			<br />
 		</span>
