@@ -108,9 +108,20 @@ const Play = () => {
 	return (
 		<div className={`play play-state-${gameState}`}>
 			{gameState === GameState.LOBBY && (
-				<button className="play-btn" onClick={joinMatchmaking}>
-					Join a game
-				</button>
+				<div className="lobby-btns">
+					<button
+						className="play-btn ranked-btn"
+						onClick={joinMatchmaking}
+					>
+						Join a ranked game
+					</button>
+					<button
+						className="play-btn fun-btn"
+						onClick={joinMatchmaking}
+					>
+						Join a fun game
+					</button>
+				</div>
 			)}
 			{gameState === GameState.MATCHMAKING && (
 				<Matchmaking
