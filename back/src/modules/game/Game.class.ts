@@ -101,19 +101,7 @@ export class Game {
 		);
 		this._status = GameStatus.ABORTED;
 		if (this._gameStartTime) {
-			await this._prismaService.match.create({
-				data: {
-					createdAt:
-						this._gameStartTime.toISOString() ||
-						new Date().toISOString(),
-					finishedAt: new Date().toISOString(),
-					bounces: this._bounce,
-					userOneId: this._player1Profile.user.id,
-					userTwoId: this._player2Profile.user.id,
-					winnerId: otherPlayer.profile.user.id,
-					looserId: leaved.profile.user.id,
-				},
-			});
+			this._registerGame(otherPlayer, leaved);
 		}
 		this.onEnd();
 	}
@@ -399,16 +387,55 @@ export class Game {
 	}
 
 	private async _registerGame(winner: IPlayer, loser: IPlayer) {
-		await this._prismaService.match.create({
-			data: {
-				createdAt: this._gameStartTime.toISOString(),
-				finishedAt: new Date().toISOString(),
-				bounces: this._bounce,
-				userOneId: this._player1Profile.user.id,
-				userTwoId: this._player2Profile.user.id,
-				winnerId: winner.profile.user.id,
-				looserId: loser.profile.user.id,
-			},
-		});
+		let eloDiff = Math.abs(
+			winner.profile.user.profile.elo - loser.profile.user.profile.elo,
+		);
+		if (eloDiff > 1000) eloDiff = 1000;
+		eloDiff /= 400;
+		eloDiff = Math.pow(10, eloDiff) + 1;
+		let score = 1 / eloDiff;
+		score = Math.round((1 - score) * 20);
+		const winnerElo = winner.profile.user.profile.elo + score;
+		const loserElo = loser.profile.user.profile.elo - score;
+		await Promise.all([
+			this._prismaService.match.create({
+				data: {
+					createdAt: this._gameStartTime.toISOString(),
+					finishedAt: new Date().toISOString(),
+					bounces: this._bounce,
+					userOneId: this._player1Profile.user.id,
+					userTwoId: this._player2Profile.user.id,
+					winnerId: winner.profile.user.id,
+					looserId: loser.profile.user.id,
+				},
+			}),
+			this._prismaService.user.update({
+				where: { id: winner.profile.user.id },
+				data: {
+					profile: {
+						update: {
+							xp: {
+								increment: 50,
+							},
+							elo: {
+								set: winnerElo,
+							},
+						},
+					},
+				},
+			}),
+			this._prismaService.user.update({
+				where: { id: loser.profile.user.id },
+				data: {
+					profile: {
+						update: {
+							elo: {
+								set: loserElo,
+							},
+						},
+					},
+				},
+			}),
+		]);
 	}
 }
