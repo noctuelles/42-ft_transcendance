@@ -90,10 +90,13 @@ const Play = () => {
 		setGameState(GameState.RESULTS);
 	}
 
-	function joinMatchmaking() {
+	function joinMatchmaking(type: 'ranked' | 'fun') {
 		setGameState(GameState.MATCHMAKING);
 		sendMessage(
-			JSON.stringify({ event: 'matchmaking', data: { action: 'join' } }),
+			JSON.stringify({
+				event: 'matchmaking',
+				data: { action: 'join', type: type },
+			}),
 		);
 	}
 
@@ -111,13 +114,17 @@ const Play = () => {
 				<div className="lobby-btns">
 					<button
 						className="play-btn ranked-btn"
-						onClick={joinMatchmaking}
+						onClick={() => {
+							joinMatchmaking('ranked');
+						}}
 					>
 						Join a ranked game
 					</button>
 					<button
 						className="play-btn fun-btn"
-						onClick={joinMatchmaking}
+						onClick={() => {
+							joinMatchmaking('fun');
+						}}
 					>
 						Join a fun game
 					</button>
