@@ -21,24 +21,37 @@ export default function ChannelList({
 	});
 	return (
 		<>
-			{channels.map((channel) => {
-				var classSelected: string = '';
-				if (selectedChannel == channel.id)
-					classSelected = 'selectedChannel';
-				return (
-					<Channel
-						key={channel.id}
-						channel={channel}
-						className={classSelected}
-						setSelectedChannel={setSelectedChannel}
-						hasJoined={channel.members.some((member) => {
-							return member === userContext.user.id;
-						})}
-					/>
-				);
-			})}
+			{channels
+				.sort((channel1, channel2) => {
+					return (
+						(!isUserInChannel(userContext.user.id, channel1) &&
+							isUserInChannel(userContext.user.id, channel2) &&
+							1) ||
+						0
+					);
+				})
+				.map((channel) => {
+					var classSelected: string = '';
+					if (selectedChannel == channel.id)
+						classSelected = 'selectedChannel';
+					return (
+						<Channel
+							key={channel.id}
+							channel={channel}
+							className={classSelected}
+							setSelectedChannel={setSelectedChannel}
+							hasJoined={isUserInChannel(
+								userContext.user.id,
+								channel,
+							)}
+						/>
+					);
+				})}
 		</>
 	);
+	function isUserInChannel(userId: number, channel: IChannel) {
+		return channel.members.includes(userId);
+	}
 }
 
 function getChannels(): IChannel[] {
