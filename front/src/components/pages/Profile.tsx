@@ -7,7 +7,7 @@ import ProfileSummary from './details/profile/ProfileSummary';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { ProfileData, ProfileMatchData } from './details/profile/ProfileTypes';
-import AchievementItem from './details/profile/AchievementItem';
+import AchievementTable from './details/profile/AchievementTable';
 
 const Profile = () => {
 	const userContext = React.useContext(UserContext);
@@ -39,6 +39,7 @@ const Profile = () => {
 	}, [userContext]);
 
 	if (!profile) return <h2>Profile loading...</h2>;
+
 	return (
 		<div className="profile-container">
 			<ProfileHeader
@@ -60,15 +61,7 @@ const Profile = () => {
 					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
-			<AchievementItem
-				achievement={{
-					img: 'blabla',
-					title: 'Butcher',
-					description: 'Lojrtioje.',
-				}}
-				unlocked={false}
-				unlockedDate={new Date('2023-01-26T14:05:13.728Z')}
-			/>
+			<AchievementTable achievements={profile.achievements} />
 		</div>
 	);
 };

@@ -3,9 +3,10 @@ import '@/style/details/profile/AchievementItem.css';
 import ProgressBar from '@/components/global/ProgressBar';
 import CheckMark from '@/assets/check-mark.svg';
 import Cross from '@/assets/cross.svg';
+import NoviceBall from '@/assets/novice-ball.svg';
 
 interface AchievementItemProps {
-	achievement: ProfileAchievement;
+	achievement: ProfileAchievement | undefined;
 	unlocked: boolean;
 	unlockedDate?: Date;
 	progress?: string;
@@ -20,7 +21,7 @@ const AchievementItem = (props: AchievementItemProps) => {
 			<h3>{props.achievement.title}</h3>
 			<hr />
 			<div className="achievement-item-top">
-				<img src={NoviceBall} alt="Achievement" />
+				<img src={props.achievement?.img} alt="Achievement" />
 				<p>{props.achievement.description}</p>
 			</div>
 

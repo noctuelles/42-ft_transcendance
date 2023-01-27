@@ -38,9 +38,31 @@ export interface ProfileData {
 
 /* Other interfaces.. */
 
+export enum ProfileDataTarget {
+	PROFILE_MATCH,
+	PROFILE_MATCH_WON,
+}
+
+export enum AchievementId {
+	ACH_NEW_SUBJECT = 1,
+	ACH_APPRENTICE_JUGGLER,
+	ACH_DAUTING_SUBJECT,
+}
+
+export const AchievementIdArray = [
+	AchievementId.ACH_NEW_SUBJECT,
+	AchievementId.ACH_APPRENTICE_JUGGLER,
+	AchievementId.ACH_DAUTING_SUBJECT,
+];
+
+export type AchievementIdValue = `${AchievementId}`;
+
 export interface ProfileAchievement {
 	achieveAt?: Date;
 	title: string;
 	img: object;
 	description: string;
+	earnings: number;
+	data: ProfileDataTarget;
+	threeshold: number;
 }

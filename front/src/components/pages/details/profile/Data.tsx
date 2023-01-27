@@ -1,4 +1,8 @@
-import { ProfileAchievement } from './ProfileTypes';
+import {
+	ProfileAchievement,
+	ProfileDataTarget,
+	AchievementId,
+} from './ProfileTypes';
 import NoviceBall from '@/assets/novice-ball.svg';
 import JackOLanternBall from '@/assets/jack-o-lantern-ball.svg';
 import DiscoBall from '@/assets/disco-ball.svg';
@@ -10,19 +14,16 @@ export const bounceImg: string =
 export const tropheeImg: string =
 	'data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IlVwbG9hZGVkIHRvIHN2Z3JlcG8uY29tIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiANCgkgd2lkdGg9IjgwMHB4IiBoZWlnaHQ9IjgwMHB4IiB2aWV3Qm94PSIwIDAgMzIgMzIiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCgkuc2hhcnBjb3JuZXJzX2VlbntmaWxsOiMxMTE5MTg7fQ0KCS5zdDB7ZmlsbDojMTExOTE4O30NCjwvc3R5bGU+DQo8cGF0aCBjbGFzcz0ic2hhcnBjb3JuZXJzX2VlbiIgZD0iTTIwLDIzaC04djVoLTF2MmgxMHYtMmgtMVYyM3ogTTE0LDI1aDR2MWgtNFYyNXogTTE0LDI4di0xaDR2MUgxNHogTTI0LDJIOEM1LjI0MywyLDMsNC4yNDMsMyw3DQoJczIuMjQzLDUsNSw1YzAsNC4wNzksMy4wNTUsNy40MzgsNyw3LjkzMVYyMmgydi0yLjA2OWMzLjk0NS0wLjQ5Myw3LTMuODUyLDctNy45MzFjMi43NTcsMCw1LTIuMjQzLDUtNVMyNi43NTcsMiwyNCwyeiBNNSw3DQoJYzAtMS42NTQsMS4zNDYtMywzLTN2NkM2LjM0NiwxMCw1LDguNjU0LDUsN3ogTTI0LDEwVjRjMS42NTQsMCwzLDEuMzQ2LDMsM1MyNS42NTQsMTAsMjQsMTB6Ii8+DQo8L3N2Zz4=';
 
-enum AchievementId {
-	ACH_NEW_SUBJECT = 1,
-	ACH_APPRENTICE_JUGGLER,
-	ACH_DAUTING_SUBJECT,
-}
-
-export const achievementList = new Map<AchievementId, ProfileAchievement>([
+export const AchievementMap = new Map<AchievementId, ProfileAchievement>([
 	[
 		AchievementId.ACH_NEW_SUBJECT,
 		{
 			title: 'New Subject',
 			img: NoviceBall,
 			description: 'Win your first match',
+			earnings: 10,
+			data: ProfileDataTarget.PROFILE_MATCH,
+			threeshold: 1,
 		},
 	],
 	[
@@ -31,6 +32,9 @@ export const achievementList = new Map<AchievementId, ProfileAchievement>([
 			title: 'Apprentice Juggler',
 			img: RegularBall,
 			description: 'Play at least 10 match',
+			earnings: 15,
+			data: ProfileDataTarget.PROFILE_MATCH,
+			threeshold: 10,
 		},
 	],
 	[
@@ -38,7 +42,10 @@ export const achievementList = new Map<AchievementId, ProfileAchievement>([
 		{
 			title: 'Dauting Subject',
 			img: JackOLanternBall,
-			description: 'Win your first match',
+			description: 'Win at least 20 match',
+			earnings: 42,
+			data: ProfileDataTarget.PROFILE_MATCH_WON,
+			threeshold: 1,
 		},
 	],
 ]);
