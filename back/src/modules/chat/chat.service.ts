@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import Channel from './Channel';
-import { ChannelType } from './Channel';
+import { ChannelType, IPunishment } from './Channel';
 
 export class Message {
 	channel: number;
@@ -80,6 +80,21 @@ export class ChatService {
 				this.websocketsService.getSocketsFromUsersId([userId])[0],
 			);
 		}
+		// TODO: Check password
 		return ret;
+	}
+
+	isUserBannedFromChannel(userId: number, channelId: number) {
+		this.purgeEndedPunishment(this.channels.get(channelId).banned);
+		return this.channels.get(channelId).banned.some((bannedInfos) => {
+			return bannedInfos.userId === userId;
+		});
+	}
+
+	purgeEndedPunishment(punishments: IPunishment[]) {
+		for (let i = punishments.length - 1; i >= 0; i--) {
+			if (punishments[i].endDate < new Date(Date.now()))
+				punishments.splice(i, 1);
+		}
 	}
 }
