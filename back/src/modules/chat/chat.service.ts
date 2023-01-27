@@ -126,6 +126,9 @@ export class ChatService {
 			return false;
 		}
 		this.channels.get(channelId).members.push(userId);
+		this.sendChannelListToSocket(
+			this.websocketsService.getSocketsFromUsers([userId])[0],
+		);
 		return true;
 	}
 }

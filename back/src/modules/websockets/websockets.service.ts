@@ -62,10 +62,14 @@ export class WebsocketsService {
 		client.send(JSON.stringify({ event: event, data: data }));
 	}
 
-	sendToAllUsers(users: number[], event: string, data: any) {
-		const receivers = this._sockets.filter((socket) => {
+	getSocketsFromUsers(users: number[]) {
+		return this._sockets.filter((socket) => {
 			return users.includes(socket.user.id);
 		});
+	}
+
+	sendToAllUsers(users: number[], event: string, data: any) {
+		const receivers = this.getSocketsFromUsers(users);
 		this.sendToAll(receivers, event, data);
 	}
 

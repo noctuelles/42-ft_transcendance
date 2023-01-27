@@ -32,7 +32,7 @@ export default function ChannelList({
 						className={classSelected}
 						setSelectedChannel={setSelectedChannel}
 						hasJoined={channel.members.some((member) => {
-							member.id === userContext.user.id;
+							return member === userContext.user.id;
 						})}
 					/>
 				);
