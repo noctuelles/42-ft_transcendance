@@ -87,7 +87,7 @@ export class ChatService {
 	}
 
 	channelExists(channel: number) {
-		return channel in [...this.channels.keys()];
+		return [...this.channels.keys()].includes(channel);
 	}
 
 	isUserInChannel(user_id: number, channel: number): boolean {
