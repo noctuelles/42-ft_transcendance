@@ -14,6 +14,7 @@ export class ChatGateway {
 				.getChannel(data.channel)
 				?.canUserSendMessage(socket.user.id)
 		) {
+			// TODO: Tell why can't send message
 			return;
 		}
 		let message = new Message(data);

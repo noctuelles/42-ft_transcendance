@@ -91,6 +91,13 @@ export class ChatService {
 		});
 	}
 
+	isUserMutedInChannel(userId: number, channelId: number) {
+		this.purgeEndedPunishment(this.channels.get(channelId).muted);
+		return this.channels.get(channelId).muted.some((mutedInfos) => {
+			return mutedInfos.userId === userId;
+		});
+	}
+
 	purgeEndedPunishment(punishments: IPunishment[]) {
 		for (let i = punishments.length - 1; i >= 0; i--) {
 			if (punishments[i].endDate < new Date(Date.now()))
