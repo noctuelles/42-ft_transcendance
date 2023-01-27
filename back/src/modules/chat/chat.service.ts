@@ -117,4 +117,15 @@ export class ChatService {
 			...this.channels.values(),
 		]);
 	}
+
+	addUserInChannel(userId: number, channelId: number): boolean {
+		if (
+			!this.channelExists(channelId) ||
+			this.isUserInChannel(userId, channelId)
+		) {
+			return false;
+		}
+		this.channels.get(channelId).members.push(userId);
+		return true;
+	}
 }
