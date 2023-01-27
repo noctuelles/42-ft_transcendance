@@ -41,6 +41,6 @@ export interface ProfileData {
 export interface ProfileAchievement {
 	achieveAt?: Date;
 	title: string;
-	img: string;
+	img: object;
 	description: string;
 }

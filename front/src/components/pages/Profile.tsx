@@ -66,7 +66,7 @@ const Profile = () => {
 					title: 'Butcher',
 					description: 'Lojrtioje.',
 				}}
-				unlocked={true}
+				unlocked={false}
 				unlockedDate={new Date('2023-01-26T14:05:13.728Z')}
 			/>
 		</div>
