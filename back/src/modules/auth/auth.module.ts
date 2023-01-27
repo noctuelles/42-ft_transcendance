@@ -10,6 +10,6 @@ import { Api42Service } from './api42.service';
 	imports: [NestjsFormDataModule, PrismaModule, UsersModule],
 	controllers: [AuthController],
 	providers: [Api42Service, AuthService],
-	exports: [],
+	exports: [AuthService],
 })
 export class AuthModule {}
