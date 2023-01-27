@@ -5,31 +5,33 @@ import { back_url } from '@/config.json';
 
 interface IUserContext {
 	auth: {
-		logged: boolean,
-		setLogged: (logged: boolean) => void,
-		creating: boolean,
-		setCreating: (creating: boolean) => void,
-		setAccessToken: (access_token: string) => void,
-		updating: boolean,
-		setUpdating: (updating: boolean) => void,
+		logged: boolean;
+		setLogged: (logged: boolean) => void;
+		creating: boolean;
+		setCreating: (creating: boolean) => void;
+		setAccessToken: (access_token: string) => void;
+		updating: boolean;
+		setUpdating: (updating: boolean) => void;
 		creatingUser: {
-			login: string,
-			name: string,
-			profile_picture: string,
-		},
-		setCreatingUser: (user: any) => void,
-		changeName: (name: string) => void,
-	},
-	updateUser: () => void,
-	getAccessToken: () => Promise<string>,
+			login: string;
+			name: string;
+			profile_picture: string;
+		};
+		setCreatingUser: (user: any) => void;
+		changeName: (name: string) => void;
+	};
+	updateUser: () => void;
+	getAccessToken: () => Promise<string>;
 	user: {
-		id: number,
-		name: string,
-		profile_picture: string,
-	},
+		id: number;
+		name: string;
+		profile_picture: string;
+	};
 }
 
-export const UserContext = React.createContext<IUserContext>({} as IUserContext);
+export const UserContext = React.createContext<IUserContext>(
+	{} as IUserContext,
+);
 
 function UserContextProvider(props: any) {
 	const [logged, setLogged] = useState(false);
