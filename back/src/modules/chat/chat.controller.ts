@@ -11,9 +11,22 @@ export class ChatController {
 	@Patch('channel/join')
 	async joinChannel(
 		@CurrentUser() user: User,
-		@Body() { channelId }: { channelId: number },
+		@Body()
+		{
+			channelId,
+			password,
+		}: { channelId: number; password: string | undefined },
 	) {
-		// TODO: Call another function to check the type of the channel, the password, etc, etc
-		this.chatService.addUserInChannel(user.id, channelId);
+		if (
+			this.chatService.isUserAllowedToJoinChannel(
+				user.id,
+				channelId,
+				password,
+			)
+		)
+			this.chatService.addUserInChannel(user.id, channelId);
+		else {
+			// TODO: Return error to tell why not allowed
+		}
 	}
 }

@@ -24,6 +24,14 @@ interface Channel {
 	type: ChannelType;
 	owner_id: number;
 	members: number[];
+	admins: number[];
+	muted: IPunishment[];
+	banned: IPunishment[];
+}
+
+interface IPunishment {
+	userId: number;
+	endDate: Date;
 }
 
 enum ChannelType {
@@ -43,6 +51,9 @@ export class ChatService {
 				type: ChannelType.PUBLIC,
 				owner_id: 3,
 				members: [3, 9],
+				admins: [] as number[],
+				muted: [] as IPunishment[],
+				banned: [] as IPunishment[],
 			},
 		],
 		[
@@ -53,6 +64,9 @@ export class ChatService {
 				type: ChannelType.PUBLIC,
 				owner_id: 3,
 				members: [3, 9],
+				admins: [] as number[],
+				muted: [] as IPunishment[],
+				banned: [] as IPunishment[],
 			},
 		],
 		[
@@ -63,6 +77,9 @@ export class ChatService {
 				type: ChannelType.PUBLIC,
 				owner_id: 3,
 				members: [3, 9],
+				admins: [] as number[],
+				muted: [] as IPunishment[],
+				banned: [] as IPunishment[],
 			},
 		],
 		[
@@ -73,6 +90,9 @@ export class ChatService {
 				type: ChannelType.PUBLIC,
 				owner_id: 3,
 				members: [-1, 9],
+				admins: [] as number[],
+				muted: [] as IPunishment[],
+				banned: [] as IPunishment[],
 			},
 		],
 	]);
@@ -130,5 +150,28 @@ export class ChatService {
 			this.websocketsService.getSocketsFromUsers([userId])[0],
 		);
 		return true;
+	}
+
+	isUserAllowedToJoinChannel(
+		userId: number,
+		channelId: number,
+		password: string,
+	): boolean {
+		if (!this.channelExists(channelId)) {
+			return false;
+		}
+		if (this.channels.get(channelId).type === ChannelType.PRIVATE)
+			return false;
+		if (this.isUserBannedFromChannel(userId, channelId)) {
+			return false;
+		}
+		// TODO: Check password
+		return true;
+	}
+
+	isUserBannedFromChannel(userId: number, channelId: number) {
+		return this.channels.get(channelId).banned.some((bannedInfos) => {
+			bannedInfos.userId === userId;
+		});
 	}
 }
