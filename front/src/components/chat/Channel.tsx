@@ -4,10 +4,12 @@ export default function Channel({
 	channel,
 	setSelectedChannel,
 	className,
+	hasJoined,
 }: {
 	channel: IChannel;
 	setSelectedChannel: any;
 	className: string;
+	hasJoined: boolean;
 }) {
 	return (
 		<div
@@ -16,7 +18,12 @@ export default function Channel({
 				setSelectedChannel(channel.id);
 			}}
 		>
-			{channel.name}
+			<span>{channel.name}</span>
+			{!hasJoined && (
+				<button>
+					Join
+				</button>
+			)}
 		</div>
 	);
 }

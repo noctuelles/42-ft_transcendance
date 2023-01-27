@@ -1,8 +1,9 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useContext } from 'react';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import IChannel from './IChannel';
 import Channel from './Channel';
+import { UserContext } from '@/context/UserContext';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -11,6 +12,7 @@ export default function ChannelList({
 	setSelectedChannel: any;
 	selectedChannel: number;
 }) {
+	const userContext = useContext(UserContext);
 	const channels = getChannels();
 	useEffect(() => {
 		if (selectedChannel === 0 && channels.length > 0) {
@@ -29,6 +31,9 @@ export default function ChannelList({
 						channel={channel}
 						className={classSelected}
 						setSelectedChannel={setSelectedChannel}
+						hasJoined={channel.members.some((member) => {
+							member.id === userContext.user.id;
+						})}
 					/>
 				);
 			})}
