@@ -1,0 +1,10 @@
+.achievements-table h2 {
+	text-align: center;
+	text-decoration: underline;
+}
+
+.achievements-item-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
