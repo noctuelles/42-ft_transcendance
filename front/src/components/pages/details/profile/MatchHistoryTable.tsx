@@ -33,9 +33,9 @@ const MatchHistoryTable = (props: MatchHistoryTableProps) => {
 			) : (
 				<tbody>
 					{props.matches.map((m: ProfileMatchData) => (
-						<tr>
+						<tr key={m.id}>
 							<td>
-								<MatchHistoryRow key={m.id} match={m} />
+								<MatchHistoryRow match={m} />
 							</td>
 						</tr>
 					))}
