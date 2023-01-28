@@ -3,31 +3,33 @@ import jwtDecode from 'jwt-decode';
 import React, { useState } from 'react';
 import { back_url } from '@/config.json';
 
-export const UserContext = React.createContext({
+interface IUserContext {
 	auth: {
-		logged: false,
-		setLogged: (logged: boolean) => {},
-		creating: false,
-		setCreating: (creating: boolean) => {},
-		setAccessToken: (access_token: string) => {},
-		updating: false,
-		setUpdating: (updating: boolean) => {},
+		logged: boolean,
+		setLogged: (logged: boolean) => void,
+		creating: boolean,
+		setCreating: (creating: boolean) => void,
+		setAccessToken: (access_token: string) => void,
+		updating: boolean,
+		setUpdating: (updating: boolean) => void,
 		creatingUser: {
-			login: '',
-			name: '',
-			profile_picture: '',
+			login: string,
+			name: string,
+			profile_picture: string,
 		},
-		setCreatingUser: (user: any) => {},
-		changeName: (name: string) => {},
+		setCreatingUser: (user: any) => void,
+		changeName: (name: string) => void,
 	},
-	updateUser: () => {},
-	getAccessToken: () => {},
+	updateUser: () => void,
+	getAccessToken: () => Promise<string>,
 	user: {
-		id: -1,
-		name: '',
-		profile_picture: '',
+		id: number,
+		name: string,
+		profile_picture: string,
 	},
-});
+}
+
+export const UserContext = React.createContext<IUserContext>({} as IUserContext);
 
 function UserContextProvider(props: any) {
 	const [logged, setLogged] = useState(false);
