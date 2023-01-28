@@ -11,10 +11,11 @@
 	align-items: center;
 }
 
-.match-summary .profile-pic {
+.match-summary .match-profile-pic {
 	width: 70px;
 	height: 70px;
 	border-radius: 50%;
+	box-shadow: 2px 2px 5px 3px rgba(0, 0, 0, 0.29);
 }
 
 .match-summary #fight {
@@ -31,6 +32,7 @@ hr {
 	margin-bottom: 5px;
 }
 
-h4 {
+.match-container h4 {
+	display: inline;
 	text-align: center;
 }

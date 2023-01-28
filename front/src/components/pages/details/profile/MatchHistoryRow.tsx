@@ -22,17 +22,18 @@ const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 
 	return (
 		<div className="match-container">
-			<h4>{`Duration - ${timeInfo.minutes}m${timeInfo.seconds}s`}</h4>
+			<h4>{`Match #${props.match.id} -  Duration : ${timeInfo.minutes}m${timeInfo.seconds}s`}</h4>
+			<hr />
 			<div className="match-summary">
 				<img
-					className="profile-pic"
+					className="match-profile-pic"
 					src={props.match.userOne.profile.picture}
 				/>
 				{props.match.userOne.name}
 				<img id="fight" src={fightIcon} />
 				{props.match.userTwo.name}
 				<img
-					className="profile-pic"
+					className="match-profile-pic"
 					src={props.match.userTwo.profile.picture}
 				/>
 			</div>
