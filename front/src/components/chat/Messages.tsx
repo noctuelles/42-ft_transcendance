@@ -1,55 +1,58 @@
-import { useRef } from 'react';
-import useWebSocket from 'react-use-websocket';
-import { ws_url as WS_URL } from '@/config.json';
+import { useContext } from 'react';
 import IMessage from './IMessage';
+import { MessagesContext } from '@/context/MessagesContext';
+import { useRef, useEffect } from 'react';
 
-export default function Messages() {
-	const messages: IMessage[] = getMessages();
+// TODO: Add another interface. One without channel and one with. Maybe inheritence. Maybe commposition. Good luck !
+export default function Messages({
+	selectedChannel,
+}: {
+	selectedChannel: number;
+}) {
+	const messagesRef = useRef<HTMLDivElement>(null);
+	const oldMaxScroll = useRef(0);
+
+	const messages: IMessage[] = getMessages(selectedChannel);
+	useEffect(() => {
+		if (messagesRef.current) {
+			if (oldMaxScroll.current == messagesRef.current.scrollTop) {
+				scrollToBottom(messagesRef.current);
+			}
+			oldMaxScroll.current = getMaxScrollTop(messagesRef.current);
+		}
+	});
 	return (
-		<div id="messages">
+		<div id="messages" ref={messagesRef}>
 			{messages.map((x: IMessage, i: number) => (
-				<Message key={i} user={x.user} message={x.message} />
+				<Message
+					key={selectedChannel + '-' + i}
+					username={x.username}
+					message={x.message}
+					channel={x.channel}
+				/>
 			))}
 		</div>
 	);
 
-	function getMessages(): IMessage[] {
-		const messages = useRef<IMessage[]>([]);
-		useWebSocket(WS_URL, {
-			share: true,
-			onMessage: ({ data }: { data?: string }) => {
-				if (!data || !isChatMessage(data)) {
-					return;
-				}
-				const newMessage = parseMessage(data);
-				messages.current = [...messages.current, newMessage];
-			},
-			filter: ({ data }: { data: string }) => {
-				return isChatMessage(data);
-			},
-		});
-		return messages.current;
+	function getMessages(selectedChannel: number): IMessage[] {
+		const messages = useContext(MessagesContext)['data'];
+		const channelMessages = messages.get(selectedChannel);
+		return channelMessages === undefined ? [] : channelMessages;
 	}
+}
 
-	function isChatMessage(rawMessage: string): boolean {
-		try {
-			var message = JSON.parse(rawMessage);
-		} catch (error) {
-			return false;
-		}
-		return message?.['event'] == 'chat';
-	}
+export function scrollToBottom(element: HTMLElement) {
+	element.scrollTop = getMaxScrollTop(element);
+}
 
-	function parseMessage(rawMessage: string): IMessage {
-		const jsonMessage = JSON.parse(rawMessage);
-		return jsonMessage['data'];
-	}
+function getMaxScrollTop(element: HTMLElement) {
+	return element.scrollHeight - element.clientHeight;
 }
 
 function Message(props: IMessage) {
 	return (
 		<span className="message">
-			<span className="user">{props.user}: </span>
+			<span className="username">{props.username}: </span>
 			<span className="content">{props.message}</span>
 			<br />
 		</span>

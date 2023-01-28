@@ -1,4 +1,5 @@
 export default interface IMessage {
-	user: string;
+	username: string;
+	channel: number;
 	message: string;
 }

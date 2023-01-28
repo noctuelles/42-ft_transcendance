@@ -4,19 +4,21 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 
-import { Message, ChatService } from '../chat/chat.service';
+import { Message, ChatService } from './chat.service';
 
 @WebSocketGateway()
 export class ChatGateway {
 	constructor(private readonly chatService: ChatService) {}
-	@WebSocketServer() server;
 	@SubscribeMessage('chat')
 	async handleMessage(socket: any, data: any) {
-		data.user = socket.user.name;
-		if (!this.chatService.isIMessage(data)) {
+		data.username = socket.user.name;
+		if (
+			!this.chatService.isIMessage(data) ||
+			!this.chatService.canSendToChannel(socket.user.id, data.channel)
+		) {
 			return;
 		}
 		let message = new Message(data);
-		this.chatService.broadcastMessage(message);
+		this.chatService.sendTo(message.channel, message);
 	}
 }

@@ -89,6 +89,7 @@ function AppRoutes() {
 						});
 				}
 			}
+
 			userContext.updateUser();
 		}
 	}, [location]);

@@ -59,6 +59,9 @@ body {
 	margin: 0;
 	padding: 0;
 	height: 100%;
+
+	--blue-primary-color: #17c0e9;
+	--yellow-primary-color: #ffb800;
 }
 
 #root {
@@ -67,4 +70,16 @@ body {
 
 .logged {
 	height: 100%;
+}
+
+.app {
+	height: 100%;
+}
+
+.app-loading {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
