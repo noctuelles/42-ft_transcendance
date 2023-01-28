@@ -97,6 +97,25 @@ export const GameParams = {
 	PORTAL_MAX_SPEED: 5,
 };
 
+function createDefaultPortal(
+	center: IPosition,
+	color: string,
+	direction: 'up' | 'down',
+): IPortal {
+	return {
+		center: center,
+		width: GameParams.PORTAL_WIDTH,
+		height: GameParams.PORTAL_HEIGHT,
+		link: null,
+		color: color,
+		direction: direction,
+		speed:
+			Math.random() *
+				(GameParams.PORTAL_MAX_SPEED - GameParams.PORTAL_MIN_SPEED) +
+			GameParams.PORTAL_MIN_SPEED,
+	};
+}
+
 export function getDefaultGameState(
 	profile1: IProfile,
 	profile2: IProfile,
@@ -148,8 +167,8 @@ export function getDefaultGameState(
 	};
 	if (type === GameType.FUN) {
 		let portals = [
-			{
-				center: {
+			createDefaultPortal(
+				{
 					x:
 						GameParams.GAME_WIDTH / 2 -
 						GameParams.PORTAL_WIDTH / 2 -
@@ -159,36 +178,20 @@ export function getDefaultGameState(
 						GameParams.PORTAL_OFFSET -
 						GameParams.PORTAL_HEIGHT / 2,
 				},
-				width: GameParams.PORTAL_WIDTH,
-				height: GameParams.PORTAL_HEIGHT,
-				link: null,
-				color: '#c3a749',
-				direction: 'up',
-				speed:
-					Math.random() *
-						(GameParams.PORTAL_MAX_SPEED -
-							GameParams.PORTAL_MIN_SPEED) +
-					GameParams.PORTAL_MIN_SPEED,
-			},
-			{
-				center: {
+				'#c3a749',
+				'up',
+			),
+			createDefaultPortal(
+				{
 					x:
 						GameParams.GAME_WIDTH / 2 +
 						GameParams.PORTAL_WIDTH / 2 +
 						GameParams.PORTAL_OFFSET,
 					y: GameParams.PORTAL_OFFSET + GameParams.PORTAL_HEIGHT / 2,
 				},
-				width: GameParams.PORTAL_WIDTH,
-				height: GameParams.PORTAL_HEIGHT,
-				link: null,
-				color: '#701415',
-				direction: 'down',
-				speed:
-					Math.random() *
-						(GameParams.PORTAL_MAX_SPEED -
-							GameParams.PORTAL_MIN_SPEED) +
-					GameParams.PORTAL_MIN_SPEED,
-			},
+				'#701415',
+				'down',
+			),
 		];
 		portals[0].link = portals[1];
 		portals[1].link = portals[0];
