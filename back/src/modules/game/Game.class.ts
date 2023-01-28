@@ -13,6 +13,7 @@ import {
 	IRect,
 	IPlayer,
 	GameType,
+	IPortal,
 } from './Game.interfaces';
 
 export class Game {
@@ -45,7 +46,11 @@ export class Game {
 		this._websocketsService = websocketsService;
 		this._prismaService = prismaService;
 		this._type = type;
-		this._gameState = getDefaultGameState(player1Profile, player2Profile);
+		this._gameState = getDefaultGameState(
+			player1Profile,
+			player2Profile,
+			type,
+		);
 		this._resetBall(this._gameState.ball);
 	}
 
@@ -287,6 +292,39 @@ export class Game {
 		}
 	}
 
+	private _setBallInvunlerableToPortal(ball: IBall) {
+		ball.portalUsable = false;
+		setTimeout(() => {
+			ball.portalUsable = true;
+		}, 200);
+	}
+
+	private _checkBallCollidePortal(
+		ball: IBall,
+		ballRadius: number,
+		portal: IPortal,
+	) {
+		if (ball.portalUsable) {
+			const ballColide: IRect = {
+				x: ball.position.x - ballRadius,
+				y: ball.position.y - ballRadius,
+				width: ballRadius * 2,
+				height: ballRadius * 2,
+			};
+			const portalCollide: IRect = {
+				x: portal.center.x - portal.width / 2 + 2,
+				y: portal.center.y - portal.height / 2,
+				width: portal.width * 2 - 4,
+				height: portal.height * 2,
+			};
+			if (this._checkColide(ballColide, portalCollide)) {
+				ball.position.x = portal.link.center.x;
+				ball.position.y = portal.link.center.y;
+				this._setBallInvunlerableToPortal(ball);
+			}
+		}
+	}
+
 	private _normalizeDirection(ball: IBall) {
 		const norm = Math.sqrt(
 			ball.direction.x * ball.direction.x +
@@ -317,12 +355,41 @@ export class Game {
 			this._gameState.gameInfos.paddleWidth,
 			this._gameState.gameInfos.paddleHeight,
 		);
+		this._gameState.portals.forEach((portal) => {
+			this._checkBallCollidePortal(ball, ballRadius, portal);
+		});
+	}
+
+	private _updatePortal(portal: IPortal) {
+		if (portal.direction == 'up') {
+			portal.center.y -= portal.speed;
+		}
+		if (portal.direction == 'down') {
+			portal.center.y += portal.speed;
+		}
+		if (
+			portal.center.y <
+			portal.height / 2 + GameParams.PORTAL_OFFSET / 2
+		) {
+			portal.direction = 'down';
+		}
+		if (
+			portal.center.y >
+			GameParams.GAME_HEIGHT -
+				portal.height / 2 -
+				GameParams.PORTAL_OFFSET / 2
+		) {
+			portal.direction = 'up';
+		}
 	}
 
 	private _updateState() {
 		this._updatePlayer(this._gameState.player1);
 		this._updatePlayer(this._gameState.player2);
 		this._updateBall(this._gameState.ball);
+		this._gameState.portals.forEach((portal) => {
+			this._updatePortal(portal);
+		});
 	}
 
 	private async _game() {
