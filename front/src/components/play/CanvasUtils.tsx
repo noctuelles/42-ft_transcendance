@@ -1,4 +1,10 @@
-import { IGameInfos, IGameState, IPlayer, IPosition } from './GameInterfaces';
+import {
+	IGameInfos,
+	IGameState,
+	IPlayer,
+	IPortal,
+	IPosition,
+} from './GameInterfaces';
 
 function drawRect(
 	ctx: any,
@@ -54,6 +60,21 @@ function drawBall(
 	ctx.fill();
 }
 
+function drawPortal(ctx: any, portal: IPortal) {
+	ctx.fillStyle = portal.color;
+	ctx.beginPath();
+	ctx.ellipse(
+		portal.center.x,
+		portal.center.y,
+		portal.width,
+		portal.height,
+		0,
+		0,
+		2 * Math.PI,
+	);
+	ctx.fill();
+}
+
 export function drawState(state: IGameState, canvasRef: any) {
 	const canvas: any = canvasRef.current;
 	const ctx = canvas.getContext('2d');
@@ -70,4 +91,10 @@ export function drawState(state: IGameState, canvasRef: any) {
 
 	drawPaddle(ctx, state.player1, '#ffb800', state.gameInfos);
 	drawPaddle(ctx, state.player2, '#17c0e9', state.gameInfos);
+
+	if (state.portals) {
+		state.portals.forEach((portal) => {
+			drawPortal(ctx, portal);
+		});
+	}
 }
