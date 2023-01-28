@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
 import { Prisma } from '@prisma/client';
+import { TwoFAService } from './TwoFA.service';
 
 type UserWithProfile = Prisma.UserGetPayload<{
 	include: {
@@ -19,6 +20,7 @@ export class AuthService {
 		private readonly userService: UsersService,
 		private readonly prismaService: PrismaService,
 		private readonly jwtService: JwtService,
+		private readonly twoFAService: TwoFAService,
 	) {}
 
 	/*
@@ -43,6 +45,9 @@ export class AuthService {
 			},
 		});
 		if (!user) throw new BadRequestException('User not found');
+		if (user.otpSecret) {
+			//TODO: Check the 2fa code
+		}
 		const tokens = await this.generateTokens(user);
 		return {
 			state: 'connected',
