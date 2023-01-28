@@ -61,7 +61,7 @@ const Profile = () => {
 					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
-			<AchievementTable achievements={profile.achievements} />
+			<AchievementTable profile={profile} />
 		</div>
 	);
 };

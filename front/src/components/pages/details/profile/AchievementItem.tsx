@@ -6,29 +6,31 @@ import Cross from '@/assets/cross.svg';
 import NoviceBall from '@/assets/novice-ball.svg';
 
 interface AchievementItemProps {
-	achievement: ProfileAchievement | undefined;
+	achievement: ProfileAchievement;
 	unlocked: boolean;
 	unlockedDate?: Date;
-	progress?: string;
+	progress: number;
+	threeshold: number;
 }
 
 const AchievementItem = (props: AchievementItemProps) => {
 	return (
 		<div
 			className="achievement-item-container"
-			style={{ WebkitFilter: !props.unlocked ? 'blur(1px)' : '' }}
+			style={{
+				WebkitFilter: !props.unlocked ? 'blur(1px) grayscale(60%)' : '',
+			}}
 		>
 			<h3>{props.achievement.title}</h3>
 			<hr />
 			<div className="achievement-item-top">
-				<img src={props.achievement?.img} alt="Achievement" />
+				<img src={props.achievement.img.toString()} alt="Achievement" />
 				<p>{props.achievement.description}</p>
 			</div>
-
 			<ProgressBar
 				width="100%"
 				height="15px"
-				percent={12}
+				percent={Math.round((props.progress / props.threeshold) * 100)}
 				innerBarColor="rgb(255, 153, 0)"
 			/>
 			<div className="achievement-item-bottom">

@@ -1,15 +1,11 @@
-import { ProfileAchievementData, ProfileDataTarget } from './ProfileTypes';
-import {
-	AchievementId,
-	AchievementIdArray,
-	AchievementIdValue,
-} from './ProfileTypes';
+import { ProfileData, ProfileDataTarget } from './ProfileTypes';
+import { AchievementIdArray } from './ProfileTypes';
 import { AchievementMap } from './Data';
 import AchievementItem from './AchievementItem';
 import '@/style/details/profile/AchievementTable.css';
 
 interface AchievementTableProps {
-	achievements: ProfileAchievementData[];
+	profile: ProfileData;
 }
 
 const AchievementTable = (props: AchievementTableProps) => {
@@ -27,37 +23,61 @@ const AchievementTable = (props: AchievementTableProps) => {
 		</div>
 	);
 
-	//TODO: valeur pourcentage.
-	function mapProfileValueToAchievement(target: ProfileDataTarget) {}
+	//TODO: valeur pourcentage. and remove this if forest.
+	function mapProfileValueToAchievement(target: ProfileDataTarget): number {
+		if (target === ProfileDataTarget.PROFILE_MATCH)
+			return props.profile.matchesCount;
+		else if (target == ProfileDataTarget.PROFILE_MATCH_WON)
+			return props.profile.matchesWonCount;
+		return 0;
+	}
 
 	function generateAchievementItem() {
-		const unlockedAchievementId: number[] = props.achievements.map(
+		const unlockedAchievementId: number[] = props.profile.achievements.map(
 			(e) => e.id,
 		);
 		const lockedAchievementId: number[] = AchievementIdArray.filter(
 			(id: number) => !unlockedAchievementId.includes(id),
 		);
 
-		const unlockedAchievement = props.achievements.map(
+		//TODO: a bit of code duplication here. Can be done smarter
+		const unlockedAchievement = props.profile.achievements.map(
 			(achievementData) => {
+				// We're asserting that the database will always return valid ids
+				// (hence the exclamation mark at the end of the next statement;
+				const profileAchievement = AchievementMap.get(
+					achievementData.id,
+				)!;
 				return (
 					<AchievementItem
 						key={achievementData.id}
 						unlocked={true}
 						unlockedDate={new Date(achievementData.unlockedAt)}
-						achievement={AchievementMap.get(achievementData.id)}
+						progress={mapProfileValueToAchievement(
+							profileAchievement.data,
+						)}
+						threeshold={profileAchievement.threeshold}
+						achievement={profileAchievement}
 					/>
 				);
 			},
 		);
 
-		const lockedAchievement = lockedAchievementId.map((id) => (
-			<AchievementItem
-				key={id}
-				unlocked={false}
-				achievement={AchievementMap.get(id)}
-			/>
-		));
+		const lockedAchievement = lockedAchievementId.map((id) => {
+			const profileAchievement = AchievementMap.get(id)!;
+
+			return (
+				<AchievementItem
+					key={id}
+					unlocked={false}
+					progress={mapProfileValueToAchievement(
+						profileAchievement.data,
+					)}
+					threeshold={profileAchievement.threeshold}
+					achievement={profileAchievement}
+				/>
+			);
+		});
 
 		return [unlockedAchievement, lockedAchievement];
 	}
