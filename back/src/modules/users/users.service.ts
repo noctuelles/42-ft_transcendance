@@ -196,13 +196,11 @@ export class UsersService {
 				profile: {
 					select: {
 						xp: true,
-						achievements: true,
 						picture: true,
 						achievements: {
 							select: {
 								id: true,
 								unlockedAt: true,
-								type: true,
 							},
 						},
 					},
