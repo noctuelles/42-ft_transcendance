@@ -391,17 +391,7 @@ export class Game {
 	}
 
 	private async _registerGame(winner: IPlayer, loser: IPlayer) {
-		let eloDiff = Math.abs(
-			winner.profile.user.profile.elo - loser.profile.user.profile.elo,
-		);
-		if (eloDiff > 1000) eloDiff = 1000;
-		eloDiff /= 400;
-		eloDiff = Math.pow(10, eloDiff) + 1;
-		let score = 1 / eloDiff;
-		score = Math.round((1 - score) * 20);
-		const winnerElo = winner.profile.user.profile.elo + score;
-		const loserElo = loser.profile.user.profile.elo - score;
-		await Promise.all([
+		const promises = [
 			this._prismaService.match.create({
 				data: {
 					createdAt: this._gameStartTime.toISOString(),
@@ -421,25 +411,52 @@ export class Game {
 							xp: {
 								increment: 50,
 							},
-							elo: {
-								set: winnerElo,
-							},
 						},
 					},
 				},
 			}),
-			this._prismaService.user.update({
-				where: { id: loser.profile.user.id },
-				data: {
-					profile: {
-						update: {
-							elo: {
-								set: loserElo,
+		];
+		if (this._type === GameType.RANKED) {
+			let eloDiff = Math.abs(
+				winner.profile.user.profile.elo -
+					loser.profile.user.profile.elo,
+			);
+			if (eloDiff > 1000) eloDiff = 1000;
+			eloDiff /= 400;
+			eloDiff = Math.pow(10, eloDiff) + 1;
+			let score = 1 / eloDiff;
+			score = Math.round((1 - score) * 20);
+			const winnerElo = winner.profile.user.profile.elo + score;
+			const loserElo = loser.profile.user.profile.elo - score;
+			promises.push(
+				this._prismaService.user.update({
+					where: { id: winner.profile.user.id },
+					data: {
+						profile: {
+							update: {
+								elo: {
+									set: winnerElo,
+								},
 							},
 						},
 					},
-				},
-			}),
-		]);
+				}),
+			);
+			promises.push(
+				this._prismaService.user.update({
+					where: { id: loser.profile.user.id },
+					data: {
+						profile: {
+							update: {
+								elo: {
+									set: loserElo,
+								},
+							},
+						},
+					},
+				}),
+			);
+		}
+		await Promise.all(promises);
 	}
 }

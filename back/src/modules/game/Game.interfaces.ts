@@ -75,7 +75,7 @@ export const GameParams = {
 	BALL_MAX_SPEED: 15,
 	BALL_PERTURBATOR: 0.2,
 	//TODO: change to 300
-	GAME_TIME: 1,
+	GAME_TIME: 1000000,
 };
 
 export function getDefaultGameState(
