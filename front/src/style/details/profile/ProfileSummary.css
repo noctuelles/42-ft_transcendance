@@ -1,5 +1,5 @@
 .profile-summary {
 	padding: 5px;
 	display: flex;
-	flex-direction: row;
+	flex-wrap: wrap;
 }
