@@ -11,12 +11,13 @@ import LoggedApp from '../global/LoggedApp';
 import Profile from '../pages/Profile';
 import Play from '../pages/Play';
 import Chat from '@/components/chat/Chat';
-import Login from '../pages/Login';
+import Login from '../pages/auth/Login';
 import Social from '../pages/Social';
 import { back_url } from '../../config.json';
 import { UserContext } from '../../context/UserContext';
 import Cookies from 'js-cookie';
-import UserCreation from '../pages/UserCreation';
+import UserCreation from '../pages/auth/UserCreation';
+import TwoFaLog from '../pages/auth/TwoFaLog';
 
 function AppRoutes() {
 	const location = useLocation();
@@ -85,6 +86,15 @@ function AppRoutes() {
 								userContext.auth.setUpdating(false);
 								userContext.auth.setCreatingUser(data.user);
 								navigate('/userCreation', { replace: true });
+							} else if (data.state == '2fa') {
+								Cookies.set(
+									'transcendance_2fa_cookie',
+									data.token,
+									{
+										expires: 2 * 60 * 60,
+									},
+								);
+								navigate('/2fa', { replace: true });
 							}
 						});
 				}
@@ -97,6 +107,7 @@ function AppRoutes() {
 	return (
 		<Routes>
 			<Route path="/callback" element={<div></div>} />
+			<Route path="/2fa" element={<TwoFaLog />} />
 			<Route
 				path="/login"
 				element={
