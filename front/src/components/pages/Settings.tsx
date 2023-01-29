@@ -93,6 +93,10 @@ function Settings() {
 			.then((data) => {
 				if (data.result === 'activated') {
 					setTwoFaStatus(true);
+					setQrcode('');
+					setFinished(false);
+					setError('|');
+					setReset(false);
 				} else if (data.result === 'error') {
 					setFinished(false);
 					setReset(true);
