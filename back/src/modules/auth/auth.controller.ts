@@ -20,6 +20,7 @@ import { User } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 import { FormDataRequest } from 'nestjs-form-data';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
+import { TwoFaLogDTO } from './DTO/TwoFALogDTO';
 import { TwoFAService } from './TwoFA.service';
 
 @Controller('auth')
@@ -116,6 +117,12 @@ export class AuthController {
 	@UseGuards(AuthGuard)
 	async verify2FA(@CurrentUser() user, @Body('code') code: string) {
 		return await this.twoFAService.verify2FA(user, code);
+	}
+
+	@Post('2fa/connect')
+	async connect2FA(@Body(new ValidationPipe()) body: TwoFaLogDTO) {
+		const { token, code } = body;
+		return await this.authService.connect2FA(token, code);
 	}
 
 	@Post('2fa/disable')

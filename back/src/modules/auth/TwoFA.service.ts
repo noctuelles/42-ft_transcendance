@@ -46,6 +46,14 @@ export class TwoFAService {
 		}
 	}
 
+	async connect(user, code) {
+		const secret = user.otpSecret;
+		if (!secret) {
+			throw new BadRequestException('2FA not enabled');
+		}
+		return authenticator.verify({ token: code, secret });
+	}
+
 	async disable2FA(user) {
 		await this.prismaService.user.update({
 			where: { id: user.id },
