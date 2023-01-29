@@ -2,12 +2,16 @@ import '@/style/details/profile/MatchHistoryRow.css';
 import Fight from '@/assets/fight.svg';
 import FightFlipped from '@/assets/fight_flipped.svg';
 import { ProfileMatchData } from './ProfileTypes';
+import { useContext } from 'react';
+import { UserContext } from '@/context/UserContext';
 
 interface MatchHistoryRowProps {
 	match: ProfileMatchData;
 }
 
 const MatchHistoryRow = (props: MatchHistoryRowProps) => {
+	const userContext = useContext(UserContext);
+
 	let fightIcon = null;
 	let diff =
 		new Date(props.match.finishedAt).getTime() -
@@ -17,8 +21,15 @@ const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 		minutes: Math.floor((diff / (1000 * 60)) % 60),
 	};
 
-	if (props.match.userOne !== props.match.looser) fightIcon = Fight;
-	else fightIcon = FightFlipped;
+	if (!props.match.looser) {
+		if (props.match.userOne.name === userContext.user.name)
+			fightIcon = FightFlipped;
+		else fightIcon = Fight;
+	} else {
+		if (props.match.userOne.name === userContext.user.name)
+			fightIcon = Fight;
+		else fightIcon = FightFlipped;
+	}
 
 	return (
 		<div className="match-container">

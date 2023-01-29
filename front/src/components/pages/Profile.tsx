@@ -36,7 +36,7 @@ const Profile = () => {
 
 	useEffect(() => {
 		handleSearch(userContext.user.name);
-	}, [userContext]);
+	}, []);
 
 	if (!profile) return <h2>Profile loading...</h2>;
 
