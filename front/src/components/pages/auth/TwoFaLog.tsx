@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 function TwoFaLog() {
-	const [code, setCode] = useState([-1, -1, -1, -1, -1, -1]);
 	const [finished, setFinished] = useState(false);
 	const [error, setError] = useState('|');
 	const [reset, setReset] = useState(false);
@@ -17,8 +16,21 @@ function TwoFaLog() {
 	const infoBoxContext = useContext(InfoBoxContext);
 	const navigate = useNavigate();
 
-	function testCode() {
-		const codeString = code.join('');
+	function checkCookie() {
+		setReset(false);
+		setError('|');
+		if (!Cookies.get('transcendance_2fa_cookie')) {
+			infoBoxContext.addInfo({
+				type: InfoType.ERROR,
+				message:
+					'You take too long to enter your code. Please try again',
+			});
+			navigate('/login', { replace: true });
+		}
+	}
+
+	function checkCode(code: string) {
+		setFinished(true);
 		fetch(back_url + '/auth/2fa/connect', {
 			method: 'POST',
 			headers: {
@@ -26,7 +38,7 @@ function TwoFaLog() {
 			},
 			body: JSON.stringify({
 				token: Cookies.get('transcendance_2fa_cookie'),
-				code: codeString,
+				code: code,
 			}),
 		})
 			.then((res) => {
@@ -53,7 +65,6 @@ function TwoFaLog() {
 					userContext.updateUser();
 					navigate('/', { replace: true });
 				} else if (data.state === 'error') {
-					setCode([-1, -1, -1, -1, -1, -1]);
 					setFinished(false);
 					setReset(true);
 					setError('Invalid code, please rerty');
@@ -61,40 +72,19 @@ function TwoFaLog() {
 			});
 	}
 
-	function changeCode(number: number, position: number) {
-		if (!Cookies.get('transcendance_2fa_cookie')) {
-			infoBoxContext.addInfo({
-				type: InfoType.ERROR,
-				message:
-					'You take too long to enter your code. Please try again',
-			});
-			navigate('/login', { replace: true });
-		}
-		setReset(false);
-		setError('|');
-		setCode((prev: any) => {
-			prev[position] = number;
-			return prev;
-		});
-		if (position == 5) {
-			setFinished(true);
-			testCode();
-		}
-	}
-
 	return (
 		<div className="twofa">
 			<h1>Please open your 2FA application and enter your code</h1>
 			<TwoFaInput
-				code={code}
-				changeCode={changeCode}
-				available={!finished}
+				enabled={!finished}
+				callback={checkCode}
+				onChange={checkCookie}
 				reset={reset}
 			/>
-			<Loader color={finished ? 'black' : 'transparent'} />
 			<p style={{ color: error === '|' ? 'transparent' : 'black' }}>
 				{error}
 			</p>
+			<Loader color={finished ? 'black' : 'transparent'} />
 		</div>
 	);
 }

@@ -18,6 +18,7 @@ import { UserContext } from '../../context/UserContext';
 import Cookies from 'js-cookie';
 import UserCreation from '../pages/auth/UserCreation';
 import TwoFaLog from '../pages/auth/TwoFaLog';
+import Settings from '../pages/Settings';
 
 function AppRoutes() {
 	const location = useLocation();
@@ -143,6 +144,7 @@ function AppRoutes() {
 				<Route path="social" element={<Social />} />
 				<Route path="profile" element={<Profile />} />
 				<Route path="chat" element={<Chat />} />
+				<Route path="settings" element={<Settings />} />
 				<Route path="*" element={<Navigate replace to="play" />} />
 			</Route>
 			<Route path="*" element={<Navigate replace to="/" />} />
