@@ -40,9 +40,9 @@ export class TwoFAService {
 				where: { id: user.id },
 				data: { otpSecret: secret },
 			});
-			return true;
+			return { result: 'activated' };
 		} else {
-			return false;
+			return { result: 'error' };
 		}
 	}
 

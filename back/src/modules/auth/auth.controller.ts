@@ -130,4 +130,10 @@ export class AuthController {
 	async disable2FA(@CurrentUser() user) {
 		return await this.twoFAService.disable2FA(user);
 	}
+
+	@Get('2fa')
+	@UseGuards(AuthGuard)
+	async get2FA(@CurrentUser() user) {
+		return user.otpSecret ? { enabled: true } : { enabled: false };
+	}
 }
