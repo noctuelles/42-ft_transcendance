@@ -7,7 +7,6 @@ nav {
 	padding-left: 5%;
 	padding-right: 1em;
 
-
 	justify-content: space-between;
 	box-shadow: 0px 0px 2px black;
 	align-items: center;
@@ -57,4 +56,16 @@ nav {
 	-moz-transition: 0.3s;
 	-webkit-transition: 0.3s;
 	transition: 0.3s;
+}
+
+.nav-logout {
+	margin-left: 10px;
+	border: solid 2px transparent;
+	cursor: pointer;
+	background-color: var(--blue-primary-color);
+	border-radius: 20px;
+}
+
+.nav-logout:hover {
+	border: solid 2px black;
 }
