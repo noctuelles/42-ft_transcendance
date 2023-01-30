@@ -1,7 +1,4 @@
 .match-details {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
 }
 
 .match-details-right {
@@ -14,10 +11,22 @@
 
 .match-details-left,
 .match-details-right {
-	flex-basis: 49%;
+	flex-basis: 45%;
 }
 
 .match-details-center {
-	flex-basis: 0.5%;
-	background-color: black;
+	flex-basis: 10%;
+}
+
+.match-details-center ul {
+	display: inline;
+}
+
+.match-details-center ul li {
+	margin: 10px 10px;
+}
+
+.match-details table {
+	margin-left: auto;
+	margin-right: auto;
 }

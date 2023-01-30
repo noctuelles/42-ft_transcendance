@@ -1,19 +1,48 @@
 import ProgressBar from '@/components/global/ProgressBar';
 import '@/style/details/profile/MatchHistoryRowDetails.css';
+import { UserMatchData } from './ProfileTypes';
 
-function SideDetails(side: string) {}
+interface SideDetailsProps {
+	side: string;
+	player: UserMatchData;
+}
 
-export function MatchHistoryRowDetails() {
+function SideDetails({ side }: SideDetailsProps) {
+	return (
+		<div className={`match-details-${side}`}>
+			<p>blalba</p>
+		</div>
+	);
+}
+
+interface MatchHistoryRowDetailsProps {
+	userOne: UserMatchData;
+	userTwo: UserMatchData;
+}
+
+export function MatchHistoryRowDetails({
+	userOne,
+	userTwo,
+}: MatchHistoryRowDetailsProps) {
 	return (
 		<div className="match-details">
-			<div className="match-details-left">
-				<ProgressBar percent={10} height="15px" text="lol" />
-				<p>lol</p>
-			</div>
-			<div className="match-details-center"></div>
-			<div className="match-details-right">
-				<ProgressBar percent={10} />
-			</div>
+			<table>
+				<colgroup span={3}></colgroup>
+				<tr>
+					<td>{userOne.profile.xp}</td>
+					<td>
+						<u>Level</u>
+					</td>
+					<td>{userTwo.profile.xp}</td>
+				</tr>
+				<tr>
+					<td>
+						<ProgressBar percent={10} />
+					</td>
+					<td>Level</td>
+					<td>{userTwo.profile.xp}</td>
+				</tr>
+			</table>
 		</div>
 	);
 }

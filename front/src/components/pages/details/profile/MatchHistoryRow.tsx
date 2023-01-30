@@ -52,7 +52,10 @@ const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 			</div>
 			<CollapseArrow>
 				<hr />
-				<MatchHistoryRowDetails />
+				<MatchHistoryRowDetails
+					userOne={props.match.userOne}
+					userTwo={props.match.userTwo}
+				/>
 			</CollapseArrow>
 		</div>
 	);

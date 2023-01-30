@@ -5,7 +5,7 @@ interface UserProfileMatchData {
 	xp: number;
 }
 
-interface UserMatchData {
+export interface UserMatchData {
 	name: string;
 	profile: UserProfileMatchData;
 }
