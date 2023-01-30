@@ -29,14 +29,15 @@ const AchievementItem = (props: AchievementItemProps) => {
 			</div>
 			<ProgressBar
 				width="100%"
-				height="15px"
+				height="20px"
 				percent={Math.round((props.progress / props.threeshold) * 100)}
+				text={`${props.progress}/${props.threeshold}`}
 				innerBarColor="rgb(255, 153, 0)"
 			/>
 			<div className="achievement-item-bottom">
 				<img
 					src={props.unlocked ? CheckMark : Cross}
-					alt="unlock state"
+					alt="unlock_state"
 				/>
 				<span>
 					{props.unlocked ? (

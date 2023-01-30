@@ -27,8 +27,9 @@ const ProgressBar = (props: ProgressBarProps) => {
 						? props.innerBarColor
 						: '#3399ff',
 				}}
-			></div>
-			<span className="progress-bar-text">{props.text}</span>
+			>
+				<span className="progress-bar-text">{props.text}</span>
+			</div>
 		</div>
 	);
 };

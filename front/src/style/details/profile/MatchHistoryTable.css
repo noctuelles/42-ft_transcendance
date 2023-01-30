@@ -31,6 +31,6 @@
 /* Handle */
 .match-history-table ul::-webkit-scrollbar-thumb {
 	border-radius: 10px;
-	background-color: #000000;
+	background-color: rgb(122, 122, 122);
 	border: 2px solid #555555;
 }
