@@ -2,8 +2,10 @@ import '@/style/details/profile/MatchHistoryRow.css';
 import Fight from '@/assets/fight.svg';
 import FightFlipped from '@/assets/fight_flipped.svg';
 import { ProfileMatchData } from './ProfileTypes';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
+import { CollapseArrow } from '@/components/global/CollapseArrow';
+import { Col } from 'react-bootstrap';
 
 interface MatchHistoryRowProps {
 	match: ProfileMatchData;
@@ -11,6 +13,7 @@ interface MatchHistoryRowProps {
 
 const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 	const userContext = useContext(UserContext);
+	const [className, setClassName] = useState('up');
 
 	let fightIcon = null;
 	let diff =
@@ -48,6 +51,9 @@ const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 					src={props.match.userTwo.profile.picture}
 				/>
 			</div>
+			<CollapseArrow>
+				<p>Bonjour</p>
+			</CollapseArrow>
 		</div>
 	);
 };

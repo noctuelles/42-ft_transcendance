@@ -1,0 +1,18 @@
+.arrow {
+	border: solid black;
+	padding: 5px;
+	border-width: 0 4px 4px 0;
+	display: inline-block;
+}
+
+.up {
+	transform: rotate(-135deg);
+}
+
+.down {
+	transform: rotate(45deg);
+}
+
+.arrow:hover {
+	cursor: pointer;
+}
