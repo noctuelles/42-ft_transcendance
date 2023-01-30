@@ -10,38 +10,21 @@ interface MatchHistoryTableProps {
 }
 
 const MatchHistoryTable = (props: MatchHistoryTableProps) => {
-	const userContext = useContext(UserContext);
-
 	return (
-		<table>
-			<thead>
-				<tr>
-					<th scope="col">Match history:</th>
-				</tr>
-			</thead>
+		<div className="match-history-table">
+			<h3>Match history</h3>
 			{!props.matches || props.matches.length == 0 ? (
-				<tbody>
-					<tr>
-						<td>
-							{props.name == userContext.user.name
-								? 'You '
-								: `${props.name} `}
-							haven't played any match...
-						</td>
-					</tr>
-				</tbody>
+				<span>You don't have any match yet</span>
 			) : (
-				<tbody>
+				<ul>
 					{props.matches.map((m: ProfileMatchData) => (
-						<tr key={m.id}>
-							<td>
-								<MatchHistoryRow match={m} />
-							</td>
-						</tr>
+						<li key={m.id}>
+							<MatchHistoryRow match={m} />
+						</li>
 					))}
-				</tbody>
+				</ul>
 			)}
-		</table>
+		</div>
 	);
 };
 

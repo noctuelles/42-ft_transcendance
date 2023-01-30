@@ -1,0 +1,23 @@
+.match-details {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.match-details-right {
+	text-align: right;
+}
+
+.match-details-left {
+	text-align: left;
+}
+
+.match-details-left,
+.match-details-right {
+	flex-basis: 49%;
+}
+
+.match-details-center {
+	flex-basis: 0.5%;
+	background-color: black;
+}

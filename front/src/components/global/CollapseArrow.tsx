@@ -13,12 +13,12 @@ export function CollapseArrow({ children }: CollapseArrowProps) {
 	}
 
 	return (
-		<div>
+		<>
 			{!collapse ? children : null}
 			<div
 				className={`arrow ${collapse ? 'up' : 'down'}`}
 				onClick={handleArrowClick}
 			/>
-		</div>
+		</>
 	);
 }
