@@ -136,4 +136,10 @@ export class AuthController {
 	async get2FA(@CurrentUser() user) {
 		return user.otpSecret ? { enabled: true } : { enabled: false };
 	}
+	
+	@Post('logout')
+	@UseGuards(AuthGuard)
+	async logout(@Body('refresh_token') refreshToken: string) {
+		return await this.authService.logout(refreshToken);
+	}
 }

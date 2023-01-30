@@ -245,4 +245,25 @@ export class AuthService {
 			throw new BadRequestException('Invalid access token');
 		}
 	}
+
+	async logout(refreshToken: string) {
+		try {
+			const decode = this.jwtService.verify(refreshToken);
+			if (
+				!decode ||
+				!decode.type ||
+				decode.type !== 'refresh' ||
+				!decode.identifier
+			) {
+				throw new BadRequestException('Invalid refresh token');
+			}
+			await this.prismaService.authIdentifier.delete({
+				where: {
+					identifier: decode.identifier,
+				},
+			});
+		} catch (e) {
+			throw new BadRequestException('Invalid refresh token');
+		}
+	}
 }
