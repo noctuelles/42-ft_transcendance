@@ -12,7 +12,7 @@ interface MatchHistoryTableProps {
 const MatchHistoryTable = (props: MatchHistoryTableProps) => {
 	return (
 		<div className="match-history-table">
-			<h3>Match history</h3>
+			<h3>Matchs</h3>
 			{!props.matches || props.matches.length == 0 ? (
 				<span>You don't have any match yet</span>
 			) : (
