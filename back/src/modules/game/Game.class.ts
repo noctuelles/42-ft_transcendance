@@ -361,17 +361,12 @@ export class Game {
 	}
 
 	private _updatePortal(portal: IPortal) {
-		if (portal.direction == 'up') {
-			portal.center.y -= portal.speed;
-		}
-		if (portal.direction == 'down') {
-			portal.center.y += portal.speed;
-		}
+		portal.center.y += portal.speed * portal.direction;
 		if (
 			portal.center.y <
 			portal.height / 2 + GameParams.PORTAL_OFFSET / 2
 		) {
-			portal.direction = 'down';
+			portal.direction = 1;
 		}
 		if (
 			portal.center.y >
@@ -379,7 +374,7 @@ export class Game {
 				portal.height / 2 -
 				GameParams.PORTAL_OFFSET / 2
 		) {
-			portal.direction = 'up';
+			portal.direction = -1;
 		}
 	}
 

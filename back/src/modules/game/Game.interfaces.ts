@@ -49,7 +49,7 @@ export interface IPortal {
 	height: number;
 	link: IPortal;
 	color: string;
-	direction: 'up' | 'down';
+	direction: 1 | -1;
 	speed: number;
 }
 
@@ -98,7 +98,7 @@ export const GameParams = {
 function createDefaultPortal(
 	center: IPosition,
 	color: string,
-	direction: 'up' | 'down',
+	direction: 1 | -1,
 ): IPortal {
 	return {
 		center: center,
@@ -177,7 +177,7 @@ export function getDefaultGameState(
 						GameParams.PORTAL_HEIGHT / 2,
 				},
 				'#c3a749',
-				'up',
+				-1,
 			),
 			createDefaultPortal(
 				{
@@ -188,7 +188,7 @@ export function getDefaultGameState(
 					y: GameParams.PORTAL_OFFSET + GameParams.PORTAL_HEIGHT / 2,
 				},
 				'#701415',
-				'down',
+				1,
 			),
 		];
 		portals[0].link = portals[1];
