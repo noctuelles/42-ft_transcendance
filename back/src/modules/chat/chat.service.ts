@@ -147,7 +147,7 @@ export class ChatService {
 		}
 		this.channels.get(channelId).members.push(userId);
 		this.sendChannelListToSocket(
-			this.websocketsService.getSocketsFromUsers([userId])[0],
+			this.websocketsService.getSocketsFromUsersId([userId])[0],
 		);
 		return true;
 	}
