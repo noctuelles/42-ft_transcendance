@@ -1,32 +1,9 @@
-.match-details {
-}
-
-.match-details-right {
-	text-align: right;
-}
-
-.match-details-left {
-	text-align: left;
-}
-
-.match-details-left,
-.match-details-right {
-	flex-basis: 45%;
-}
-
-.match-details-center {
-	flex-basis: 10%;
-}
-
-.match-details-center ul {
-	display: inline;
-}
-
-.match-details-center ul li {
-	margin: 10px 10px;
-}
-
 .match-details table {
 	margin-left: auto;
 	margin-right: auto;
+}
+
+.match-details tr img {
+	width: 20px;
+	height: 20px;
 }

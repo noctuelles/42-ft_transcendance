@@ -23,15 +23,9 @@ const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 		minutes: Math.floor((diff / (1000 * 60)) % 60),
 	};
 
-	if (!props.match.looser) {
-		if (props.match.userOne.name === userContext.user.name)
-			fightIcon = FightFlipped;
-		else fightIcon = Fight;
-	} else {
-		if (props.match.userOne.name === userContext.user.name)
-			fightIcon = Fight;
-		else fightIcon = FightFlipped;
-	}
+	if (props.match.looser.name === props.match.userOne.name)
+		fightIcon = FightFlipped;
+	else fightIcon = Fight;
 
 	return (
 		<div className="match-container">
@@ -55,6 +49,7 @@ const MatchHistoryRow = (props: MatchHistoryRowProps) => {
 				<MatchHistoryRowDetails
 					userOne={props.match.userOne}
 					userTwo={props.match.userTwo}
+					looser={props.match.looser}
 				/>
 			</CollapseArrow>
 		</div>

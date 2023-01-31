@@ -116,7 +116,7 @@ export class UsersService {
 
 	matchInclude = {};
 
-	/* Fetch a profile of a specified username */
+	/* Fetch a profile of a specified username zer*/
 	async fetchProfileData(username: string) {
 		const user = await this.prismaService.user.findUnique({
 			where: {
@@ -186,7 +186,7 @@ export class UsersService {
 								name: true,
 							},
 						},
-						winner: {
+						looser: {
 							select: {
 								name: true,
 							},
