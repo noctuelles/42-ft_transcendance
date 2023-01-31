@@ -11,6 +11,8 @@ interface ICreatingUser {
 	profile_picture: string;
 }
 
+interface IMatchData {}
+
 @Injectable()
 export class UsersService {
 	private creatingUsers: ICreatingUser[] = [];
@@ -114,81 +116,41 @@ export class UsersService {
 		});
 	}
 
-	matchInclude = {};
-
 	/* Fetch a profile of a specified username zer*/
 	async fetchProfileData(username: string) {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				name: username,
 			},
-			select: {
-				matchesWon: {
-					select: {
-						id: true,
-						createdAt: true,
-						finishedAt: true,
-						bounces: true,
-						userOne: {
-							select: {
-								name: true,
-								profile: {
-									select: {
-										picture: true,
-										xp: true,
+			include: {
+				matches: {
+					include: {
+						asUserOne: {
+							include: {
+								userOne: {
+									include: {
+										user: true,
+									},
+								},
+								userTwo: {
+									include: {
+										user: true,
 									},
 								},
 							},
 						},
-						userTwo: {
-							select: {
-								name: true,
-								profile: {
-									select: {
-										picture: true,
-										xp: true,
+						asUserTwo: {
+							include: {
+								userOne: {
+									include: {
+										user: true,
 									},
 								},
-							},
-						},
-						looser: {
-							select: {
-								name: true,
-							},
-						},
-					},
-				},
-				matchesLost: {
-					select: {
-						id: true,
-						createdAt: true,
-						finishedAt: true,
-						bounces: true,
-						userOne: {
-							select: {
-								name: true,
-								profile: {
-									select: {
-										picture: true,
-										xp: true,
+								userTwo: {
+									include: {
+										user: true,
 									},
 								},
-							},
-						},
-						userTwo: {
-							select: {
-								profile: {
-									select: {
-										picture: true,
-										xp: true,
-									},
-								},
-								name: true,
-							},
-						},
-						looser: {
-							select: {
-								name: true,
 							},
 						},
 					},
@@ -197,26 +159,39 @@ export class UsersService {
 					select: {
 						xp: true,
 						picture: true,
-						achievements: {
-							select: {
-								id: true,
-								unlockedAt: true,
-							},
-						},
+						achievements: true,
 					},
 				},
 			},
 		});
+
+		/*
+		 * interface match {
+		 *    createAt: Date;
+		 *    endAt: Date;
+		 *    userOne: UserMatchDetails;
+		 *    userTwo: UserMatchDetails;
+		 * }
+		 *
+		 * interface UserMatchDetails {
+		 *   xpBeg: number;
+		 *   name: string;
+		 *   picture: string;
+		 *   [...]
+		 * }
+		 *
+		 */
+		// Le back s'occupe de passer les relations en objet complétement exploitable car le front.
+		// Est-ce que c'est pas mal exploiter prisma, de devoir recrée une interface pour ?
+
+		const completeMatch = user.matches.map((match) => {
+			const matchDetail = match.asUserOne
+				? match?.asUserOne
+				: match?.asUserTwo;
+
+			return matchDetail;
+		});
+
 		if (!user) return null;
-		return {
-			matches: [...user.matchesLost, ...user.matchesWon],
-			achievements: user.profile.achievements,
-			matchesCount: user.matchesWon.length + user.matchesLost.length,
-			matchesWonCount: user.matchesWon.length,
-			matchesLostCount: user.matchesLost.length,
-			picture: user.profile.picture,
-			name: username,
-			xp: user.profile.xp,
-		};
 	}
 }

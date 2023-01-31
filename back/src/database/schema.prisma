@@ -24,11 +24,6 @@ model User {
     friends        User[]           @relation("UserFriends")
     friendsOf      User[]           @relation("UserFriends")
 
-    matchAsUserOne Match[] @relation("UserOne")
-    matchAsUserTwo Match[] @relation("UserTwo")
-    matchesWon     Match[] @relation("WinnerUser")
-    matchesLost    Match[] @relation("LooserUser")
-
     // Here i define an explicit many-to-many relations.
     // Three models defines this kind of relation :
     //    User and UserChannel has a many-to-many relations (an User can be in multiple channel and a Channel can have multiple User)
@@ -38,6 +33,7 @@ model User {
     // See https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations
 
     onChannels UserOnChannel[]
+    matches    UserOnMatch[]
 }
 
 model UserOnChannel {
@@ -77,26 +73,30 @@ model UserAchievement {
     userProfileId Int
 }
 
+model UserOnMatch {
+    id     Int  @id @default(autoincrement())
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
+
+    score    Int      @default(0)
+    xpAtBeg  Int
+    xpEarned Int?
+    win      Boolean?
+    bounce   Int      @default(0)
+
+    asUserOne Match? @relation("userOne")
+    asUserTwo Match? @relation("userTwo")
+}
+
 model Match {
+    userOne          UserOnMatch @relation("userOne", fields: [userOneOnMatchId], references: [id])
+    userOneOnMatchId Int         @unique
+    userTwo          UserOnMatch @relation("userTwo", fields: [userTwoOnMatchId], references: [id])
+    userTwoOnMatchId Int         @unique
+
     id         Int       @id @unique @default(autoincrement())
     createdAt  DateTime  @default(now())
     finishedAt DateTime?
-
-    userOneScore  Int  @default(0)
-    userTwoScore  Int  @default(0)
-    userOneXp     Int  @db.Integer
-    userTwoXp     Int  @db.Integer
-    userOneBounce Int? @db.Integer
-    userTwoBounce Int? @db.Integer
-
-    userOne   User @relation("UserOne", fields: [userOneId], references: [id])
-    userTwo   User @relation("UserTwo", fields: [userTwoId], references: [id])
-    winner    User @relation("WinnerUser", fields: [winnerId], references: [id])
-    looser    User @relation("LooserUser", fields: [looserId], references: [id])
-    userOneId Int
-    userTwoId Int
-    winnerId  Int
-    looserId  Int
 }
 
 model AuthIdentifier {
