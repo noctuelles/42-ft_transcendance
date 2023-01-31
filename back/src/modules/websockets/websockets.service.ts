@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
 export class WebsocketsService {
 	private _sockets = [];
+	private _socketsOnClose = new Map();
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly prismaService: PrismaService,
@@ -55,6 +56,21 @@ export class WebsocketsService {
 			this.send(socket, 'error', 'Invalid session cookie');
 			socket.close();
 			return;
+		}
+	}
+
+	registerOnClose(socket, action: () => void) {
+		this._socketsOnClose.set(socket, [
+			...(this._socketsOnClose.get(socket) || []),
+			action,
+		]);
+	}
+
+	unregisterSocket(socket) {
+		this._sockets = this._sockets.filter((s) => s !== socket);
+		const actions = this._socketsOnClose.get(socket);
+		if (actions) {
+			actions.forEach((action) => action());
 		}
 	}
 

@@ -9,7 +9,6 @@
 }
 
 .play-btn {
-	background-color: #ffb800;
 	border: 2px solid transparent;
 	border-radius: 15px;
 	color: #000;
@@ -18,8 +17,18 @@
 	cursor: pointer;
 	width: 300px;
 	height: 100px;
-	font-size: 40px;
+	font-size: 30px;
 	font-weight: 600;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+.ranked-btn {
+	background-color: var(--yellow-primary-color);
+}
+
+.fun-btn {
+	background-color: var(--blue-primary-color);
 }
 
 .play-btn:hover {
