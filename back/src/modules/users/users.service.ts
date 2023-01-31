@@ -116,8 +116,42 @@ export class UsersService {
 		});
 	}
 
+	//TODO: AuthGuard.
 	/* Fetch a profile of a specified username zer*/
 	async fetchProfileData(username: string) {
+		const opt = {
+			include: {
+				userOne: {
+					include: {
+						user: {
+							select: {
+								name: true,
+								profile: {
+									select: {
+										picture: true,
+									},
+								},
+							},
+						},
+					},
+				},
+				userTwo: {
+					include: {
+						user: {
+							select: {
+								name: true,
+								profile: {
+									select: {
+										picture: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		};
+
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				name: username,
@@ -126,38 +160,18 @@ export class UsersService {
 				matches: {
 					include: {
 						asUserOne: {
-							include: {
-								userOne: {
-									include: {
-										user: true,
-									},
-								},
-								userTwo: {
-									include: {
-										user: true,
-									},
-								},
-							},
+							...opt,
 						},
 						asUserTwo: {
-							include: {
-								userOne: {
-									include: {
-										user: true,
-									},
-								},
-								userTwo: {
-									include: {
-										user: true,
-									},
-								},
-							},
+							...opt,
 						},
 					},
 				},
 				profile: {
 					select: {
 						xp: true,
+						lostMatches: true,
+						wonMatches: true,
 						picture: true,
 						achievements: true,
 					},
@@ -165,33 +179,13 @@ export class UsersService {
 			},
 		});
 
-		/*
-		 * interface match {
-		 *    createAt: Date;
-		 *    endAt: Date;
-		 *    userOne: UserMatchDetails;
-		 *    userTwo: UserMatchDetails;
-		 * }
-		 *
-		 * interface UserMatchDetails {
-		 *   xpBeg: number;
-		 *   name: string;
-		 *   picture: string;
-		 *   [...]
-		 * }
-		 *
-		 */
-		// Le back s'occupe de passer les relations en objet complétement exploitable car le front.
-		// Est-ce que c'est pas mal exploiter prisma, de devoir recrée une interface pour ?
-
-		const completeMatch = user.matches.map((match) => {
-			const matchDetail = match.asUserOne
-				? match?.asUserOne
-				: match?.asUserTwo;
-
-			return matchDetail;
-		});
-
 		if (!user) return null;
+		return {
+			matchs: user.matches.map((match) =>
+				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
+			),
+			name: user.name,
+			...user.profile,
+		};
 	}
 }

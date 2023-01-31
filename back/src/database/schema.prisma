@@ -61,6 +61,8 @@ model UserProfile {
     id           Int               @id @unique @default(autoincrement())
     xp           Int               @default(0)
     elo          Int               @default(1000)
+    wonMatches   Int               @default(0)
+    lostMatches  Int               @default(0)
     picture      String
     achievements UserAchievement[]
     user         User?
@@ -81,8 +83,8 @@ model UserOnMatch {
     score    Int      @default(0)
     xpAtBeg  Int
     xpEarned Int?
-    win      Boolean?
-    bounce   Int      @default(0)
+    winner   Boolean?
+    bounces  Int      @default(0)
 
     asUserOne Match? @relation("userOne")
     asUserTwo Match? @relation("userTwo")

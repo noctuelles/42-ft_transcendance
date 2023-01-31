@@ -2,8 +2,6 @@ import '@/style/details/profile/MatchHistoryRow.css';
 import Fight from '@/assets/fight.svg';
 import FightFlipped from '@/assets/fight_flipped.svg';
 import { ProfileMatchData } from './ProfileTypes';
-import { useContext, useState } from 'react';
-import { UserContext } from '@/context/UserContext';
 import { CollapseArrow } from '@/components/global/CollapseArrow';
 import { MatchHistoryRowDetails } from './MatchHistoryRowDetails';
 
@@ -11,45 +9,40 @@ interface MatchHistoryRowProps {
 	match: ProfileMatchData;
 }
 
-const MatchHistoryRow = (props: MatchHistoryRowProps) => {
-	const userContext = useContext(UserContext);
-
-	let fightIcon = null;
-	let diff =
-		new Date(props.match.finishedAt).getTime() -
-		new Date(props.match.createdAt).getTime();
-	let timeInfo = {
+const MatchHistoryRow = ({ match }: MatchHistoryRowProps) => {
+	const diff =
+		new Date(match.finishedAt).getTime() -
+		new Date(match.createdAt).getTime();
+	const timeInfo = {
 		seconds: Math.floor((diff / 1000) % 60),
 		minutes: Math.floor((diff / (1000 * 60)) % 60),
 	};
 
-	if (props.match.looser.name === props.match.userOne.name)
-		fightIcon = FightFlipped;
-	else fightIcon = Fight;
-
 	return (
 		<div className="match-container">
-			<h4>{`Match #${props.match.id} -  Duration : ${timeInfo.minutes}m${timeInfo.seconds}s`}</h4>
+			<h4>{`Match #${match.id} -  Duration : ${timeInfo.minutes}m${timeInfo.seconds}s`}</h4>
 			<hr />
 			<div className="match-summary">
 				<img
 					className="match-profile-pic"
-					src={props.match.userOne.profile.picture}
+					src={match.userOne.user.profile.picture}
 				/>
-				{props.match.userOne.name}
-				<img id="fight" src={fightIcon} />
-				{props.match.userTwo.name}
+				{match.userOne.user.name}
+				<img
+					id="fight"
+					src={match.userOne.winner ? Fight : FightFlipped}
+				/>
+				{match.userTwo.user.name}
 				<img
 					className="match-profile-pic"
-					src={props.match.userTwo.profile.picture}
+					src={match.userTwo.user.profile.picture}
 				/>
 			</div>
 			<CollapseArrow>
 				<hr />
 				<MatchHistoryRowDetails
-					userOne={props.match.userOne}
-					userTwo={props.match.userTwo}
-					looser={props.match.looser}
+					userOne={match.userOne}
+					userTwo={match.userTwo}
 				/>
 			</CollapseArrow>
 		</div>

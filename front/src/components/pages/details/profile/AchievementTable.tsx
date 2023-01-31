@@ -8,7 +8,7 @@ interface AchievementTableProps {
 	profile: ProfileData;
 }
 
-const AchievementTable = (props: AchievementTableProps) => {
+const AchievementTable = ({ profile }: AchievementTableProps) => {
 	const [unlockedAchievement, lockedAchievement] = generateAchievementItem();
 
 	return (
@@ -23,25 +23,25 @@ const AchievementTable = (props: AchievementTableProps) => {
 		</div>
 	);
 
-	//TODO: valeur pourcentage. and remove this if forest.
+	//TODO: remove this if forest.
 	function mapProfileValueToAchievement(target: ProfileDataTarget): number {
 		if (target === ProfileDataTarget.PROFILE_MATCH)
-			return props.profile.matchesCount;
+			return profile.wonMatches + profile.lostMatches;
 		else if (target == ProfileDataTarget.PROFILE_MATCH_WON)
-			return props.profile.matchesWonCount;
+			return profile.wonMatches;
 		return 0;
 	}
 
 	function generateAchievementItem() {
-		const unlockedAchievementId: number[] = props.profile.achievements.map(
+		const unlockedAchievementId: number[] = profile.achievements.map(
 			(e) => e.id,
 		);
 		const lockedAchievementId: number[] = AchievementIdArray.filter(
 			(id: number) => !unlockedAchievementId.includes(id),
 		);
 
-		//TODO: a bit of code duplication here. Can be done smarter
-		const unlockedAchievement = props.profile.achievements.map(
+		//TODO: a bit of code duplication here. Can be done smarter.
+		const unlockedAchievement = profile.achievements.map(
 			(achievementData) => {
 				// We're asserting that the database will always return valid ids
 				// (hence the exclamation mark at the end of the next statement;

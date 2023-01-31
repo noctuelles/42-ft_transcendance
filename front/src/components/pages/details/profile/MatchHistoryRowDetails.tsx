@@ -1,4 +1,3 @@
-import ProgressBar from '@/components/global/ProgressBar';
 import '@/style/details/profile/MatchHistoryRowDetails.css';
 import { UserMatchData } from './ProfileTypes';
 import CheckMark from '@/assets/check-mark.svg';
@@ -7,7 +6,6 @@ import Cross from '@/assets/cross.svg';
 interface MatchHistoryRowDetailsProps {
 	userOne: UserMatchData;
 	userTwo: UserMatchData;
-	looser: UserMatchData;
 }
 
 interface MatchDetails {
@@ -20,30 +18,34 @@ interface MatchDetails {
 export function MatchHistoryRowDetails({
 	userOne,
 	userTwo,
-	looser,
 }: MatchHistoryRowDetailsProps) {
+	// any way to factorise that ?
 	const userDetails: MatchDetails[] = [
 		{
 			id: 0,
 			label: 'Score',
-			userOneData: '1',
-			userTwoData: '2',
+			userOneData: userOne.score,
+			userTwoData: userTwo.score,
 		},
 		{
 			id: 1,
 			label: 'Winner',
-			userOneData:
-				userOne.name !== looser?.name ? (
-					<img src={CheckMark} />
-				) : (
-					<img src={Cross} />
-				),
-			userTwoData:
-				userTwo.name !== looser?.name ? (
-					<img src={CheckMark} />
-				) : (
-					<img src={Cross} />
-				),
+			userOneData: userOne.winner ? (
+				<img src={CheckMark} />
+			) : (
+				<img src={Cross} />
+			),
+			userTwoData: userTwo.winner ? (
+				<img src={CheckMark} />
+			) : (
+				<img src={Cross} />
+			),
+		},
+		{
+			id: 2,
+			label: 'XP',
+			userOneData: `+${userOne.xpEarned}`,
+			userTwoData: `+${userTwo.xpEarned}`,
 		},
 	];
 

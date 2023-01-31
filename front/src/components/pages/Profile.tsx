@@ -55,9 +55,9 @@ const Profile = () => {
 					name={profile.name}
 				/>
 				<ProfileSummary
-					matches={profile.matchesCount}
-					win={profile.matchesWonCount}
-					lost={profile.matchesLostCount}
+					matches={profile.wonMatches + profile.lostMatches}
+					win={profile.wonMatches}
+					lost={profile.lostMatches}
 					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
@@ -70,7 +70,8 @@ function getTotalNbrBounces(matches: ProfileMatchData[]): number {
 	let totalNbrBounces = 0;
 
 	matches.forEach(
-		(match: ProfileMatchData) => (totalNbrBounces += match.bounces),
+		(match: ProfileMatchData) =>
+			match.userOne.bounce + match.userTwo.bounce,
 	);
 	return totalNbrBounces;
 }
