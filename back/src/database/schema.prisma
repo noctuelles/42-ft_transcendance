@@ -16,17 +16,18 @@ datasource db {
 model User {
     id             Int              @id @unique @default(autoincrement())
     login          String           @unique
-    name           String           @unique
+    name           String           @unique @db.VarChar(255)
     profile        UserProfile      @relation(fields: [profileId], references: [id])
     profileId      Int              @unique
     status         UserStatus       @default(ONLINE)
     authIdentifier AuthIdentifier[]
     friends        User[]           @relation("UserFriends")
     friendsOf      User[]           @relation("UserFriends")
-    matchAsUserOne Match[]          @relation("UserOne")
-    matchAsUserTwo Match[]          @relation("UserTwo")
-    matchesWon     Match[]          @relation("WinnerUser")
-    matchesLost    Match[]          @relation("LooserUser")
+
+    matchAsUserOne Match[] @relation("UserOne")
+    matchAsUserTwo Match[] @relation("UserTwo")
+    matchesWon     Match[] @relation("WinnerUser")
+    matchesLost    Match[] @relation("LooserUser")
 
     // Here i define an explicit many-to-many relations.
     // Three models defines this kind of relation :
@@ -80,15 +81,22 @@ model Match {
     id         Int       @id @unique @default(autoincrement())
     createdAt  DateTime  @default(now())
     finishedAt DateTime?
-    bounces    Int
-    userOne    User      @relation("UserOne", fields: [userOneId], references: [id])
-    userTwo    User      @relation("UserTwo", fields: [userTwoId], references: [id])
-    winner     User      @relation("WinnerUser", fields: [winnerId], references: [id])
-    looser     User      @relation("LooserUser", fields: [looserId], references: [id])
-    userOneId  Int
-    userTwoId  Int
-    winnerId   Int
-    looserId   Int
+
+    userOneScore  Int  @default(0)
+    userTwoScore  Int  @default(0)
+    userOneXp     Int  @db.Integer
+    userTwoXp     Int  @db.Integer
+    userOneBounce Int? @db.Integer
+    userTwoBounce Int? @db.Integer
+
+    userOne   User @relation("UserOne", fields: [userOneId], references: [id])
+    userTwo   User @relation("UserTwo", fields: [userTwoId], references: [id])
+    winner    User @relation("WinnerUser", fields: [winnerId], references: [id])
+    looser    User @relation("LooserUser", fields: [looserId], references: [id])
+    userOneId Int
+    userTwoId Int
+    winnerId  Int
+    looserId  Int
 }
 
 model AuthIdentifier {
