@@ -8,8 +8,6 @@ interface MatchHistoryTableProps {
 }
 
 const MatchHistoryTable = (props: MatchHistoryTableProps) => {
-	console.log(props.matches);
-
 	return (
 		<div className="match-history-table">
 			<h3>Matchs</h3>

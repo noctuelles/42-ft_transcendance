@@ -14,7 +14,7 @@ export function CollapseArrow({ children }: CollapseArrowProps) {
 
 	return (
 		<>
-			{!collapse ? children : null}
+			{!collapse && children}
 			<div
 				className={`arrow ${collapse ? 'up' : 'down'}`}
 				onClick={handleArrowClick}

@@ -1,6 +1,12 @@
-.achievements-table h2 {
+.achievements-table {
 	text-align: center;
-	text-decoration: underline;
+}
+
+.achievements-table h2 {
+	padding: 5px;
+	display: inline-block;
+	border: solid black;
+	border-radius: 20px;
 }
 
 .achievements-item-container {
