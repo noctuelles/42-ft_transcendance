@@ -5,31 +5,34 @@ import { back_url } from '@/config.json';
 
 interface IUserContext {
 	auth: {
-		logged: boolean,
-		setLogged: (logged: boolean) => void,
-		creating: boolean,
-		setCreating: (creating: boolean) => void,
-		setAccessToken: (access_token: string) => void,
-		updating: boolean,
-		setUpdating: (updating: boolean) => void,
+		logged: boolean;
+		setLogged: (logged: boolean) => void;
+		creating: boolean;
+		setCreating: (creating: boolean) => void;
+		setAccessToken: (access_token: string) => void;
+		updating: boolean;
+		setUpdating: (updating: boolean) => void;
 		creatingUser: {
-			login: string,
-			name: string,
-			profile_picture: string,
-		},
-		setCreatingUser: (user: any) => void,
-		changeName: (name: string) => void,
-	},
-	updateUser: () => void,
-	getAccessToken: () => Promise<string>,
+			login: string;
+			name: string;
+			profile_picture: string;
+		};
+		setCreatingUser: (user: any) => void;
+		changeName: (name: string) => void;
+	};
+	updateUser: () => void;
+	getAccessToken: () => Promise<string>;
+	logout: () => void;
 	user: {
-		id: number,
-		name: string,
-		profile_picture: string,
-	},
+		id: number;
+		name: string;
+		profile_picture: string;
+	};
 }
 
-export const UserContext = React.createContext<IUserContext>({} as IUserContext);
+export const UserContext = React.createContext<IUserContext>(
+	{} as IUserContext,
+);
 
 function UserContextProvider(props: any) {
 	const [logged, setLogged] = useState(false);
@@ -128,6 +131,25 @@ function UserContextProvider(props: any) {
 		setCreatingUser({ ...creatingUser, name: name });
 	}
 
+	async function logout() {
+		const cookie = Cookies.get('transcendance_session_cookie');
+		const access_token = await getAccessToken();
+		fetch(back_url + '/auth/logout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + access_token,
+			},
+			body: JSON.stringify({
+				refresh_token: cookie,
+			}),
+		});
+		Cookies.remove('transcendance_session_cookie');
+		setLogged(false);
+		setUser({ id: -1, name: '', profile_picture: '' });
+		setAccessToken('');
+	}
+
 	return (
 		<UserContext.Provider
 			value={{
@@ -143,6 +165,7 @@ function UserContextProvider(props: any) {
 					setCreatingUser,
 					changeName,
 				},
+				logout,
 				updateUser,
 				getAccessToken,
 				user: user,

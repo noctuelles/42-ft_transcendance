@@ -12,6 +12,8 @@ import {
 	IPosition,
 	IRect,
 	IPlayer,
+	GameType,
+	IPortal,
 } from './Game.interfaces';
 
 export class Game {
@@ -21,6 +23,7 @@ export class Game {
 	private _player1Profile: IProfile;
 	private _player2Profile: IProfile;
 	private _status: GameStatus = GameStatus.STARTING;
+	private _type: GameType;
 
 	private _startCounter: number = 10;
 	private _gameStartTime: Date | null = null;
@@ -34,14 +37,20 @@ export class Game {
 	constructor(
 		player1Profile: IProfile,
 		player2Profile: IProfile,
-		_websocketsService: WebsocketsService,
-		_prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		prismaService: PrismaService,
+		type: GameType,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
-		this._websocketsService = _websocketsService;
-		this._prismaService = _prismaService;
-		this._gameState = getDefaultGameState(player1Profile, player2Profile);
+		this._websocketsService = websocketsService;
+		this._prismaService = prismaService;
+		this._type = type;
+		this._gameState = getDefaultGameState(
+			player1Profile,
+			player2Profile,
+			type,
+		);
 		this._resetBall(this._gameState.ball);
 	}
 
@@ -283,6 +292,39 @@ export class Game {
 		}
 	}
 
+	private _setBallInvunlerableToPortal(ball: IBall) {
+		ball.portalUsable = false;
+		setTimeout(() => {
+			ball.portalUsable = true;
+		}, 200);
+	}
+
+	private _checkBallCollidePortal(
+		ball: IBall,
+		ballRadius: number,
+		portal: IPortal,
+	) {
+		if (ball.portalUsable) {
+			const ballColide: IRect = {
+				x: ball.position.x - ballRadius,
+				y: ball.position.y - ballRadius,
+				width: ballRadius * 2,
+				height: ballRadius * 2,
+			};
+			const portalCollide: IRect = {
+				x: portal.center.x - portal.width / 2 + 2,
+				y: portal.center.y - portal.height / 2,
+				width: portal.width * 2 - 4,
+				height: portal.height * 2,
+			};
+			if (this._checkColide(ballColide, portalCollide)) {
+				ball.position.x = portal.link.center.x;
+				ball.position.y = portal.link.center.y;
+				this._setBallInvunlerableToPortal(ball);
+			}
+		}
+	}
+
 	private _normalizeDirection(ball: IBall) {
 		const norm = Math.sqrt(
 			ball.direction.x * ball.direction.x +
@@ -313,12 +355,36 @@ export class Game {
 			this._gameState.gameInfos.paddleWidth,
 			this._gameState.gameInfos.paddleHeight,
 		);
+		this._gameState.portals.forEach((portal) => {
+			this._checkBallCollidePortal(ball, ballRadius, portal);
+		});
+	}
+
+	private _updatePortal(portal: IPortal) {
+		portal.center.y += portal.speed * portal.direction;
+		if (
+			portal.center.y <
+			portal.height / 2 + GameParams.PORTAL_OFFSET / 2
+		) {
+			portal.direction = 1;
+		}
+		if (
+			portal.center.y >
+			GameParams.GAME_HEIGHT -
+				portal.height / 2 -
+				GameParams.PORTAL_OFFSET / 2
+		) {
+			portal.direction = -1;
+		}
 	}
 
 	private _updateState() {
 		this._updatePlayer(this._gameState.player1);
 		this._updatePlayer(this._gameState.player2);
 		this._updateBall(this._gameState.ball);
+		this._gameState.portals.forEach((portal) => {
+			this._updatePortal(portal);
+		});
 	}
 
 	private async _game() {
@@ -387,17 +453,7 @@ export class Game {
 	}
 
 	private async _registerGame(winner: IPlayer, loser: IPlayer) {
-		let eloDiff = Math.abs(
-			winner.profile.user.profile.elo - loser.profile.user.profile.elo,
-		);
-		if (eloDiff > 1000) eloDiff = 1000;
-		eloDiff /= 400;
-		eloDiff = Math.pow(10, eloDiff) + 1;
-		let score = 1 / eloDiff;
-		score = Math.round((1 - score) * 20);
-		const winnerElo = winner.profile.user.profile.elo + score;
-		const loserElo = loser.profile.user.profile.elo - score;
-		await Promise.all([
+		const promises = [
 			this._prismaService.match.create({
 				data: {
 					createdAt: this._gameStartTime.toISOString(),
@@ -417,25 +473,52 @@ export class Game {
 							xp: {
 								increment: 50,
 							},
-							elo: {
-								set: winnerElo,
-							},
 						},
 					},
 				},
 			}),
-			this._prismaService.user.update({
-				where: { id: loser.profile.user.id },
-				data: {
-					profile: {
-						update: {
-							elo: {
-								set: loserElo,
+		];
+		if (this._type === GameType.RANKED) {
+			let eloDiff = Math.abs(
+				winner.profile.user.profile.elo -
+					loser.profile.user.profile.elo,
+			);
+			if (eloDiff > 1000) eloDiff = 1000;
+			eloDiff /= 400;
+			eloDiff = Math.pow(10, eloDiff) + 1;
+			let score = 1 / eloDiff;
+			score = Math.round((1 - score) * 20);
+			const winnerElo = winner.profile.user.profile.elo + score;
+			const loserElo = loser.profile.user.profile.elo - score;
+			promises.push(
+				this._prismaService.user.update({
+					where: { id: winner.profile.user.id },
+					data: {
+						profile: {
+							update: {
+								elo: {
+									set: winnerElo,
+								},
 							},
 						},
 					},
-				},
-			}),
-		]);
+				}),
+			);
+			promises.push(
+				this._prismaService.user.update({
+					where: { id: loser.profile.user.id },
+					data: {
+						profile: {
+							update: {
+								elo: {
+									set: loserElo,
+								},
+							},
+						},
+					},
+				}),
+			);
+		}
+		await Promise.all(promises);
 	}
 }
