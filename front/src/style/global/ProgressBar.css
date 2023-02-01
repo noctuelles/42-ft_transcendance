@@ -2,15 +2,14 @@
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: flex-start;
+	width: 100%;
 
-	background-color: darkgray;
 	border-radius: 15px;
 	box-shadow: inset 0px 0px 15px 1px rgba(0, 0, 0, 0.92);
 }
 
 .progress-bar-inner {
 	box-shadow: inset 0px 0px 10px 0px #000000;
-	background-color: #3399ff;
 	border-radius: 15px;
 }
 

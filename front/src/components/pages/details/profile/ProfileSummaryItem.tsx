@@ -1,7 +1,8 @@
-import Cross from '@/assets/cross.svg';
+import Grave from '@/assets/grave.svg';
 import TableTennis from '@/assets/table-tennis.svg';
+import Trophee from '@/assets/trophee.svg';
+import Bounce from '@/assets/bounce.svg';
 import '@/style/details/profile/ProfileSummaryItem.css';
-import { bounceImg, tropheeImg } from './Data';
 
 interface ProfileSummaryItemProps {
 	type: string;
@@ -10,18 +11,18 @@ interface ProfileSummaryItemProps {
 
 function ProfileSummaryItem(props: ProfileSummaryItemProps) {
 	const item = new Map([
-		['won', { img: tropheeImg, text: 'Win' }],
+		['won', { img: Trophee, text: 'Win' }],
 		['played', { img: TableTennis, text: 'Played' }],
-		['lost', { img: Cross, text: 'Loose' }],
-		['bounce', { img: bounceImg, text: 'Bounce' }],
+		['lost', { img: Grave, text: 'Lose' }],
+		['bounce', { img: Bounce, text: 'Bounce' }],
 	]);
-	const selectedItem = item.get(props.type);
+	const selectedItem = item.get(props.type)!;
 
 	return (
 		<div className="profile-summary-item">
-			<img src={selectedItem?.img} width="60" height="60" />
+			<img src={selectedItem.img} width="60" height="60" />
 			<div className="profile-summary-item-text">
-				<p>{selectedItem?.text}</p>
+				<p>{selectedItem.text}</p>
 				<h3>{props.count || '-'}</h3>
 			</div>
 		</div>

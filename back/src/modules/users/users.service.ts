@@ -11,6 +11,8 @@ interface ICreatingUser {
 	profile_picture: string;
 }
 
+interface IMatchData {}
+
 @Injectable()
 export class UsersService {
 	private creatingUsers: ICreatingUser[] = [];
@@ -114,110 +116,76 @@ export class UsersService {
 		});
 	}
 
-	matchInclude = {};
-
-	/* Fetch a profile of a specified username */
+	//TODO: AuthGuard.
+	/* Fetch a profile of a specified username zer*/
 	async fetchProfileData(username: string) {
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				name: username,
-			},
-			select: {
-				matchesWon: {
-					select: {
-						id: true,
-						createdAt: true,
-						finishedAt: true,
-						bounces: true,
-						userOne: {
+		const opt = {
+			include: {
+				userOne: {
+					include: {
+						user: {
 							select: {
 								name: true,
 								profile: {
 									select: {
 										picture: true,
-										xp: true,
 									},
 								},
-							},
-						},
-						userTwo: {
-							select: {
-								name: true,
-								profile: {
-									select: {
-										picture: true,
-										xp: true,
-									},
-								},
-							},
-						},
-						looser: {
-							select: {
-								name: true,
 							},
 						},
 					},
 				},
-				matchesLost: {
-					select: {
-						id: true,
-						createdAt: true,
-						finishedAt: true,
-						bounces: true,
-						userOne: {
+				userTwo: {
+					include: {
+						user: {
 							select: {
 								name: true,
 								profile: {
 									select: {
 										picture: true,
-										xp: true,
 									},
 								},
 							},
 						},
-						userTwo: {
-							select: {
-								profile: {
-									select: {
-										picture: true,
-										xp: true,
-									},
-								},
-								name: true,
-							},
+					},
+				},
+			},
+		};
+
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				name: username,
+			},
+			include: {
+				matches: {
+					include: {
+						asUserOne: {
+							...opt,
 						},
-						winner: {
-							select: {
-								name: true,
-							},
+						asUserTwo: {
+							...opt,
 						},
 					},
 				},
 				profile: {
 					select: {
 						xp: true,
+						lostMatches: true,
+						wonMatches: true,
 						picture: true,
-						achievements: {
-							select: {
-								id: true,
-								unlockedAt: true,
-								type: true,
-							},
-						},
+						achievements: true,
 					},
 				},
 			},
 		});
+
 		if (!user) return null;
 		return {
-			matches: [...user.matchesLost, ...user.matchesWon],
-			achievements: user.profile.achievements,
-			matchesCount: user.matchesWon.length + user.matchesLost.length,
-			matchesWonCount: user.matchesWon.length,
-			matchesLostCount: user.matchesLost.length,
-			picture: user.profile.picture,
-			name: username,
-			xp: user.profile.xp,
+			matches: user.matches.map((match) =>
+				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
+			),
+			name: user.name,
+			...user.profile,
 		};
 	}
 }

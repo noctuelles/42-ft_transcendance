@@ -1,7 +1,5 @@
 import '@/style/details/profile/MatchHistoryTable.css';
 import MatchHistoryRow from './MatchHistoryRow';
-import { useContext } from 'react';
-import { UserContext } from '@/context/UserContext';
 import { ProfileMatchData } from './ProfileTypes';
 
 interface MatchHistoryTableProps {
@@ -10,38 +8,23 @@ interface MatchHistoryTableProps {
 }
 
 const MatchHistoryTable = (props: MatchHistoryTableProps) => {
-	const userContext = useContext(UserContext);
-
 	return (
-		<table>
-			<thead>
-				<tr>
-					<th scope="col">Match history:</th>
-				</tr>
-			</thead>
+		<div className="match-history-table">
+			<h3>Matchs</h3>
 			{!props.matches || props.matches.length == 0 ? (
-				<tbody>
-					<tr>
-						<td>
-							{props.name == userContext.user.name
-								? 'You '
-								: `${props.name} `}
-							haven't played any match...
-						</td>
-					</tr>
-				</tbody>
+				<span>
+					You don't have any match yet. Don't delay, play today !
+				</span>
 			) : (
-				<tbody>
+				<ul>
 					{props.matches.map((m: ProfileMatchData) => (
-						<tr>
-							<td>
-								<MatchHistoryRow key={m.id} match={m} />
-							</td>
-						</tr>
+						<li key={m.id}>
+							<MatchHistoryRow match={m} />
+						</li>
 					))}
-				</tbody>
+				</ul>
 			)}
-		</table>
+		</div>
 	);
 };
 

@@ -453,31 +453,9 @@ export class Game {
 	}
 
 	private async _registerGame(winner: IPlayer, loser: IPlayer) {
-		const promises = [
-			this._prismaService.match.create({
-				data: {
-					createdAt: this._gameStartTime.toISOString(),
-					finishedAt: new Date().toISOString(),
-					bounces: this._bounce,
-					userOneId: this._player1Profile.user.id,
-					userTwoId: this._player2Profile.user.id,
-					winnerId: winner.profile.user.id,
-					looserId: loser.profile.user.id,
-				},
-			}),
-			this._prismaService.user.update({
-				where: { id: winner.profile.user.id },
-				data: {
-					profile: {
-						update: {
-							xp: {
-								increment: 50,
-							},
-						},
-					},
-				},
-			}),
-		];
+		const winnerXP = 50;
+		const loserXP = 0;
+		let eloChange = 0;
 		if (this._type === GameType.RANKED) {
 			let eloDiff = Math.abs(
 				winner.profile.user.profile.elo -
@@ -488,37 +466,88 @@ export class Game {
 			eloDiff = Math.pow(10, eloDiff) + 1;
 			let score = 1 / eloDiff;
 			score = Math.round((1 - score) * 20);
-			const winnerElo = winner.profile.user.profile.elo + score;
-			const loserElo = loser.profile.user.profile.elo - score;
-			promises.push(
-				this._prismaService.user.update({
-					where: { id: winner.profile.user.id },
-					data: {
-						profile: {
-							update: {
-								elo: {
-									set: winnerElo,
-								},
-							},
-						},
-					},
-				}),
-			);
-			promises.push(
-				this._prismaService.user.update({
-					where: { id: loser.profile.user.id },
-					data: {
-						profile: {
-							update: {
-								elo: {
-									set: loserElo,
-								},
-							},
-						},
-					},
-				}),
-			);
+			eloChange = score;
 		}
+
+		const user1 = this._player1Profile.user;
+		const isUser1Winner = user1.id === winner.profile.user.id;
+		const user2 = this._player2Profile.user;
+		const isUser2Winner = user2.id === winner.profile.user.id;
+
+		let promises = [];
+		promises.push(
+			this._prismaService.match.create({
+				data: {
+					createdAt: this._gameStartTime.toISOString(),
+					finishedAt: new Date().toISOString(),
+					type: this._type,
+					userOne: {
+						create: {
+							userId: user1.id,
+							score: isUser1Winner ? winner.score : loser.score,
+							xpAtBeg: user1.profile.xp,
+							xpEarned: isUser1Winner ? winnerXP : loserXP,
+							eloAtBeg: user1.profile.elo,
+							eloEarned: isUser1Winner ? eloChange : -eloChange,
+							winner: isUser1Winner,
+							bounces: this._bounce, //TODO: separate user1/user2 bounces
+						},
+					},
+					userTwo: {
+						create: {
+							userId: user2.id,
+							score: isUser2Winner ? winner.score : loser.score,
+							xpAtBeg: user2.profile.xp,
+							xpEarned: isUser2Winner ? winnerXP : loserXP,
+							eloAtBeg: user2.profile.elo,
+							eloEarned: isUser2Winner ? eloChange : -eloChange,
+							winner: isUser2Winner,
+							bounces: this._bounce, //TODO: separate user1/user2 bounces
+						},
+					},
+				},
+			}),
+		);
+		promises.push(
+			this._prismaService.user.update({
+				where: { id: winner.profile.user.id },
+				data: {
+					profile: {
+						update: {
+							xp: {
+								increment: winnerXP,
+							},
+							elo: {
+								increment: eloChange,
+							},
+							wonMatches: {
+								increment: 1,
+							},
+						},
+					},
+				},
+			}),
+		);
+		promises.push(
+			this._prismaService.user.update({
+				where: { id: loser.profile.user.id },
+				data: {
+					profile: {
+						update: {
+							xp: {
+								increment: loserXP,
+							},
+							elo: {
+								increment: -eloChange,
+							},
+							lostMatches: {
+								increment: 1,
+							},
+						},
+					},
+				},
+			}),
+		);
 		await Promise.all(promises);
 	}
 }

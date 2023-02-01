@@ -46,7 +46,8 @@ export class GameService {
 		}
 	}
 
-	async joinQueue(socket, type: GameType) {
+	async joinQueue(socket, type) {
+		type = type.toUpperCase();
 		const user = await this.prismaService.user.findUnique({
 			where: { id: socket.user.id },
 			include: { profile: true },

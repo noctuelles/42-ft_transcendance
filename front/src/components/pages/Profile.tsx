@@ -7,6 +7,7 @@ import ProfileSummary from './details/profile/ProfileSummary';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { ProfileData, ProfileMatchData } from './details/profile/ProfileTypes';
+import AchievementTable from './details/profile/AchievementTable';
 
 const Profile = () => {
 	const userContext = React.useContext(UserContext);
@@ -35,11 +36,12 @@ const Profile = () => {
 
 	useEffect(() => {
 		handleSearch(userContext.user.name);
-	}, [userContext]);
+	}, []);
 
 	if (!profile) return <h2>Profile loading...</h2>;
+
 	return (
-		<div className="container">
+		<div className="profile-container">
 			<ProfileHeader
 				username={profile.name}
 				total_xp={profile.xp}
@@ -53,12 +55,13 @@ const Profile = () => {
 					name={profile.name}
 				/>
 				<ProfileSummary
-					matches={profile.matchesCount}
-					win={profile.matchesWonCount}
-					lost={profile.matchesLostCount}
+					matches={profile.wonMatches + profile.lostMatches}
+					win={profile.wonMatches}
+					lost={profile.lostMatches}
 					bounces={getTotalNbrBounces(profile.matches)}
 				/>
 			</div>
+			<AchievementTable profile={profile} />
 		</div>
 	);
 };
@@ -66,8 +69,9 @@ const Profile = () => {
 function getTotalNbrBounces(matches: ProfileMatchData[]): number {
 	let totalNbrBounces = 0;
 
-	matches.forEach(
-		(match: ProfileMatchData) => (totalNbrBounces += match.bounces),
+	matches?.forEach(
+		(match: ProfileMatchData) =>
+			match.userOne.bounce + match.userTwo.bounce,
 	);
 	return totalNbrBounces;
 }
