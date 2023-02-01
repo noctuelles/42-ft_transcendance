@@ -18,14 +18,13 @@ export class ChatController {
 		}: { channelId: number; password: string | undefined },
 	) {
 		if (
-			this.chatService.isUserAllowedToJoinChannel(
-				user.id,
-				channelId,
-				password,
-			)
-		)
-			this.chatService.addUserInChannel(user.id, channelId);
-		else {
+			this.chatService
+				.getChannel(channelId)
+				?.canUserJoin(user.id, password)
+		) {
+			this.chatService.getChannel(channelId).addUser(user.id);
+			this.chatService.sendChannelListToUser(user.id);
+		} else {
 			// TODO: Return error to tell why not allowed
 		}
 	}

@@ -1,8 +1,4 @@
-import {
-	SubscribeMessage,
-	WebSocketGateway,
-	WebSocketServer,
-} from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 
 import { Message, ChatService } from './chat.service';
 
@@ -14,11 +10,13 @@ export class ChatGateway {
 		data.username = socket.user.name;
 		if (
 			!this.chatService.isIMessage(data) ||
-			!this.chatService.canSendToChannel(socket.user.id, data.channel)
+			!this.chatService
+				.getChannel(data.channel)
+				?.canUserSendMessage(socket.user.id)
 		) {
 			return;
 		}
 		let message = new Message(data);
-		this.chatService.sendTo(message.channel, message);
+		this.chatService.sendMessage(message, data.channel);
 	}
 }

@@ -31,6 +31,7 @@ export default function ChannelList({
 					);
 				})
 				.map((channel) => {
+					console.log('pouet', channel);
 					var classSelected: string = '';
 					if (selectedChannel == channel.id)
 						classSelected = 'selectedChannel';
@@ -50,7 +51,8 @@ export default function ChannelList({
 		</>
 	);
 	function isUserInChannel(userId: number, channel: IChannel) {
-		return channel.members.includes(userId);
+		console.log(channel);
+		return channel.membersId.includes(userId);
 	}
 }
 
@@ -86,5 +88,6 @@ function isChannelsMessage(rawMessage: string) {
 
 function parseChannel(rawMessage: string): IChannel[] {
 	const jsonMessage = JSON.parse(rawMessage);
+	console.log('parsed', jsonMessage);
 	return jsonMessage['data'];
 }
