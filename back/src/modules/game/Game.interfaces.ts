@@ -11,8 +11,8 @@ export enum GameStatus {
 }
 
 export enum GameType {
-	RANKED = 'ranked',
-	FUN = 'fun',
+	RANKED = 'RANKED',
+	FUN = 'FUN',
 }
 
 export interface IGameInfos {
