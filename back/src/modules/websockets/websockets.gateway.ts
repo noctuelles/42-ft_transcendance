@@ -22,4 +22,8 @@ export class WebsocketGateway implements OnGatewayConnection {
 	async handleConnection(socket) {
 		await this.websocketsService.registerSocket(socket);
 	}
+
+	async handleDisconnect(socket) {
+		this.websocketsService.unregisterSocket(socket);
+	}
 }

@@ -20,11 +20,19 @@ export interface IPlayer {
 	paddle: IPosition;
 }
 
+export interface IPortal {
+	center: IPosition;
+	width: number;
+	height: number;
+	color: string;
+}
+
 export interface IGameState {
 	gameInfos: IGameInfos;
 	player1: IPlayer;
 	player2: IPlayer;
 	ball: IPosition;
+	portals?: IPortal[];
 }
 
 export interface IGameResult {

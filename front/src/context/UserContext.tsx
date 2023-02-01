@@ -22,6 +22,7 @@ interface IUserContext {
 	};
 	updateUser: () => void;
 	getAccessToken: () => Promise<string>;
+	logout: () => void;
 	user: {
 		id: number;
 		name: string;
@@ -130,6 +131,25 @@ function UserContextProvider(props: any) {
 		setCreatingUser({ ...creatingUser, name: name });
 	}
 
+	async function logout() {
+		const cookie = Cookies.get('transcendance_session_cookie');
+		const access_token = await getAccessToken();
+		fetch(back_url + '/auth/logout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + access_token,
+			},
+			body: JSON.stringify({
+				refresh_token: cookie,
+			}),
+		});
+		Cookies.remove('transcendance_session_cookie');
+		setLogged(false);
+		setUser({ id: -1, name: '', profile_picture: '' });
+		setAccessToken('');
+	}
+
 	return (
 		<UserContext.Provider
 			value={{
@@ -145,6 +165,7 @@ function UserContextProvider(props: any) {
 					setCreatingUser,
 					changeName,
 				},
+				logout,
 				updateUser,
 				getAccessToken,
 				user: user,

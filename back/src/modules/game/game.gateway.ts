@@ -10,7 +10,7 @@ export class GameGateway {
 		if (!payload || !payload.action) return;
 		switch (payload.action) {
 			case 'join':
-				this.gameService.joinQueue(socket);
+				this.gameService.joinQueue(socket, payload.type);
 				break;
 			case 'cancel':
 				this.gameService.cancelQueue(socket);
