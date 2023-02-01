@@ -1,0 +1,23 @@
+.ranking-chooser {
+	width: 400px;
+	height: 60px;
+	background-color: lightgray;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.ranking-type {
+	width: 50%;
+	height: 100%;
+	border: solid 1px black;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.ranking-choosed {
+	background-color: rgb(141, 141, 141);
+}

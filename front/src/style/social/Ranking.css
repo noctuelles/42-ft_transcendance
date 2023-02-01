@@ -1,0 +1,11 @@
+.ranking-content {
+	margin-top: 50px;
+	margin-bottom: 50px;
+	width: 80%;
+	height: fit-content;
+	background-color: lightgray;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
