@@ -1,6 +1,6 @@
 .ranking-content {
-	margin-top: 50px;
-	margin-bottom: 50px;
+	margin-top: 30px;
+	margin-bottom: 30px;
 	width: 80%;
 	height: fit-content;
 	background-color: lightgray;
@@ -8,4 +8,5 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	padding: 10px;
 }
