@@ -3,6 +3,14 @@
 	margin-right: auto;
 }
 
+.match-details .user-one-details {
+	color: rgb(51, 153, 255);
+}
+
+.match-details .user-two-details {
+	color: rgb(255, 153, 0);
+}
+
 .match-details tr img {
 	width: 20px;
 	height: 20px;

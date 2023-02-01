@@ -3,3 +3,7 @@ export default function getLevelByXP(xp: number): [number, number] {
 
 	return [Math.floor(logProgression), Math.floor((logProgression % 1) * 100)];
 }
+
+export function formatXP(level: number, percent: number) {
+	return `Level ${level} - ${percent}%`;
+}

@@ -1,11 +1,16 @@
 import '@/style/details/profile/MatchHistoryRowDetails.css';
-import { UserMatchData } from './ProfileTypes';
-import CheckMark from '@/assets/check-mark.svg';
-import Cross from '@/assets/cross.svg';
+import { MatchType, UserMatchData } from './ProfileTypes';
+import CheckMarkIcon from '@/assets/check-mark.svg';
+import CrossIcon from '@/assets/cross.svg';
+import FunMatchIcon from '@/assets/fun.svg';
+import RankedMatchIcon from '@/assets/ranked.svg';
+import getLevelByXP from './Utils';
+import { formatXP } from './Utils';
 
 interface MatchHistoryRowDetailsProps {
 	userOne: UserMatchData;
 	userTwo: UserMatchData;
+	type: MatchType;
 }
 
 interface MatchDetails {
@@ -18,51 +23,78 @@ interface MatchDetails {
 export function MatchHistoryRowDetails({
 	userOne,
 	userTwo,
+	type,
 }: MatchHistoryRowDetailsProps) {
 	// any way to factorise that ?
 	const userDetails: MatchDetails[] = [
 		{
 			id: 0,
+			label: 'Level',
+			userOneData: formatXP(...getLevelByXP(userOne.xpAtBeg)),
+			userTwoData: formatXP(...getLevelByXP(userTwo.xpAtBeg)),
+		},
+		{
+			id: 1,
 			label: 'Score',
 			userOneData: userOne.score,
 			userTwoData: userTwo.score,
 		},
 		{
-			id: 1,
+			id: 2,
 			label: 'Winner',
 			userOneData: userOne.winner ? (
-				<img src={CheckMark} />
+				<img src={CheckMarkIcon} />
 			) : (
-				<img src={Cross} />
+				<img src={CrossIcon} />
 			),
 			userTwoData: userTwo.winner ? (
-				<img src={CheckMark} />
+				<img src={CheckMarkIcon} />
 			) : (
-				<img src={Cross} />
+				<img src={CrossIcon} />
 			),
 		},
 		{
-			id: 2,
+			id: 3,
 			label: 'XP',
 			userOneData: `+${userOne.xpEarned}`,
 			userTwoData: `+${userTwo.xpEarned}`,
 		},
 	];
 
+	if (type === MatchType.RANKED)
+		userDetails.push({
+			id: 4,
+			label: 'ELO',
+			userOneData: `${userOne.eloEarned > 0 ? '+' : ''}${
+				userOne.eloEarned
+			}`,
+			userTwoData: `${userTwo.eloEarned > 0 ? '+' : ''}${
+				userTwo.eloEarned
+			}`,
+		});
+
 	return (
 		<div className="match-details">
+			<img
+				src={type === MatchType.RANKED ? RankedMatchIcon : FunMatchIcon}
+				width={30}
+				height={30}
+				alt=""
+			/>
+			<h3>{type}</h3>
 			<table>
 				<thead></thead>
-				<colgroup span={3}></colgroup>
 				<tbody>
 					{userDetails.map((detail) => {
 						return (
 							<tr key={detail.id}>
-								<td>{detail.userOneData}</td>
-								<td>
-									<u>{detail.label}</u>
+								<td className="user-one-details">
+									{detail.userOneData}
 								</td>
-								<td>{detail.userTwoData}</td>
+								<td>{detail.label}</td>
+								<td className="user-two-details">
+									{detail.userTwoData}
+								</td>
 							</tr>
 						);
 					})}

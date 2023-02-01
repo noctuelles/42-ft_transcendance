@@ -43,6 +43,7 @@ const MatchHistoryRow = ({ match }: MatchHistoryRowProps) => {
 				<MatchHistoryRowDetails
 					userOne={match.userOne}
 					userTwo={match.userTwo}
+					type={match.type}
 				/>
 			</CollapseArrow>
 		</div>

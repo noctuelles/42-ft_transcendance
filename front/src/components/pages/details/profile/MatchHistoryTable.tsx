@@ -1,7 +1,5 @@
 import '@/style/details/profile/MatchHistoryTable.css';
 import MatchHistoryRow from './MatchHistoryRow';
-import { useContext } from 'react';
-import { UserContext } from '@/context/UserContext';
 import { ProfileMatchData } from './ProfileTypes';
 
 interface MatchHistoryTableProps {
@@ -10,11 +8,15 @@ interface MatchHistoryTableProps {
 }
 
 const MatchHistoryTable = (props: MatchHistoryTableProps) => {
+	console.log(props.matches);
+
 	return (
 		<div className="match-history-table">
 			<h3>Matchs</h3>
 			{!props.matches || props.matches.length == 0 ? (
-				<span>You don't have any match yet</span>
+				<span>
+					You don't have any match yet. Don't delay, play today !
+				</span>
 			) : (
 				<ul>
 					{props.matches.map((m: ProfileMatchData) => (

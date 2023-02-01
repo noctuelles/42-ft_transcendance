@@ -69,7 +69,7 @@ const Profile = () => {
 function getTotalNbrBounces(matches: ProfileMatchData[]): number {
 	let totalNbrBounces = 0;
 
-	matches.forEach(
+	matches?.forEach(
 		(match: ProfileMatchData) =>
 			match.userOne.bounce + match.userTwo.bounce,
 	);

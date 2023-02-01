@@ -4,6 +4,8 @@ export interface UserMatchData {
 	score: number;
 	xpAtBeg: number;
 	xpEarned: number;
+	eloAtBeg: number;
+	eloEarned: number;
 	winner: boolean;
 	bounce: number;
 	user: {
@@ -25,6 +27,7 @@ export interface ProfileMatchData {
 	finishedAt: string;
 	userOne: UserMatchData;
 	userTwo: UserMatchData;
+	type: MatchType;
 }
 
 export interface ProfileData {
@@ -55,6 +58,11 @@ export const AchievementIdArray = [
 	AchievementId.ACH_APPRENTICE_JUGGLER,
 	AchievementId.ACH_DAUTING_SUBJECT,
 ];
+
+export enum MatchType {
+	FUN = 'FUN',
+	RANKED = 'RANKED',
+}
 
 export type AchievementIdValue = `${AchievementId}`;
 
