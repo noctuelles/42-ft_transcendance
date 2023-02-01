@@ -1,8 +1,9 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useContext } from 'react';
 import { ws_url as WS_URL } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import IChannel from './IChannel';
 import Channel from './Channel';
+import { UserContext } from '@/context/UserContext';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -11,6 +12,7 @@ export default function ChannelList({
 	setSelectedChannel: any;
 	selectedChannel: number;
 }) {
+	const userContext = useContext(UserContext);
 	const channels = getChannels();
 	useEffect(() => {
 		if (selectedChannel === 0 && channels.length > 0) {
@@ -19,21 +21,39 @@ export default function ChannelList({
 	});
 	return (
 		<>
-			{channels.map((channel) => {
-				var classSelected: string = '';
-				if (selectedChannel == channel.id)
-					classSelected = 'selectedChannel';
-				return (
-					<Channel
-						key={channel.id}
-						channel={channel}
-						className={classSelected}
-						setSelectedChannel={setSelectedChannel}
-					/>
-				);
-			})}
+			{channels
+				.sort((channel1, channel2) => {
+					return (
+						(!isUserInChannel(userContext.user.id, channel1) &&
+							isUserInChannel(userContext.user.id, channel2) &&
+							1) ||
+						0
+					);
+				})
+				.map((channel) => {
+					console.log('pouet', channel);
+					var classSelected: string = '';
+					if (selectedChannel == channel.id)
+						classSelected = 'selectedChannel';
+					return (
+						<Channel
+							key={channel.id}
+							channel={channel}
+							className={classSelected}
+							setSelectedChannel={setSelectedChannel}
+							hasJoined={isUserInChannel(
+								userContext.user.id,
+								channel,
+							)}
+						/>
+					);
+				})}
 		</>
 	);
+	function isUserInChannel(userId: number, channel: IChannel) {
+		console.log(channel);
+		return channel.membersId.includes(userId);
+	}
 }
 
 function getChannels(): IChannel[] {
@@ -68,5 +88,6 @@ function isChannelsMessage(rawMessage: string) {
 
 function parseChannel(rawMessage: string): IChannel[] {
 	const jsonMessage = JSON.parse(rawMessage);
+	console.log('parsed', jsonMessage);
 	return jsonMessage['data'];
 }
