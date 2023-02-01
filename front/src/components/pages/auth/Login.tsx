@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { back_url } from '@/config.json';
-import '@/style/Login.css';
+import '@/style/auth/Login.css';
 import portal from '@/assets/portal.svg';
 
 function Login() {

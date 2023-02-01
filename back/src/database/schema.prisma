@@ -16,7 +16,8 @@ datasource db {
 model User {
     id             Int              @id @unique @default(autoincrement())
     login          String           @unique
-    name           String           @unique @db.VarChar(255)
+    name           String           @unique
+    otpSecret      String?
     profile        UserProfile      @relation(fields: [profileId], references: [id])
     profileId      Int              @unique
     status         UserStatus       @default(ONLINE)

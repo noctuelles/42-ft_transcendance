@@ -1,0 +1,35 @@
+.settings {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.settings h1 {
+	font-size: 50px;
+}
+
+.set-twoFa {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.set-twoFa h2 {
+	font-size: 40px;
+	margin-bottom: 10px;
+}
+
+.set-twoFa button {
+	width: 200px;
+	height: 50px;
+	font-size: 20px;
+	cursor: pointer;
+	border: solid 2px transparent;
+}
+
+.set-twoFa button:hover {
+	border: solid 2px #000;
+}

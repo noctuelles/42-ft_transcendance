@@ -12,6 +12,7 @@ export default function UserInput({
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
 	});
+	// TODO: Disable input if user not in channel
 	return (
 		<form onSubmit={onSubmit}>
 			<input
