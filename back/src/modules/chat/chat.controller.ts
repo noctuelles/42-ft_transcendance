@@ -3,19 +3,19 @@ import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
 import { User } from '@prisma/client';
 import { ChatService } from './chat.service';
+import { JoinChannelDTO } from './JoinChannel.dto';
+import { ValidationPipe, UsePipes } from '@nestjs/common';
 
 @Controller('chat')
 export class ChatController {
 	constructor(private readonly chatService: ChatService) {}
 	@UseGuards(AuthGuard)
+	@UsePipes(ValidationPipe)
 	@Patch('channel/join')
 	async joinChannel(
 		@CurrentUser() user: User,
 		@Body()
-		{
-			channelId,
-			password,
-		}: { channelId: number; password: string | undefined },
+		{ channelId, password }: JoinChannelDTO,
 	) {
 		if (
 			this.chatService
