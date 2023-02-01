@@ -70,9 +70,10 @@ model UserProfile {
 }
 
 model UserAchievement {
-    id            Int         @id @unique
+    id            Int             @id @default(autoincrement())
+    type          AchievementType
     unlockedAt    DateTime
-    UserProfile   UserProfile @relation(fields: [userProfileId], references: [id])
+    UserProfile   UserProfile     @relation(fields: [userProfileId], references: [id])
     userProfileId Int
 }
 

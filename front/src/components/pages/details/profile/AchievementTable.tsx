@@ -1,5 +1,8 @@
-import { ProfileData, ProfileDataTarget } from './ProfileTypes';
-import { AchievementIdArray } from './ProfileTypes';
+import {
+	AchievementType,
+	ProfileData,
+	ProfileDataTarget,
+} from './ProfileTypes';
 import { AchievementMap } from './Data';
 import AchievementItem from './AchievementItem';
 import '@/style/details/profile/AchievementTable.css';
@@ -14,7 +17,9 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 	return (
 		<div className="achievements-table">
 			<h2>
-				{`Achievements (${unlockedAchievement.length}/${AchievementIdArray.length})`}
+				{`Achievements (${unlockedAchievement.length}/${
+					Object.values(AchievementType).length
+				})`}
 			</h2>
 			<hr />
 			<div className="achievements-item-container">
@@ -33,24 +38,22 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 	}
 
 	function generateAchievementItem() {
-		const unlockedAchievementId: number[] = profile.achievements.map(
-			(e) => e.id,
-		);
-		const lockedAchievementId: number[] = AchievementIdArray.filter(
-			(id: number) => !unlockedAchievementId.includes(id),
+		const unlockedAchievementType: string[] = profile.achievements.map(
+			(achievement) => achievement.type,
 		);
 
-		//TODO: a bit of code duplication here. Can be done smarter.
+		const lockedAchievementType: string[] = Object.values(
+			AchievementType,
+		).filter((s) => !unlockedAchievementType.includes(s));
+
 		const unlockedAchievement = profile.achievements.map(
 			(achievementData) => {
-				// We're asserting that the database will always return valid ids
-				// (hence the exclamation mark at the end of the next statement;
 				const profileAchievement = AchievementMap.get(
-					achievementData.id,
+					achievementData.type,
 				)!;
 				return (
 					<AchievementItem
-						key={achievementData.id}
+						key={profileAchievement.title}
 						unlocked={true}
 						unlockedDate={new Date(achievementData.unlockedAt)}
 						progress={mapProfileValueToAchievement(
@@ -63,12 +66,12 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 			},
 		);
 
-		const lockedAchievement = lockedAchievementId.map((id) => {
-			const profileAchievement = AchievementMap.get(id)!;
+		const lockedAchievement = lockedAchievementType.map((type) => {
+			const profileAchievement = AchievementMap.get(type.toString())!;
 
 			return (
 				<AchievementItem
-					key={id}
+					key={profileAchievement.title}
 					unlocked={false}
 					progress={mapProfileValueToAchievement(
 						profileAchievement.data,
