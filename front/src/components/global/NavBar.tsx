@@ -20,6 +20,9 @@ function NavBar(props: any) {
 				<li className="navItem">
 					<Link to="/chat">Chat</Link>
 				</li>
+				<li className="navItem">
+					<Link to="/settings">Settings</Link>
+				</li>
 			</ul>
 			<div className="navRight">
 				<img src={userContext.user.profile_picture} />

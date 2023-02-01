@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
 import checkIcon from '@/assets/check_icon.png';
-import '@/style/UserCreation.css';
+import '@/style/auth/UserCreation.css';
 import ImageLoad from 'image-preview-react';
 import { back_url } from '@/config.json';
 import Cookies from 'js-cookie';

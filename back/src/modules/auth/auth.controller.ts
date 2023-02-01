@@ -20,6 +20,8 @@ import { User } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 import { FormDataRequest } from 'nestjs-form-data';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
+import { TwoFaLogDTO } from './DTO/TwoFALogDTO';
+import { TwoFAService } from './TwoFA.service';
 
 @Controller('auth')
 export class AuthController {
@@ -27,6 +29,7 @@ export class AuthController {
 		private readonly api42Service: Api42Service,
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
+		private readonly twoFAService: TwoFAService,
 	) {}
 
 	@Get()
@@ -104,6 +107,36 @@ export class AuthController {
 		return 'Hey ' + user.login;
 	}
 
+	@Post('2fa/enable')
+	@UseGuards(AuthGuard)
+	async enable2FA(@CurrentUser() user) {
+		return await this.twoFAService.enable2FA(user);
+	}
+
+	@Post('2fa/verify')
+	@UseGuards(AuthGuard)
+	async verify2FA(@CurrentUser() user, @Body('code') code: string) {
+		return await this.twoFAService.verify2FA(user, code);
+	}
+
+	@Post('2fa/connect')
+	async connect2FA(@Body(new ValidationPipe()) body: TwoFaLogDTO) {
+		const { token, code } = body;
+		return await this.authService.connect2FA(token, code);
+	}
+
+	@Post('2fa/disable')
+	@UseGuards(AuthGuard)
+	async disable2FA(@CurrentUser() user) {
+		return await this.twoFAService.disable2FA(user);
+	}
+
+	@Get('2fa')
+	@UseGuards(AuthGuard)
+	async get2FA(@CurrentUser() user) {
+		return user.otpSecret ? { enabled: true } : { enabled: false };
+	}
+	
 	@Post('logout')
 	@UseGuards(AuthGuard)
 	async logout(@Body('refresh_token') refreshToken: string) {

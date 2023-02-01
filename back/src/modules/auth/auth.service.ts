@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
 import { Prisma } from '@prisma/client';
+import { TwoFAService } from './TwoFA.service';
 
 type UserWithProfile = Prisma.UserGetPayload<{
 	include: {
@@ -19,6 +20,7 @@ export class AuthService {
 		private readonly userService: UsersService,
 		private readonly prismaService: PrismaService,
 		private readonly jwtService: JwtService,
+		private readonly twoFAService: TwoFAService,
 	) {}
 
 	/*
@@ -43,11 +45,47 @@ export class AuthService {
 			},
 		});
 		if (!user) throw new BadRequestException('User not found');
+		if (user.otpSecret) {
+			const token = this.jwtService.sign({ user: user.id });
+			return {
+				state: '2fa',
+				token: token,
+			};
+		}
 		const tokens = await this.generateTokens(user);
 		return {
 			state: 'connected',
 			tokens: tokens,
 		};
+	}
+
+	async connect2FA(token: string, code: string) {
+		try {
+			const decoded = this.jwtService.verify(token);
+			if (!decoded || !decoded.user)
+				throw new BadRequestException('Invalid token');
+			const user = await this.prismaService.user.findUnique({
+				where: {
+					id: decoded.user,
+				},
+				include: {
+					profile: true,
+				},
+			});
+			if (!user) throw new BadRequestException('User not found');
+			if (!(await this.twoFAService.connect(user, code))) {
+				return {
+					state: 'error',
+				};
+			}
+			const tokens = await this.generateTokens(user);
+			return {
+				state: 'connected',
+				tokens: tokens,
+			};
+		} catch (err) {
+			throw new BadRequestException('Invalid token');
+		}
 	}
 
 	/*
