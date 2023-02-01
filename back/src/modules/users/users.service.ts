@@ -181,7 +181,7 @@ export class UsersService {
 
 		if (!user) return null;
 		return {
-			matchs: user.matches.map((match) =>
+			matches: user.matches.map((match) =>
 				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
 			),
 			name: user.name,
