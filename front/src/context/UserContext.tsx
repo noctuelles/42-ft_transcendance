@@ -19,6 +19,8 @@ interface IUserContext {
 		};
 		setCreatingUser: (user: any) => void;
 		changeName: (name: string) => void;
+		twoFaStatus: boolean | null;
+		setTwoFaStatus: (status: boolean) => void;
 	};
 	updateUser: () => void;
 	getAccessToken: () => Promise<string>;
@@ -45,6 +47,7 @@ function UserContextProvider(props: any) {
 		name: '',
 		profile_picture: '',
 	});
+	const [twoFaStatus, setTwoFaStatus] = useState<boolean | null>(null);
 
 	async function refreshToken(): Promise<boolean> {
 		const refresh_token = Cookies.get('transcendance_session_cookie');
@@ -164,6 +167,8 @@ function UserContextProvider(props: any) {
 					creatingUser,
 					setCreatingUser,
 					changeName,
+					twoFaStatus,
+					setTwoFaStatus,
 				},
 				logout,
 				updateUser,
