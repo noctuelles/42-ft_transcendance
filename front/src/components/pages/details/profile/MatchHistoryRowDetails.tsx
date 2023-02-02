@@ -11,6 +11,7 @@ interface MatchHistoryRowDetailsProps {
 	userOne: UserMatchData;
 	userTwo: UserMatchData;
 	type: MatchType;
+	date: Date;
 }
 
 interface MatchDetails {
@@ -24,6 +25,7 @@ export function MatchHistoryRowDetails({
 	userOne,
 	userTwo,
 	type,
+	date,
 }: MatchHistoryRowDetailsProps) {
 	// any way to factorise that ?
 	const userDetails: MatchDetails[] = [
@@ -81,7 +83,15 @@ export function MatchHistoryRowDetails({
 				height={30}
 				alt=""
 			/>
-			<h3>{type}</h3>
+			<h3>
+				{`${type} - ${date.toLocaleString('default', {
+					day: '2-digit',
+					month: '2-digit',
+					year: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit',
+				})}`}
+			</h3>
 			<table>
 				<thead></thead>
 				<tbody>

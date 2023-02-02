@@ -18,6 +18,7 @@ export interface UserMatchData {
 
 export interface ProfileAchievementData {
 	id: number;
+	type: AchievementType;
 	unlockedAt: string;
 }
 
@@ -47,24 +48,16 @@ export enum ProfileDataTarget {
 	PROFILE_MATCH_WON,
 }
 
-export enum AchievementId {
-	ACH_NEW_SUBJECT = 1,
-	ACH_APPRENTICE_JUGGLER,
-	ACH_DAUTING_SUBJECT,
+export enum AchievementType {
+	NewSubject = 'NEW_SUBJECT',
+	ApprenticeJuggler = 'APPRENTICE_JUGGLER',
+	DautingSubject = 'DAUTING_SUBJECT',
 }
-
-export const AchievementIdArray = [
-	AchievementId.ACH_NEW_SUBJECT,
-	AchievementId.ACH_APPRENTICE_JUGGLER,
-	AchievementId.ACH_DAUTING_SUBJECT,
-];
 
 export enum MatchType {
 	FUN = 'FUN',
 	RANKED = 'RANKED',
 }
-
-export type AchievementIdValue = `${AchievementId}`;
 
 export interface ProfileAchievement {
 	achieveAt?: Date;

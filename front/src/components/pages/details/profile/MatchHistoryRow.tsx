@@ -44,6 +44,7 @@ const MatchHistoryRow = ({ match }: MatchHistoryRowProps) => {
 					userOne={match.userOne}
 					userTwo={match.userTwo}
 					type={match.type}
+					date={new Date(match.createdAt)}
 				/>
 			</CollapseArrow>
 		</div>

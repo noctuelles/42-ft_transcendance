@@ -30,7 +30,11 @@ const AchievementItem = (props: AchievementItemProps) => {
 			<ProgressBar
 				width="100%"
 				height="20px"
-				percent={Math.round((props.progress / props.threeshold) * 100)}
+				percent={
+					props.progress > props.threeshold
+						? 100
+						: Math.round((props.progress / props.threeshold) * 100)
+				}
 				text={`${props.progress}/${props.threeshold}`}
 				innerBarColor="rgb(255, 153, 0)"
 			/>
