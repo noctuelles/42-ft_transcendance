@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import ProgressBar from '../global/ProgressBar';
 import getLevelByXP from '../pages/details/profile/Utils';
 import { IUserRanking } from './Ranking';
 
@@ -22,13 +21,9 @@ function RankingElement(props: IRankingElementProps) {
 					{props.user.name}
 				</div>
 				<div className="ranking-right">
-					<h3>ELO {props.user.elo}</h3>
-					<div className="ranking-progress">
-						<ProgressBar
-							percent={percentCompleted}
-							text={`Level ${level} - ${percentCompleted}%`}
-						/>
-					</div>
+					<h3 className="ranking-elo">ELO {props.user.elo}</h3>
+					<div className="spacer"></div>
+					<h3 className="ranking-xp">Level {level}</h3>
 				</div>
 			</div>
 		</Link>
