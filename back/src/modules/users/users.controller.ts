@@ -9,4 +9,9 @@ export class UsersController {
 	async getUserProfileData(@Param('userName') username: string) {
 		return await this.usersService.fetchProfileData(username);
 	}
+
+	@Get('ranking')
+	async getUserRanking() {
+		return await this.usersService.fetchRanking();
+	}
 }

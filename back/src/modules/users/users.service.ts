@@ -188,4 +188,27 @@ export class UsersService {
 			...user.profile,
 		};
 	}
+
+	async fetchRanking() {
+		const dbUsers = await this.prismaService.user.findMany({
+			include: {
+				profile: {
+					select: {
+						xp: true,
+						picture: true,
+						elo: true,
+					},
+				},
+			},
+		});
+		let users = dbUsers.map((user) => ({
+			id: user.id,
+			name: user.name,
+			picture: user.profile.picture,
+			xp: user.profile.xp,
+			elo: user.profile.elo,
+		}));
+		users.sort((a, b) => b.xp - a.xp);
+		return users;
+	}
 }

@@ -11,6 +11,13 @@
 	padding-top: 10px;
 }
 
+.ranking-loading {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
 .ranking-users {
 	width: 100%;
 }
@@ -40,15 +47,18 @@
 	height: 80%;
 	width: auto;
 	border-radius: 50%;
+	margin-left: 10px;
+	margin-right: 10px;
 }
 
 .ranking-left {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-evenly;
+	justify-content: flex-start;
 	align-items: center;
 	width: 40%;
 	font-size: 40px;
+	margin-left: 50px;
 }
 
 .ranking-right {

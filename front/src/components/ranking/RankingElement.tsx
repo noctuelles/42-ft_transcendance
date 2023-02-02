@@ -1,15 +1,10 @@
 import { Link } from 'react-router-dom';
 import ProgressBar from '../global/ProgressBar';
 import getLevelByXP from '../pages/details/profile/Utils';
+import { IUserRanking } from './Ranking';
 
 interface IRankingElementProps {
-	user: {
-		id: number;
-		name: string;
-		picture: string;
-		elo: number;
-		xp: number;
-	};
+	user: IUserRanking;
 	position: number;
 }
 
