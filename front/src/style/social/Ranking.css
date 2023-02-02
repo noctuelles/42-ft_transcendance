@@ -8,5 +8,64 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	padding: 10px;
+	padding-top: 10px;
+}
+
+.ranking-users {
+	width: 100%;
+}
+
+.ranking-pos-1 {
+	color: rgb(161, 142, 35);
+}
+.ranking-pos-2 {
+	color: rgb(94, 94, 94);
+}
+.ranking-pos-3 {
+	color: rgb(170, 94, 17);
+}
+
+.ranking-element {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	height: 70px;
+	width: 100%;
+	border-top: solid 1px black;
+	text-decoration: none;
+	color: black;
+}
+
+.ranking-element img {
+	height: 80%;
+	width: auto;
+	border-radius: 50%;
+}
+
+.ranking-left {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+	width: 40%;
+	font-size: 40px;
+}
+
+.ranking-right {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+	width: 60%;
+}
+
+.ranking-progress {
+	width: 50%;
+	height: 25px;
+}
+
+.ranking-right h3 {
+	margin-top: -4px;
+	margin-bottom: -5px;
+	font-size: 30px;
 }

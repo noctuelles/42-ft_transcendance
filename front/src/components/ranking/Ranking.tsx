@@ -29,6 +29,48 @@ function Ranking(props: IRankingProps) {
 			elo: 1200,
 			xp: 100,
 		},
+		{
+			id: 4,
+			name: 'dhubleur',
+			picture: 'http://localhost:3000/cdn/user/dhubleur.jpg',
+			elo: 1100,
+			xp: 100,
+		},
+		{
+			id: 5,
+			name: 'dhubleur',
+			picture: 'http://localhost:3000/cdn/user/dhubleur.jpg',
+			elo: 1100,
+			xp: 100,
+		},
+		{
+			id: 6,
+			name: 'dhubleur',
+			picture: 'http://localhost:3000/cdn/user/dhubleur.jpg',
+			elo: 1100,
+			xp: 100,
+		},
+		{
+			id: 7,
+			name: 'dhubleur',
+			picture: 'http://localhost:3000/cdn/user/dhubleur.jpg',
+			elo: 1100,
+			xp: 100,
+		},
+		{
+			id: 8,
+			name: 'dhubleur',
+			picture: 'http://localhost:3000/cdn/user/dhubleur.jpg',
+			elo: 1100,
+			xp: 100,
+		},
+		{
+			id: 9,
+			name: 'dhubleur',
+			picture: 'http://localhost:3000/cdn/user/dhubleur.jpg',
+			elo: 1100,
+			xp: 100,
+		},
 	];
 
 	return (
