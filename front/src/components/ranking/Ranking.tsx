@@ -1,9 +1,10 @@
 import { RankingType } from '../pages/Social';
 import '@/style/social/Ranking.css';
 import RankingElement from './RankingElement';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { back_url } from '@/config.json';
 import Loader from '../global/Loader';
+import { UserContext } from '@/context/UserContext';
 
 interface IRankingProps {
 	rankingType: RankingType;
@@ -18,14 +19,25 @@ export interface IUserRanking {
 }
 
 function Ranking(props: IRankingProps) {
+	const userContext = useContext(UserContext);
 	const [ranking, setRanking] = useState<IUserRanking[]>([]);
 
 	useEffect(() => {
-		fetch(`${back_url}/users/ranking`)
-			.then((res) => res.json())
-			.then((data) => {
-				setRanking(data);
-			});
+		async function fetchApi() {
+			const accessToken = await userContext.getAccessToken();
+			fetch(`${back_url}/users/ranking`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					'Content-Type': 'application/json',
+				},
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					setRanking(data);
+				});
+		}
+		fetchApi();
 	}, []);
 
 	return (
