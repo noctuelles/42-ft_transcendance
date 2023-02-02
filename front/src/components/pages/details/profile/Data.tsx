@@ -1,19 +1,19 @@
 import {
 	ProfileAchievement,
 	ProfileDataTarget,
-	AchievementId,
+	AchievementType,
 } from './ProfileTypes';
-import NoviceBall from '@/assets/novice-ball.svg';
-import JackOLanternBall from '@/assets/jack-o-lantern-ball.svg';
-import DiscoBall from '@/assets/disco-ball.svg';
-import RegularBall from '@/assets/regular-ball.svg';
+import NoviceBallIcon from '@/assets/novice-ball.svg';
+import JackOLanternBallIcon from '@/assets/jack-o-lantern-ball.svg';
+import DiscoBallIcon from '@/assets/disco-ball.svg';
+import RegularBallIcon from '@/assets/regular-ball.svg';
 
-export const AchievementMap = new Map<AchievementId, ProfileAchievement>([
+export const AchievementMap = new Map<AchievementType, ProfileAchievement>([
 	[
-		AchievementId.ACH_NEW_SUBJECT,
+		AchievementType.NewSubject,
 		{
 			title: 'New Subject',
-			img: NoviceBall,
+			img: NoviceBallIcon,
 			description: 'Win your first match',
 			earnings: 10,
 			data: ProfileDataTarget.PROFILE_MATCH,
@@ -21,10 +21,10 @@ export const AchievementMap = new Map<AchievementId, ProfileAchievement>([
 		},
 	],
 	[
-		AchievementId.ACH_APPRENTICE_JUGGLER,
+		AchievementType.ApprenticeJuggler,
 		{
 			title: 'Apprentice Juggler',
-			img: RegularBall,
+			img: RegularBallIcon,
 			description: 'Play at least 10 match',
 			earnings: 15,
 			data: ProfileDataTarget.PROFILE_MATCH,
@@ -32,10 +32,10 @@ export const AchievementMap = new Map<AchievementId, ProfileAchievement>([
 		},
 	],
 	[
-		AchievementId.ACH_DAUTING_SUBJECT,
+		AchievementType.DautingSubject,
 		{
 			title: 'Dauting Subject',
-			img: JackOLanternBall,
+			img: JackOLanternBallIcon,
 			description: 'Win at least 20 match',
 			earnings: 42,
 			data: ProfileDataTarget.PROFILE_MATCH_WON,

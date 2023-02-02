@@ -142,7 +142,7 @@ function AppRoutes() {
 				<Route index element={<Navigate replace to="play" />} />
 				<Route path="play" element={<Play />} />
 				<Route path="social" element={<Social />} />
-				<Route path="profile" element={<Profile />} />
+				<Route path="profile/:username" element={<Profile />} />
 				<Route path="chat" element={<Chat />} />
 				<Route path="settings" element={<Settings />} />
 				<Route path="*" element={<Navigate replace to="play" />} />

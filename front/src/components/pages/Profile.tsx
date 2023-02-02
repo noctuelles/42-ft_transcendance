@@ -3,20 +3,27 @@ import MatchHistoryTable from './details/profile/MatchHistoryTable';
 import '@/style/Profile.css';
 import { UserContext } from '@/context/UserContext';
 import React, { useEffect, useState } from 'react';
+import Loader from '../global/Loader';
 import ProfileSummary from './details/profile/ProfileSummary';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { ProfileData, ProfileMatchData } from './details/profile/ProfileTypes';
 import AchievementTable from './details/profile/AchievementTable';
+import { useNavigate, useParams } from 'react-router';
 
 const Profile = () => {
-	const userContext = React.useContext(UserContext);
 	const infoContext = React.useContext(InfoBoxContext);
+	const navigate = useNavigate();
+	const { username } = useParams();
 	const [profile, setProfile] = useState<ProfileData | null>(null);
 
 	function handleSearch(searchValue: string) {
 		if (profile?.name === searchValue || searchValue.length == 0) return;
-		fetch(back_url + `/users/profile/${searchValue}`)
+		navigate(`/profile/${searchValue}`);
+	}
+
+	useEffect(() => {
+		fetch(back_url + `/users/profile/${username}`)
 			.then((response) => {
 				if (response.ok) {
 					return response.json();
@@ -27,20 +34,22 @@ const Profile = () => {
 				setProfile(data);
 			})
 			.catch(() => {
-				infoContext.addInfo({
-					type: InfoType.ERROR,
-					message: `Cannot find or load profile '${searchValue}'`,
-				});
+				if (!profile) navigate('play');
+				else {
+					infoContext.addInfo({
+						type: InfoType.ERROR,
+						message: `Cannot find or load profile '${username}'`,
+					});
+				}
 			});
-	}
+	}, [navigate, username]);
 
-	useEffect(() => {
-		handleSearch(userContext.user.name);
-	}, []);
-
-	if (!profile) return <h2>Profile loading...</h2>;
-
-	return (
+	return !profile ? (
+		<div className="profile-loading">
+			<h2>Profile loading...</h2>
+			<Loader color="black" />
+		</div>
+	) : (
 		<div className="profile-container">
 			<ProfileHeader
 				username={profile.name}
