@@ -208,7 +208,7 @@ export class UsersService {
 			xp: user.profile.xp,
 			elo: user.profile.elo,
 		}));
-		users.sort((a, b) => b.xp - a.xp);
+		return users.sort((a, b) => b.elo - a.elo);
 		return users;
 	}
 
@@ -252,7 +252,7 @@ export class UsersService {
 			xp: user.profile.xp,
 			elo: user.profile.elo,
 		}));
-		users.sort((a, b) => b.xp - a.xp);
+		users.sort((a, b) => b.elo - a.elo);
 		return users;
 	}
 }
