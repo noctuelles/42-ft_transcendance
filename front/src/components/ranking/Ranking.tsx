@@ -23,22 +23,29 @@ function Ranking(props: IRankingProps) {
 	const [ranking, setRanking] = useState<IUserRanking[]>([]);
 
 	useEffect(() => {
-		async function fetchApi() {
+		setRanking([]);
+		async function fetchRanking() {
 			const accessToken = await userContext.getAccessToken();
-			fetch(`${back_url}/users/ranking`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-					'Content-Type': 'application/json',
+			fetch(
+				`${back_url}/users/ranking${
+					(props.rankingType == RankingType.FRIENDS && '/friends') ||
+					(props.rankingType == RankingType.GLOBAL && '/global')
+				}`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+						'Content-Type': 'application/json',
+					},
 				},
-			})
+			)
 				.then((res) => res.json())
 				.then((data) => {
 					setRanking(data);
 				});
 		}
-		fetchApi();
-	}, []);
+		fetchRanking();
+	}, [props.rankingType]);
 
 	return (
 		<div className="ranking-content">
