@@ -5,7 +5,7 @@ const Button = (props: any) => {
 		<button
 			className="btn"
 			type={props.type}
-			onClick={props.onBtnClick}
+			onClick={props.onClick}
 			style={{
 				...(props.width && { width: `${props.width}` }),
 				...(props.height && { width: `${props.height}` }),

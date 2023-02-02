@@ -24,7 +24,9 @@ function NavBar(props: any) {
 			</ul>
 			<div className="navRight">
 				<img src={userContext.user.profile_picture} />
-				<Link to="/profile">{userContext.user.name}</Link>
+				<Link to={`/profile/${userContext.user.name}`}>
+					{userContext.user.name}
+				</Link>
 				<button className="nav-logout" onClick={userContext.logout}>
 					Logout
 				</button>
