@@ -9,4 +9,9 @@ export class UsersController {
 	async getUserProfileData(@Param('userName') username: string) {
 		return await this.usersService.fetchProfileData(username);
 	}
+
+	@Get('friends/:userName')
+	async getUserFriendList(@Param('userName') username: string) {
+		return await this.usersService.fetchFriendList(username);
+	}
 }

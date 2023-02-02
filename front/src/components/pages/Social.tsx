@@ -1,5 +1,7 @@
+import FriendList from './details/social/FriendList';
+
 const Social = () => {
-	return <p>Social page</p>;
+	return <FriendList />;
 };
 
 export default Social;
