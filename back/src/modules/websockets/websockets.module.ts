@@ -6,6 +6,7 @@ import { WebsocketsService } from './websockets.service';
 @Module({
 	imports: [PrismaModule],
 	controllers: [],
+
 	providers: [WebsocketGateway, WebsocketsService],
 	exports: [WebsocketsService],
 })
