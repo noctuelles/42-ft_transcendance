@@ -4,12 +4,18 @@ import IFriendData, { EUserStatus } from './Types';
 import { CollapseArrow } from '@/components/global/CollapseArrow';
 import '@/style/details/social/FriendItem.css';
 import Button from '@/components/global/Button';
+import { Link } from 'react-router-dom';
 
 interface IProps {
 	friend: IFriendData;
 }
 
 interface IState {}
+
+const linkStyle: React.CSSProperties = {
+	textDecoration: 'underline',
+	color: 'black',
+};
 
 class FriendItem extends React.Component<IProps, IState> {
 	constructor(props: IProps) {
@@ -25,7 +31,14 @@ class FriendItem extends React.Component<IProps, IState> {
 						width={50}
 						height={50}
 					/>
-					<span id="friend-name">{this.props.friend.name}</span>
+					<span id="friend-name">
+						<Link
+							to={`/profile/${this.props.friend.name}`}
+							style={linkStyle}
+						>
+							{this.props.friend.name}
+						</Link>
+					</span>
 				</div>
 				<div className="friend-item-center">
 					<StatusDot status={EUserStatus.ONLINE} />

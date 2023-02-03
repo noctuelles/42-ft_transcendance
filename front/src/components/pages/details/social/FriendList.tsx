@@ -36,6 +36,14 @@ class FriendList extends React.Component<IProps, IState> {
 
 	handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
 		e.preventDefault();
+
+		const requestOptions: RequestInit = {
+			method: 'POST',
+			headers: { 'Content-Type': 'text' },
+			body: JSON.stringify({ user: this.state.friendSearchName }),
+		};
+
+		console.log(requestOptions);
 	}
 
 	handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -58,8 +66,6 @@ class FriendList extends React.Component<IProps, IState> {
 					/>
 					<button type="submit">Add</button>
 				</form>
-
-				<hr />
 
 				<ul>
 					{this.state.friends.map((friend) => (

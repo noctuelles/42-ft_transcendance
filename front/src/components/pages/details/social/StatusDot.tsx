@@ -27,7 +27,6 @@ export default class StatusDot extends React.Component<IProps, IState> {
 					style={{ backgroundColor: DotColor.get(this.props.status) }}
 				/>
 				<span>
-					{' '}
 					{this.props.status.charAt(0) +
 						this.props.status.slice(1).toLowerCase()}
 				</span>

@@ -15,7 +15,7 @@
 	overflow-x: hidden;
 	list-style-type: none;
 	padding-left: 20px;
-	height: 450px;
+	max-height: 450px;
 	max-width: 280px;
 }
 
