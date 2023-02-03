@@ -1,7 +1,6 @@
 .chat-page {
 	/* Center the chat page */
-	margin-left: auto;
-	margin-right: auto;
+	margin: auto;
 
 	display: flex;
 	height: 700px;
