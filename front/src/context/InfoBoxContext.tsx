@@ -7,7 +7,7 @@ export enum InfoType {
 }
 
 export interface IInfo {
-	id: number;
+	id: string;
 	type: InfoType;
 	message: string;
 	visible: boolean;
@@ -23,7 +23,7 @@ export interface IInfoBuilder {
 interface IInfoBoxContext {
 	infos: IInfo[];
 	addInfo: (info: IInfoBuilder) => void;
-	removeInfo: (id: number) => void;
+	removeInfo: (id: string) => void;
 	enableInfoBox: () => void;
 	disableInfoBox: () => void;
 }
@@ -34,7 +34,6 @@ export const InfoBoxContext = React.createContext<IInfoBoxContext>(
 
 function InfoBoxContextProvider(props: any) {
 	const [infos, setInfos] = useState<IInfo[]>([]);
-	const [id, setId] = useState(0);
 	const enable = useRef(true);
 
 	function enableInfoBox() {
@@ -45,7 +44,7 @@ function InfoBoxContextProvider(props: any) {
 		enable.current = false;
 	}
 
-	async function removeInfo(id: number) {
+	async function removeInfo(id: string) {
 		setInfos((infos) =>
 			infos.map((info) => {
 				if (info.id === id) {
@@ -62,19 +61,23 @@ function InfoBoxContextProvider(props: any) {
 
 	async function addInfo(info: IInfoBuilder) {
 		if (!enable.current) return;
+		const id = crypto.randomUUID();
 		setInfos((inf: IInfo[]) => {
 			if (inf.length >= 5) {
 				inf = inf.slice(1, inf.length);
 			}
 			return [
 				...inf,
-				{ ...info, id: id, visible: true, onClick: info.onClick },
+				{
+					...info,
+					id: id,
+					visible: true,
+					onClick: info.onClick,
+				},
 			];
 		});
-		const save = id;
-		setId((id) => id + 1);
 		setTimeout(() => {
-			removeInfo(save);
+			removeInfo(id);
 		}, 5000);
 	}
 	return (

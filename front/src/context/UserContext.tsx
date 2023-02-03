@@ -1,7 +1,10 @@
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { back_url } from '@/config.json';
+import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
+import { ws_url as WS_URL } from '@/config.json';
+import { InfoBoxContext, InfoType } from './InfoBoxContext';
 
 interface IUserContext {
 	auth: {
@@ -35,6 +38,7 @@ export const UserContext = React.createContext<IUserContext>(
 );
 
 function UserContextProvider(props: any) {
+	const infoBoxContext = useContext(InfoBoxContext);
 	const [logged, setLogged] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [updating, setUpdating] = useState(true);
@@ -45,13 +49,45 @@ function UserContextProvider(props: any) {
 		name: '',
 		profile_picture: '',
 	});
+	useWebSocket(WS_URL, {
+		share: true,
+		onError: (event) => {
+			setUpdating(true);
+			setUser({ id: -1, name: '', profile_picture: '' });
+			infoBoxContext.addInfo({
+				type: InfoType.ERROR,
+				message:
+					'Impossible to join backend. You can try again in a few seconds',
+			});
+		},
+		onClose: (event) => {
+			if (event.code !== 1001 && event.code !== 1000) {
+				setUpdating(true);
+				setUser({ id: -1, name: '', profile_picture: '' });
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message:
+						'Connection with backend lost. You can try again in a few seconds',
+				});
+			}
+		},
+		reconnectAttempts: 3,
+		reconnectInterval: 5000,
+		shouldReconnect: (closeEvent) => {
+			if (closeEvent.code === 1001 || closeEvent.code === 1000) {
+				return false;
+			}
+			console.log('reconnect');
+			return true;
+		},
+	});
 
 	async function refreshToken(): Promise<boolean> {
 		const refresh_token = Cookies.get('transcendance_session_cookie');
 		if (!refresh_token) {
 			return false;
 		} else {
-			const res = await fetch(back_url + '/auth/refresh', {
+			return fetch(back_url + '/auth/refresh', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -59,37 +95,41 @@ function UserContextProvider(props: any) {
 				body: JSON.stringify({
 					refresh_token: refresh_token,
 				}),
-			});
-			if (res.ok) {
-				const data = await res.json();
-				if (data.access_token) {
-					setAccessToken(data.access_token.token);
-					let decode: any = jwtDecode(data.access_token.token);
-					setUser({
-						id: decode.user.id,
-						name: decode.user.name,
-						profile_picture: decode.user.profile_picture,
-					});
-					setLogged(true);
-					Cookies.remove('transcendance_session_cookie');
-					Cookies.set(
-						'transcendance_session_cookie',
-						data.refresh_token.token,
-						{
-							expires: 7 * 24 * 60 * 60,
-						},
-					);
-				} else {
-					Cookies.remove('transcendance_session_cookie');
+			})
+				.then((res) => {
+					if (!res.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return res.json();
+				})
+				.then((data) => {
+					if (data.access_token) {
+						setAccessToken(data.access_token.token);
+						let decode: any = jwtDecode(data.access_token.token);
+						setUser({
+							id: decode.user.id,
+							name: decode.user.name,
+							profile_picture: decode.user.profile_picture,
+						});
+						setLogged(true);
+						Cookies.remove('transcendance_session_cookie');
+						Cookies.set(
+							'transcendance_session_cookie',
+							data.refresh_token.token,
+							{
+								expires: 7 * 24 * 60 * 60,
+							},
+						);
+					} else {
+						Cookies.remove('transcendance_session_cookie');
+						return false;
+					}
+					return true;
+				})
+				.catch((err) => {
 					return false;
-				}
-			} else {
-				//TODO Error message
-				Cookies.remove('transcendance_session_cookie');
-				return false;
-			}
+				});
 		}
-		return true;
 	}
 
 	async function updateUser() {
