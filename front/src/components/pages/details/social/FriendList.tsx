@@ -1,24 +1,45 @@
 import React from 'react';
+import FriendItem from './FriendItem';
+import IFriendData from './Types';
+import '@/style/details/social/FriendList.css';
 
-class FriendList extends React.Component {
-	constructor(props) {
+interface IProps {}
+
+interface IState {
+	friendSearchName: string;
+	friends: IFriendData[];
+}
+
+class FriendList extends React.Component<IProps, IState> {
+	constructor(props: IProps) {
 		super(props);
 		this.state = {
 			friendSearchName: '',
+			friends: [],
 		};
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-	componentDidMount(): void {}
+	componentDidMount(): void {
+		fetch('https://63dce19f367aa5a7a403e78b.mockapi.io/users')
+			.then((response) => {
+				if (response.ok) return response.json();
+				return Promise.reject(response);
+			})
+			.then((data: IFriendData[]) => {
+				this.setState({ ...this.state, friends: data });
+				console.log(data);
+			});
+	}
 
 	handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
 		e.preventDefault();
 	}
 
 	handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ friendSearchName: e.target.value });
+		this.setState({ ...this.state, friendSearchName: e.target.value });
 	}
 
 	render() {
@@ -37,6 +58,14 @@ class FriendList extends React.Component {
 					/>
 					<button type="submit">Add</button>
 				</form>
+
+				<hr />
+
+				<ul>
+					{this.state.friends.map((friend) => (
+						<FriendItem key={friend.id} friend={friend} />
+					))}
+				</ul>
 			</div>
 		);
 	}
