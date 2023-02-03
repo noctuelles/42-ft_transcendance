@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import Channel from './Channel';
-import { ChannelType } from './Channel';
+import { ChannelType, IPunishment } from './Channel';
 
 export class Message {
 	channel: number;
@@ -28,7 +28,10 @@ export class ChatService {
 		[3, new Channel(3, 'Channel 3', ChannelType.PUBLIC, 3)],
 		[4, new Channel(4, 'Channel 4', ChannelType.PUBLIC, 3)],
 	]);
-	constructor(private readonly websocketsService: WebsocketsService) {}
+	constructor(private readonly websocketsService: WebsocketsService) {
+		this.channels.get(4).ban(1, new Date(Date.now() + 1000 * 10)); // TODO: Remove this
+		this.channels.get(3).mute(1, new Date(Date.now() + 1000 * 10));
+	}
 
 	sendMessage(message: IMessage, channelId: number): void {
 		this.websocketsService.sendToAllUsers(
@@ -71,6 +74,7 @@ export class ChatService {
 	}
 
 	addUserToChannel(userId: number, channelId: number): boolean {
+		// TODO: Check password
 		if (!this.channelExists(channelId)) {
 			return false;
 		}
