@@ -1,54 +1,77 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import '@/style/details/chat/ChannelCreationForm.css';
-import FormCheckLabel from 'react-bootstrap/esm/FormCheckLabel';
 import * as Yup from 'yup';
+import Button from '@/components/global/Button';
+import TextField from '@/components/global/TextField';
+import { useState } from 'react';
 
-export default function ChannelCreationForm(props) {
+export default function ChannelCreationForm({
+	setter,
+}: {
+	setter: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+	const validation = Yup.object().shape({
+		channelName: Yup.string()
+			.max(25, '25 characters or less')
+			.min(10, 'At least 10 characters')
+			.required('Requiered')
+			.matches(
+				/^ ?[a-zA-Z]+(?: [a-zA-Z]+)*$/i,
+				'Only one space per word',
+			),
+		channelType: Yup.string().required('Requiered'),
+		channelPassword: Yup.string().when('channelType', {
+			is: 'Password Protected',
+			then: Yup.string()
+				.max(25, '25 characters or less')
+				.min(10, 'At least 10 characters')
+				.required('Requiered')
+				.matches(/^[A-Za-z0-9_@./#&+-]*$/i, 'Invalid password'),
+		}),
+	});
+
 	return (
 		<div className="channel-creation-form">
 			<Formik
 				initialValues={{
 					channelName: '',
 					channelPassword: '',
-					channelType: '',
+					channelType: 'Public',
 				}}
-				validationSchema={Yup.object({
-					channelName: Yup.string()
-						.max(25, 'Must be 25 characters or less')
-						.min(10, 'Must be at least 10 characters')
-						.required('Requiered')
-						.matches(
-							/^ ?[a-zA-Z]+(?: [a-zA-Z]+)*$/i,
-							'Can only contain letters seperated by one space',
-						),
-					channelPassword: Yup.string()
-						.max(25, 'Must be 25 characters or less')
-						.min(10, 'Must be at least 10 characters')
-						.required('Requiered'),
-					channelType: Yup.string().required('Requiered'),
-				})}
-				onSubmit={() => {}}
+				validationSchema={validation}
+				onSubmit={() => {
+					alert('lol');
+				}}
 			>
 				{({ isSubmitting, values }) => (
 					<Form className="channel-creation-form">
-						<label htmlFor="channelName">Channel name : </label>
-						<Field type="text" name="channelName" />
-						<br />
-						<ErrorMessage name="channelName" component="div" />
-						{values.channelType == 'Password Protected' && (
+						<h3
+							style={{
+								textAlign: 'center',
+								textDecoration: 'underline',
+							}}
+						>
+							Create new channel
+						</h3>
+						<TextField
+							label="Channel name"
+							id="channelName"
+							name="channelName"
+							helpText="Can contains only alphabetic characters"
+							type="text"
+						/>
+						{values.channelType === 'Password Protected' && (
 							<>
-								<label htmlFor="channelPassword">
-									Channel password :
-								</label>
-								<Field type="password" name="channelPassword" />
-								<br />
-								<ErrorMessage
+								<TextField
+									label="Channel password"
+									id="channelPassword"
 									name="channelPassword"
-									component="div"
+									helpText="Can only contains -_@./#&+ and alphanumeric characters"
+									type="password"
 								/>
 							</>
 						)}
-						Channel type :
+						Channel type
 						<div role="group" aria-labelledby="channel-type-radio">
 							<label>
 								<Field
@@ -75,9 +98,12 @@ export default function ChannelCreationForm(props) {
 								Password Protected
 							</label>
 						</div>
-						<button type="submit" disabled={isSubmitting}>
-							Submit
-						</button>
+						<div className="creation-form-btns">
+							<Button onClick={() => setter(false)}>Back</Button>
+							<Button type="submit" disabled={isSubmitting}>
+								Submit
+							</Button>
+						</div>
 					</Form>
 				)}
 			</Formik>

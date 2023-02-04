@@ -1,0 +1,51 @@
+.text-field {
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.field-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.valid input[type='text'],
+.valid input[type='password'] {
+	border-color: green;
+}
+
+.valid .field-feedback {
+	color: green;
+}
+
+.invalid input[type='text'],
+.invalid input[type='password'] {
+	border-color: darkred;
+}
+
+.invalid .field-feedback {
+	color: darkred;
+}
+
+input[type='email'],
+input[type='text'],
+input[type='password'],
+input[type='number'] {
+	width: 100%;
+	font-size: 1rem;
+	padding-top: 0.4rem;
+	padding-bottom: 0.4rem;
+	border: 2px solid;
+	background-color: darkgray;
+	color: black;
+	border-radius: 4px;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+.help-text {
+	font-size: 0.7rem;
+	font-style: italic;
+	text-align: right;
+}

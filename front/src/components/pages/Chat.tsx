@@ -24,6 +24,6 @@ export default function Chat() {
 			<div className="chat-page-right-side"></div>
 		</div>
 	) : (
-		<ChannelCreationForm />
+		<ChannelCreationForm setter={setShowCreationForm} />
 	);
 }
