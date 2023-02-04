@@ -9,28 +9,10 @@
 	justify-content: space-between;
 }
 
-.valid input[type='text'],
-.valid input[type='password'] {
-	border-color: green;
-}
-
-.valid .field-feedback {
-	color: green;
-}
-
-.invalid input[type='text'],
-.invalid input[type='password'] {
-	border-color: darkred;
-}
-
-.invalid .field-feedback {
-	color: darkred;
-}
-
-input[type='email'],
-input[type='text'],
-input[type='password'],
-input[type='number'] {
+.text-field input[type='email'],
+.text-field input[type='text'],
+.text-field input[type='password'],
+.text-field input[type='number'] {
 	width: 100%;
 	font-size: 1rem;
 	padding-top: 0.4rem;
@@ -42,4 +24,22 @@ input[type='number'] {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
+}
+
+.invalid input[type='text'],
+.invalid input[type='password'] {
+	border-color: darkred;
+}
+
+.invalid .field-feedback {
+	color: darkred;
+}
+
+.valid input[type='text'],
+.valid input[type='password'] {
+	border-color: green;
+}
+
+.valid .field-feedback {
+	color: green;
 }

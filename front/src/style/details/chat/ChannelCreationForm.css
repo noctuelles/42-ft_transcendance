@@ -2,7 +2,9 @@
 	margin: auto;
 	padding: 20px;
 	border-radius: 20px;
+	border: solid;
 	background-color: lightgray;
+	text-align: center;
 }
 
 .creation-form-btns {

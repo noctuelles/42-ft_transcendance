@@ -61,79 +61,71 @@ export default function ChannelCreationForm({
 	}
 
 	return (
-		<div className="channel-creation-form">
-			<Formik
-				initialValues={values}
-				validationSchema={validation}
-				onSubmit={handleSubmit}
-			>
-				{({ isSubmitting, values }) => (
-					<Form className="channel-creation-form">
-						<h3
-							style={{
-								textAlign: 'center',
-								textDecoration: 'underline',
-							}}
-						>
-							Create new channel
-						</h3>
-						<TextField
-							label="Channel name"
-							id="channelName"
-							name="channelName"
-							helpText="Can contains only alphabetic characters separated by one space"
-							type="text"
-						/>
-						{values.channelType === 'Password Protected' && (
-							<>
-								<TextField
-									label="Channel password"
-									id="channelPassword"
-									name="channelPassword"
-									helpText="Can only contains -_@./#&+ and alphanumeric characters"
-									type="password"
-								/>
-							</>
-						)}
-						<h4>Channel type</h4>
-						<div role="group" aria-labelledby="channel-type-radio">
-							<label>
-								<Field
-									type="radio"
-									name="channelType"
-									value="Public"
-								/>
-								Public
-							</label>
-							<label>
-								<Field
-									type="radio"
-									name="channelType"
-									value="Private"
-								/>
-								Private
-							</label>
-							<label>
-								<Field
-									type="radio"
-									name="channelType"
-									value="Password Protected"
-								/>
-								Password Protected
-							</label>
-						</div>
-						<div className="help-text">
-							{msgMap.get(values.channelType)}
-						</div>
-						<div className="creation-form-btns">
-							<Button onClick={() => setter(false)}>Back</Button>
-							<Button type="submit" disabled={isSubmitting}>
-								Submit
-							</Button>
-						</div>
-					</Form>
-				)}
-			</Formik>
-		</div>
+		<Formik
+			initialValues={values}
+			validationSchema={validation}
+			onSubmit={handleSubmit}
+		>
+			{({ isSubmitting, values }) => (
+				<Form className="channel-creation-form">
+					<h3>Create new channel</h3>
+					<h4>Channel Info</h4>
+					<TextField
+						label="Name"
+						id="channelName"
+						name="channelName"
+						helpText="Can contains only alphabetic characters separated by one space"
+						type="text"
+					/>
+					{values.channelType === 'Password Protected' && (
+						<>
+							<TextField
+								label="Password"
+								id="channelPassword"
+								name="channelPassword"
+								helpText="Can only contains -_@./#&+ and alphanumeric characters"
+								type="password"
+							/>
+						</>
+					)}
+					<h4>Channel type</h4>
+					<div role="group" aria-labelledby="channel-type-radio">
+						<label>
+							<Field
+								type="radio"
+								name="channelType"
+								value="Public"
+							/>
+							Public
+						</label>
+						<label>
+							<Field
+								type="radio"
+								name="channelType"
+								value="Private"
+							/>
+							Private
+						</label>
+						<label>
+							<Field
+								type="radio"
+								name="channelType"
+								value="Password Protected"
+							/>
+							Password Protected
+						</label>
+					</div>
+					<div className="help-text">
+						{msgMap.get(values.channelType)}
+					</div>
+					<div className="creation-form-btns">
+						<Button onClick={() => setter(false)}>Back</Button>
+						<Button type="submit" disabled={isSubmitting}>
+							Submit
+						</Button>
+					</div>
+				</Form>
+			)}
+		</Formik>
 	);
 }
