@@ -36,7 +36,11 @@ export default class Channel {
 	}
 
 	canUserSendMessage(userId: number): boolean {
-		return this.containsUser(userId);
+		return (
+			this.containsUser(userId) &&
+			!this.isUserMuted(userId) &&
+			!this.isUserBanned(userId)
+		);
 	}
 
 	containsUser(userId: number): boolean {
@@ -63,8 +67,59 @@ export default class Channel {
 	}
 
 	isUserBanned(userId: number): boolean {
+		this.purgeEndedPunishment(this.banned);
 		return this.banned.some((bannedInfos) => {
-			bannedInfos.userId === userId;
+			return bannedInfos.userId === userId;
 		});
+	}
+
+	isUserMuted(userId: number) {
+		this.purgeEndedPunishment(this.muted);
+		return this.muted.some((mutedInfos) => {
+			return mutedInfos.userId === userId;
+		});
+	}
+
+	purgeEndedPunishment(punishments: IPunishment[]) {
+		this.removeAllMatches(punishments, (punishment) => {
+			return punishment.endDate < new Date(Date.now());
+		});
+	}
+
+	ban(userId: number, unbanDate: Date): void {
+		if (this.isUserBanned(userId)) {
+			this.pardon(userId);
+		}
+		this.banned.push({ userId: userId, endDate: unbanDate });
+	}
+
+	pardon(userId: number): boolean {
+		return this.removeAllMatches(this.banned, (punishment) => {
+			return punishment.userId === userId;
+		});
+	}
+
+	mute(userId: number, unmuteDate: Date): void {
+		if (this.isUserMuted(userId)) {
+			this.unmute(userId);
+		}
+		this.muted.push({ userId: userId, endDate: unmuteDate });
+	}
+
+	unmute(userId: number): boolean {
+		return this.removeAllMatches(this.muted, (punishment) => {
+			return punishment.userId === userId;
+		});
+	}
+
+	removeAllMatches(array: any[], condition: (elem: any) => boolean): boolean {
+		let didMatch = false;
+		for (let i = array.length - 1; i >= 0; i--) {
+			if (condition(array[i])) {
+				didMatch = true;
+				array.splice(i, 1);
+			}
+		}
+		return didMatch;
 	}
 }
