@@ -32,6 +32,8 @@ export class Game {
 
 	private _bounceP1: number = 0;
 	private _bounceP2: number = 0;
+	private _portalsUsedP1: number = 0;
+	private _portalsUsedP2: number = 0;
 
 	private onEnd: () => void;
 
@@ -323,6 +325,11 @@ export class Game {
 				ball.position.x = portal.link.center.x;
 				ball.position.y = portal.link.center.y;
 				this._setBallInvunlerableToPortal(ball);
+				if (ball.direction.x > 0) {
+					this._portalsUsedP1++;
+				} else {
+					this._portalsUsedP2++;
+				}
 			}
 		}
 	}
@@ -501,6 +508,7 @@ export class Game {
 							eloEarned: isUser1Winner ? eloChange : -eloChange,
 							winner: isUser1Winner,
 							bounces: this._bounceP1,
+							portalsUsed: this._portalsUsedP1,
 						},
 					},
 					userTwo: {
@@ -513,6 +521,7 @@ export class Game {
 							eloEarned: isUser2Winner ? eloChange : -eloChange,
 							winner: isUser2Winner,
 							bounces: this._bounceP2,
+							portalsUsed: this._portalsUsedP2,
 						},
 					},
 				},
