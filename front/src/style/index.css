@@ -85,3 +85,9 @@ body {
 	align-items: center;
 	justify-content: center;
 }
+
+.help-text {
+	font-size: 0.7rem;
+	font-style: italic;
+	text-align: right;
+}

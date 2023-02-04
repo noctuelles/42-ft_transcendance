@@ -3,7 +3,20 @@ import '@/style/details/chat/ChannelCreationForm.css';
 import * as Yup from 'yup';
 import Button from '@/components/global/Button';
 import TextField from '@/components/global/TextField';
-import { useState } from 'react';
+
+type ChannelRadioType = 'Public' | 'Private' | 'Password Protected';
+
+interface IValues {
+	channelName: string;
+	channelPassword: string;
+	channelType: ChannelRadioType;
+}
+
+const msgMap = new Map<ChannelRadioType, string>([
+	['Public', 'Everyone can join the channel'],
+	['Private', 'User will be added upon your request'],
+	['Password Protected', 'Everyone can join the channel - with a password'],
+]);
 
 export default function ChannelCreationForm({
 	setter,
@@ -15,10 +28,7 @@ export default function ChannelCreationForm({
 			.max(25, '25 characters or less')
 			.min(10, 'At least 10 characters')
 			.required('Requiered')
-			.matches(
-				/^ ?[a-zA-Z]+(?: [a-zA-Z]+)*$/i,
-				'Only one space per word',
-			),
+			.matches(/^ ?[a-zA-Z]+(?: [a-zA-Z]+)*$/i, 'Invalid channel name'),
 		channelType: Yup.string().required('Requiered'),
 		channelPassword: Yup.string().when('channelType', {
 			is: 'Password Protected',
@@ -30,18 +40,32 @@ export default function ChannelCreationForm({
 		}),
 	});
 
+	const values: IValues = {
+		channelName: '',
+		channelPassword: '',
+		channelType: 'Public',
+	};
+
+	async function handleSubmit(values: IValues) {
+		//TODO: Hash the password before sending it to the API.
+		const reqInit: RequestInit = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(values, null, 2),
+		};
+
+		fetch('', reqInit);
+		alert(JSON.stringify(values, null, 2));
+	}
+
 	return (
 		<div className="channel-creation-form">
 			<Formik
-				initialValues={{
-					channelName: '',
-					channelPassword: '',
-					channelType: 'Public',
-				}}
+				initialValues={values}
 				validationSchema={validation}
-				onSubmit={() => {
-					alert('lol');
-				}}
+				onSubmit={handleSubmit}
 			>
 				{({ isSubmitting, values }) => (
 					<Form className="channel-creation-form">
@@ -57,7 +81,7 @@ export default function ChannelCreationForm({
 							label="Channel name"
 							id="channelName"
 							name="channelName"
-							helpText="Can contains only alphabetic characters"
+							helpText="Can contains only alphabetic characters separated by one space"
 							type="text"
 						/>
 						{values.channelType === 'Password Protected' && (
@@ -71,7 +95,7 @@ export default function ChannelCreationForm({
 								/>
 							</>
 						)}
-						Channel type
+						<h4>Channel type</h4>
 						<div role="group" aria-labelledby="channel-type-radio">
 							<label>
 								<Field
@@ -97,6 +121,9 @@ export default function ChannelCreationForm({
 								/>
 								Password Protected
 							</label>
+						</div>
+						<div className="help-text">
+							{msgMap.get(values.channelType)}
 						</div>
 						<div className="creation-form-btns">
 							<Button onClick={() => setter(false)}>Back</Button>
