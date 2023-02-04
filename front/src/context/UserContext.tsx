@@ -22,6 +22,8 @@ interface IUserContext {
 		};
 		setCreatingUser: (user: any) => void;
 		changeName: (name: string) => void;
+		twoFaStatus: boolean | null;
+		setTwoFaStatus: (status: boolean) => void;
 	};
 	updateUser: () => void;
 	getAccessToken: () => Promise<string>;
@@ -39,6 +41,7 @@ export const UserContext = React.createContext<IUserContext>(
 
 function UserContextProvider(props: any) {
 	const infoBoxContext = useContext(InfoBoxContext);
+  
 	const [logged, setLogged] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [updating, setUpdating] = useState(true);
@@ -49,6 +52,8 @@ function UserContextProvider(props: any) {
 		name: '',
 		profile_picture: '',
 	});
+	const [twoFaStatus, setTwoFaStatus] = useState<boolean | null>(null);
+  
 	useWebSocket(WS_URL, {
 		share: true,
 		onError: (event) => {
@@ -204,6 +209,8 @@ function UserContextProvider(props: any) {
 					creatingUser,
 					setCreatingUser,
 					changeName,
+					twoFaStatus,
+					setTwoFaStatus,
 				},
 				logout,
 				updateUser,

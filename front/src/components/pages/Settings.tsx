@@ -6,7 +6,6 @@ import TwoFaInput from './auth/TwoFaInput';
 import Loader from '../global/Loader';
 
 function Settings() {
-	const [twoFaStatus, setTwoFaStatus] = useState(false);
 	const [finished, setFinished] = useState(false);
 	const [reset, setReset] = useState(false);
 	const [error, setError] = useState('|');
@@ -29,10 +28,10 @@ function Settings() {
 					return res.json();
 				})
 				.then((data) => {
-					setTwoFaStatus(data.enabled);
+					userContext.auth.setTwoFaStatus(data.enabled);
 				});
 		}
-		fetchStatus();
+		if (userContext.auth.twoFaStatus === null) fetchStatus();
 	}, []);
 
 	async function disableTwoFa() {
@@ -50,7 +49,7 @@ function Settings() {
 				return 'Success';
 			})
 			.then((_) => {
-				setTwoFaStatus(false);
+				userContext.auth.setTwoFaStatus(false);
 			});
 	}
 
@@ -92,7 +91,7 @@ function Settings() {
 			})
 			.then((data) => {
 				if (data.result === 'activated') {
-					setTwoFaStatus(true);
+					userContext.auth.setTwoFaStatus(true);
 					setQrcode('');
 					setFinished(false);
 					setError('|');
@@ -113,7 +112,7 @@ function Settings() {
 	return (
 		<div className="settings">
 			<h1>Settings</h1>
-			{twoFaStatus ? (
+			{userContext.auth.twoFaStatus ? (
 				<div className="set-twoFa">
 					<h2>Two factor authentication</h2>
 					<p>Two factor authentication is enabled.</p>
