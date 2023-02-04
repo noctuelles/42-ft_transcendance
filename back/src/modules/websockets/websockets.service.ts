@@ -80,6 +80,7 @@ export class WebsocketsService {
 		if (actions) {
 			actions.forEach((action) => action());
 		}
+		if (!socket.user) return;
 		await this.prismaService.user.update({
 			where: { id: socket.user.id },
 			data: { status: 'OFFLINE' },
