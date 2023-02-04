@@ -189,4 +189,71 @@ export class UsersService {
 			...user.profile,
 		};
 	}
+
+	async fetchRanking() {
+		const dbUsers = await this.prismaService.user.findMany({
+			include: {
+				profile: {
+					select: {
+						xp: true,
+						picture: true,
+						elo: true,
+					},
+				},
+			},
+		});
+		let users = dbUsers.map((user) => ({
+			id: user.id,
+			name: user.name,
+			picture: user.profile.picture,
+			xp: user.profile.xp,
+			elo: user.profile.elo,
+		}));
+		return users.sort((a, b) => b.elo - a.elo);
+		return users;
+	}
+
+	async fetchFriendsRanking(user) {
+		const searcher = await this.prismaService.user.findUnique({
+			where: {
+				id: user.id,
+			},
+			include: {
+				friends: true,
+				profile: {
+					select: {
+						xp: true,
+						picture: true,
+						elo: true,
+					},
+				},
+			},
+		});
+		let dbUsers = await this.prismaService.user.findMany({
+			where: {
+				id: {
+					in: searcher.friends.map((f) => f.id),
+				},
+			},
+			include: {
+				profile: {
+					select: {
+						xp: true,
+						picture: true,
+						elo: true,
+					},
+				},
+			},
+		});
+		dbUsers.push(searcher);
+		let users = dbUsers.map((user) => ({
+			id: user.id,
+			name: user.name,
+			picture: user.profile.picture,
+			xp: user.profile.xp,
+			elo: user.profile.elo,
+		}));
+		users.sort((a, b) => b.elo - a.elo);
+		return users;
+	}
 }

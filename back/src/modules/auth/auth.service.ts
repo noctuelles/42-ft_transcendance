@@ -1,5 +1,10 @@
 import { LoggedUser } from '42.js/dist/structures/logged_user';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	forwardRef,
+	Inject,
+	Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { UsersService } from '../users/users.service';
@@ -17,6 +22,7 @@ type UserWithProfile = Prisma.UserGetPayload<{
 @Injectable()
 export class AuthService {
 	constructor(
+		@Inject(forwardRef(() => UsersService))
 		private readonly userService: UsersService,
 		private readonly prismaService: PrismaService,
 		private readonly jwtService: JwtService,

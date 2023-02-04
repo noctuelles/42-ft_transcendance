@@ -30,7 +30,10 @@ export class Game {
 
 	private _gameState: IGameState;
 
-	private _bounce: number = 0;
+	private _bounceP1: number = 0;
+	private _bounceP2: number = 0;
+	private _portalsUsedP1: number = 0;
+	private _portalsUsedP2: number = 0;
 
 	private onEnd: () => void;
 
@@ -64,6 +67,7 @@ export class Game {
 		}
 		this._sendToPlayers('match-starting', { time: this._startCounter });
 		this._status = GameStatus.PLAYING;
+		this._setPlayersStatus('PLAYING');
 		this._gameStartTime = new Date();
 		this._game();
 	}
@@ -112,6 +116,7 @@ export class Game {
 		if (this._gameStartTime) {
 			this._registerGame(otherPlayer, leaved);
 		}
+		this._setPlayersStatus('ONLINE');
 		this.onEnd();
 	}
 
@@ -120,6 +125,26 @@ export class Game {
 			setTimeout(() => {
 				resolve();
 			}, ms);
+		});
+	}
+
+	async _setPlayersStatus(status: 'ONLINE' | 'PLAYING') {
+		await this._prismaService.user.updateMany({
+			where: {
+				OR: [
+					{ id: this._player1Profile.user.id },
+					{ id: this._player2Profile.user.id },
+				],
+			},
+			data: { status: status },
+		});
+		this._websocketsService.broadcast('user-status', {
+			id: this._player1Profile.user.id,
+			status: status,
+		});
+		this._websocketsService.broadcast('user-status', {
+			id: this._player2Profile.user.id,
+			status: status,
 		});
 	}
 
@@ -187,12 +212,10 @@ export class Game {
 		if (ball.position.y < ballRadius) {
 			ball.position.y = ballRadius;
 			ball.direction.y *= -1;
-			this._bounce++;
 		}
 		if (ball.position.y > this._gameState.gameInfos.height - ballRadius) {
 			ball.position.y = this._gameState.gameInfos.height - ballRadius;
 			ball.direction.y *= -1;
-			this._bounce++;
 		}
 	}
 
@@ -255,40 +278,43 @@ export class Game {
 				width: paddleWidth,
 				height: 2,
 			};
+			let res = false;
 			if (this._checkColide(ballColide, paddleFrontUpCollideZone)) {
 				ball.direction.x *= -1;
 				ball.direction.y -= GameParams.BALL_PERTURBATOR;
-				this._bounce++;
 				ball.velocity += GameParams.BALL_SPEED_INCREASE;
 				this._disableCollision(ball);
+				res = true;
 			} else if (
 				this._checkColide(ballColide, paddleFrontMiddleCollideZone)
 			) {
 				ball.direction.x *= -1;
-				this._bounce++;
 				ball.velocity += GameParams.BALL_SPEED_INCREASE;
 				this._disableCollision(ball);
+				res = true;
 			} else if (
 				this._checkColide(ballColide, paddleFrontDownCollideZone)
 			) {
 				ball.direction.x *= -1;
 				ball.direction.y += GameParams.BALL_PERTURBATOR;
-				this._bounce++;
 				ball.velocity += GameParams.BALL_SPEED_INCREASE;
 				this._disableCollision(ball);
+				res = true;
 			} else if (this._checkColide(ballColide, paddleTopCollideZone)) {
 				ball.direction.x *= -1;
 				ball.direction.y *= -1;
-				this._bounce++;
 				this._disableCollision(ball);
+				res = true;
 			} else if (this._checkColide(ballColide, paddleBottomCollideZone)) {
 				ball.direction.x *= -1;
 				ball.direction.y *= -1;
-				this._bounce++;
 				this._disableCollision(ball);
-			} else if (ball.velocity > GameParams.BALL_MAX_SPEED) {
+				res = true;
+			}
+			if (ball.velocity > GameParams.BALL_MAX_SPEED) {
 				ball.velocity = GameParams.BALL_MAX_SPEED;
 			}
+			return res;
 		}
 	}
 
@@ -321,6 +347,11 @@ export class Game {
 				ball.position.x = portal.link.center.x;
 				ball.position.y = portal.link.center.y;
 				this._setBallInvunlerableToPortal(ball);
+				if (ball.direction.x > 0) {
+					this._portalsUsedP1++;
+				} else {
+					this._portalsUsedP2++;
+				}
 			}
 		}
 	}
@@ -341,20 +372,28 @@ export class Game {
 		ball.position.x += ball.direction.x * ball.velocity;
 		ball.position.y += ball.direction.y * ball.velocity;
 		this._checkBallCollideWall(ball, ballRadius);
-		this._checkBallCollidePaddle(
-			ball,
-			ballRadius,
-			this._gameState.player1.paddle,
-			this._gameState.gameInfos.paddleWidth,
-			this._gameState.gameInfos.paddleHeight,
-		);
-		this._checkBallCollidePaddle(
-			ball,
-			ballRadius,
-			this._gameState.player2.paddle,
-			this._gameState.gameInfos.paddleWidth,
-			this._gameState.gameInfos.paddleHeight,
-		);
+		if (
+			this._checkBallCollidePaddle(
+				ball,
+				ballRadius,
+				this._gameState.player1.paddle,
+				this._gameState.gameInfos.paddleWidth,
+				this._gameState.gameInfos.paddleHeight,
+			)
+		) {
+			this._bounceP1++;
+		}
+		if (
+			this._checkBallCollidePaddle(
+				ball,
+				ballRadius,
+				this._gameState.player2.paddle,
+				this._gameState.gameInfos.paddleWidth,
+				this._gameState.gameInfos.paddleHeight,
+			)
+		) {
+			this._bounceP2++;
+		}
 		this._gameState.portals.forEach((portal) => {
 			this._checkBallCollidePortal(ball, ballRadius, portal);
 		});
@@ -490,7 +529,8 @@ export class Game {
 							eloAtBeg: user1.profile.elo,
 							eloEarned: isUser1Winner ? eloChange : -eloChange,
 							winner: isUser1Winner,
-							bounces: this._bounce, //TODO: separate user1/user2 bounces
+							bounces: this._bounceP1,
+							portalsUsed: this._portalsUsedP1,
 						},
 					},
 					userTwo: {
@@ -502,7 +542,8 @@ export class Game {
 							eloAtBeg: user2.profile.elo,
 							eloEarned: isUser2Winner ? eloChange : -eloChange,
 							winner: isUser2Winner,
-							bounces: this._bounce, //TODO: separate user1/user2 bounces
+							bounces: this._bounceP2,
+							portalsUsed: this._portalsUsedP2,
 						},
 					},
 				},

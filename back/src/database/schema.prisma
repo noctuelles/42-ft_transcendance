@@ -85,13 +85,14 @@ model UserOnMatch {
     user   User @relation(fields: [userId], references: [id])
     userId Int
 
-    score     Int      @default(0)
-    xpAtBeg   Int
-    xpEarned  Int
-    eloAtBeg  Int
-    eloEarned Int
-    winner    Boolean?
-    bounces   Int      @default(0)
+    score       Int      @default(0)
+    xpAtBeg     Int
+    xpEarned    Int
+    eloAtBeg    Int
+    eloEarned   Int
+    winner      Boolean?
+    bounces     Int      @default(0)
+    portalsUsed Int      @default(0)
 
     asUserOne Match? @relation("userOne")
     asUserTwo Match? @relation("userTwo")

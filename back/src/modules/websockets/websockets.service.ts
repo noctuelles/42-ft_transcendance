@@ -50,6 +50,14 @@ export class WebsocketsService {
 				socket.close();
 				return;
 			}
+			await this.prismaService.user.update({
+				where: { id: user.id },
+				data: { status: 'ONLINE' },
+			});
+			this.sendToAll(this._sockets, 'user-status', {
+				id: user.id,
+				status: 'ONLINE',
+			});
 			socket['user'] = user;
 			this._sockets.push(socket);
 		} catch (e) {
@@ -66,12 +74,21 @@ export class WebsocketsService {
 		]);
 	}
 
-	unregisterSocket(socket) {
+	async unregisterSocket(socket) {
 		this._sockets = this._sockets.filter((s) => s !== socket);
 		const actions = this._socketsOnClose.get(socket);
 		if (actions) {
 			actions.forEach((action) => action());
 		}
+		if (!socket.user) return;
+		await this.prismaService.user.update({
+			where: { id: socket.user.id },
+			data: { status: 'OFFLINE' },
+		});
+		this.broadcast('user-status', {
+			id: socket.user.id,
+			status: 'OFFLINE',
+		});
 	}
 
 	send(client: any, event: string, data: any) {
