@@ -6,14 +6,14 @@ import InfoBox from './components/global/InfoBox';
 
 function App() {
 	return (
-		<UserContextProvider>
-			<InfoBoxContextProvider>
+		<InfoBoxContextProvider>
+			<UserContextProvider>
 				<MessagesContextProvider>
 					<InfoBox />
 					<AppRouter />
 				</MessagesContextProvider>
-			</InfoBoxContextProvider>
-		</UserContextProvider>
+			</UserContextProvider>
+		</InfoBoxContextProvider>
 	);
 }
 

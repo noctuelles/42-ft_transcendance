@@ -67,6 +67,7 @@ export class Game {
 		}
 		this._sendToPlayers('match-starting', { time: this._startCounter });
 		this._status = GameStatus.PLAYING;
+		this._setPlayersStatus('PLAYING');
 		this._gameStartTime = new Date();
 		this._game();
 	}
@@ -115,6 +116,7 @@ export class Game {
 		if (this._gameStartTime) {
 			this._registerGame(otherPlayer, leaved);
 		}
+		this._setPlayersStatus('ONLINE');
 		this.onEnd();
 	}
 
@@ -123,6 +125,26 @@ export class Game {
 			setTimeout(() => {
 				resolve();
 			}, ms);
+		});
+	}
+
+	async _setPlayersStatus(status: 'ONLINE' | 'PLAYING') {
+		await this._prismaService.user.updateMany({
+			where: {
+				OR: [
+					{ id: this._player1Profile.user.id },
+					{ id: this._player2Profile.user.id },
+				],
+			},
+			data: { status: status },
+		});
+		this._websocketsService.broadcast('user-status', {
+			id: this._player1Profile.user.id,
+			status: status,
+		});
+		this._websocketsService.broadcast('user-status', {
+			id: this._player2Profile.user.id,
+			status: status,
 		});
 	}
 
