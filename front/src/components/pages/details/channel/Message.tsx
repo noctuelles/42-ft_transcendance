@@ -9,7 +9,7 @@ interface IProps {
 const Message = ({ from, content, self }: IProps) => {
 	return (
 		<li className={self ? 'self' : 'other'}>
-			{self && <div className="notch"></div>}
+			{self && <div className="notch" />}
 			<div className="message">
 				<address>{from}</address>
 				<p>{content}</p>

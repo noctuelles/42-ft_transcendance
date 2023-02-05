@@ -27,6 +27,9 @@
 
 .self .notch {
 	order: 2;
+	border: 8px solid var(--blue-primary-color);
+	border-bottom-color: transparent;
+	border-right-color: transparent;
 }
 
 .self {
@@ -47,19 +50,8 @@
 	font-size: 0.8rem;
 }
 
-.self .notch::after {
-	content: '';
-	display: inline-block;
-	position: relative;
-	bottom: 2px;
-	width: 0px;
-	height: 0px;
-	border: 8px solid var(--blue-primary-color);
-	border-right-color: transparent;
-	border-bottom-color: transparent;
-}
-
 .message {
+	margin: 0;
 	padding: 10px;
 	background-color: lightgray;
 	box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.12);
