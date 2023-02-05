@@ -25,7 +25,7 @@ interface IUserContext {
 		twoFaStatus: boolean | null;
 		setTwoFaStatus: (status: boolean) => void;
 	};
-	updateUser: () => void;
+	updateUser: () => Promise<string>;
 	getAccessToken: () => Promise<string>;
 	logout: () => void;
 	user: {
@@ -94,10 +94,10 @@ function UserContextProvider(props: any) {
 		},
 	});
 
-	async function refreshToken(): Promise<boolean> {
+	async function refreshToken(): Promise<string> {
 		const refresh_token = Cookies.get('transcendance_session_cookie');
 		if (!refresh_token) {
-			return false;
+			return '';
 		} else {
 			return fetch(back_url + '/auth/refresh', {
 				method: 'POST',
@@ -134,35 +134,38 @@ function UserContextProvider(props: any) {
 						);
 					} else {
 						Cookies.remove('transcendance_session_cookie');
-						return false;
+						return '';
 					}
-					return true;
+					return data.access_token.token;
 				})
 				.catch((err) => {
-					return false;
+					return '';
 				});
 		}
 	}
 
 	async function updateUser() {
 		setUpdating(true);
+		let token = access_token;
 		if (access_token === '') {
-			if ((await refreshToken()) === false) {
+			token = await refreshToken();
+			if (token === '') {
 				setLogged(false);
 				setUser({ id: -1, name: '', profile_picture: '' });
 				setAccessToken('');
 				setUpdating(false);
-				return;
+				return '';
 			}
 		} else {
 			let decode: any = jwtDecode(access_token);
-			if (decode.exp < Date.now() / 1000) {
-				if ((await refreshToken()) === false) {
+			if (decode.exp < Date.now() / 1000 - 60) {
+				token = await refreshToken();
+				if (token === '') {
 					setLogged(false);
 					setUser({ id: -1, name: '', profile_picture: '' });
 					setAccessToken('');
 					setUpdating(false);
-					return;
+					return '';
 				}
 			}
 			setUser({
@@ -172,11 +175,12 @@ function UserContextProvider(props: any) {
 			});
 		}
 		setUpdating(false);
+		return token;
 	}
 
 	async function getAccessToken() {
-		await updateUser();
-		return access_token;
+		const token = await updateUser();
+		return token;
 	}
 
 	function changeName(name: string) {
