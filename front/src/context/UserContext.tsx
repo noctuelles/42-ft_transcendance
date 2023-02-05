@@ -25,7 +25,7 @@ interface IUserContext {
 		twoFaStatus: boolean | null;
 		setTwoFaStatus: (status: boolean) => void;
 	};
-	updateUser: () => void;
+	updateUser: () => Promise<string>;
 	getAccessToken: () => Promise<string>;
 	logout: () => void;
 	user: {
@@ -41,7 +41,7 @@ export const UserContext = React.createContext<IUserContext>(
 
 function UserContextProvider(props: any) {
 	const infoBoxContext = useContext(InfoBoxContext);
-  
+
 	const [logged, setLogged] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [updating, setUpdating] = useState(true);
@@ -53,7 +53,7 @@ function UserContextProvider(props: any) {
 		profile_picture: '',
 	});
 	const [twoFaStatus, setTwoFaStatus] = useState<boolean | null>(null);
-  
+
 	useWebSocket(WS_URL, {
 		share: true,
 		onError: (event) => {
@@ -66,7 +66,11 @@ function UserContextProvider(props: any) {
 			});
 		},
 		onClose: (event) => {
-			if (event.code !== 1001 && event.code !== 1000) {
+			if (
+				event.code !== 1001 &&
+				event.code !== 1000 &&
+				event.code !== 1005
+			) {
 				setUpdating(true);
 				setUser({ id: -1, name: '', profile_picture: '' });
 				infoBoxContext.addInfo({
@@ -77,20 +81,26 @@ function UserContextProvider(props: any) {
 			}
 		},
 		reconnectAttempts: 3,
-		reconnectInterval: 5000,
+		reconnectInterval: 6000,
 		shouldReconnect: (closeEvent) => {
-			if (closeEvent.code === 1001 || closeEvent.code === 1000) {
+			if (
+				closeEvent.code === 1001 ||
+				closeEvent.code === 1000 ||
+				closeEvent.code === 1005
+			) {
 				return false;
 			}
-			console.log('reconnect');
 			return true;
+		},
+		onOpen: () => {
+			updateUser();
 		},
 	});
 
-	async function refreshToken(): Promise<boolean> {
+	async function refreshToken(): Promise<string> {
 		const refresh_token = Cookies.get('transcendance_session_cookie');
 		if (!refresh_token) {
-			return false;
+			return '';
 		} else {
 			return fetch(back_url + '/auth/refresh', {
 				method: 'POST',
@@ -127,35 +137,38 @@ function UserContextProvider(props: any) {
 						);
 					} else {
 						Cookies.remove('transcendance_session_cookie');
-						return false;
+						return '';
 					}
-					return true;
+					return data.access_token.token;
 				})
 				.catch((err) => {
-					return false;
+					return '';
 				});
 		}
 	}
 
 	async function updateUser() {
 		setUpdating(true);
+		let token = access_token;
 		if (access_token === '') {
-			if ((await refreshToken()) === false) {
+			token = await refreshToken();
+			if (token === '') {
 				setLogged(false);
 				setUser({ id: -1, name: '', profile_picture: '' });
 				setAccessToken('');
 				setUpdating(false);
-				return;
+				return '';
 			}
 		} else {
 			let decode: any = jwtDecode(access_token);
 			if (decode.exp < Date.now() / 1000) {
-				if ((await refreshToken()) === false) {
+				token = await refreshToken();
+				if (token === '') {
 					setLogged(false);
 					setUser({ id: -1, name: '', profile_picture: '' });
 					setAccessToken('');
 					setUpdating(false);
-					return;
+					return '';
 				}
 			}
 			setUser({
@@ -165,11 +178,12 @@ function UserContextProvider(props: any) {
 			});
 		}
 		setUpdating(false);
+		return token;
 	}
 
 	async function getAccessToken() {
-		await updateUser();
-		return access_token;
+		const token = await updateUser();
+		return token;
 	}
 
 	function changeName(name: string) {

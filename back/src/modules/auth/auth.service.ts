@@ -168,7 +168,7 @@ export class AuthService {
 						},
 					})
 				) {
-					await this.prismaService.authIdentifier.delete({
+					await this.prismaService.authIdentifier.deleteMany({
 						where: {
 							identifier: token.identifier,
 						},
@@ -263,11 +263,21 @@ export class AuthService {
 			) {
 				throw new BadRequestException('Invalid refresh token');
 			}
-			await this.prismaService.authIdentifier.delete({
-				where: {
-					identifier: decode.identifier,
-				},
-			});
+			await Promise.all([
+				this.prismaService.authIdentifier.deleteMany({
+					where: {
+						identifier: decode.identifier,
+					},
+				}),
+				this.prismaService.user.update({
+					where: {
+						id: decode.user.id,
+					},
+					data: {
+						status: 'OFFLINE',
+					},
+				}),
+			]);
 		} catch (e) {
 			throw new BadRequestException('Invalid refresh token');
 		}

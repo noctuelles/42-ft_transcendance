@@ -1,7 +1,7 @@
 import { RankingType } from '../pages/Social';
 import '@/style/social/Ranking.css';
 import RankingElement from './RankingElement';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { back_url } from '@/config.json';
 import Loader from '../global/Loader';
 import { UserContext } from '@/context/UserContext';
@@ -21,6 +21,7 @@ export interface IUserRanking {
 function Ranking(props: IRankingProps) {
 	const userContext = useContext(UserContext);
 	const [ranking, setRanking] = useState<IUserRanking[]>([]);
+	const fetching = useRef(false);
 
 	useEffect(() => {
 		setRanking([]);
@@ -42,9 +43,13 @@ function Ranking(props: IRankingProps) {
 				.then((res) => res.json())
 				.then((data) => {
 					setRanking(data);
+					fetching.current = false;
 				});
 		}
-		fetchRanking();
+		if (!fetching.current) {
+			fetchRanking();
+			fetching.current = true;
+		}
 	}, [props.rankingType]);
 
 	return (
