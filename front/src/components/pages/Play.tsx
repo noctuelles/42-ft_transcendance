@@ -71,10 +71,12 @@ const Play = () => {
 					type: InfoType.ERROR,
 					message: 'You left the game and lost',
 				});
+			}
+			if (stateRef.current == GameState.MATCHMAKING) {
 				sendMessage(
 					JSON.stringify({
 						event: 'matchmaking',
-						data: { action: 'leave' },
+						data: { action: 'cancel' },
 					}),
 				);
 			}
