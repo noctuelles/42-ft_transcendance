@@ -92,6 +92,9 @@ function UserContextProvider(props: any) {
 			}
 			return true;
 		},
+		onOpen: () => {
+			updateUser();
+		},
 	});
 
 	async function refreshToken(): Promise<string> {
@@ -158,7 +161,7 @@ function UserContextProvider(props: any) {
 			}
 		} else {
 			let decode: any = jwtDecode(access_token);
-			if (decode.exp < Date.now() / 1000 - 60) {
+			if (decode.exp < Date.now() / 1000) {
 				token = await refreshToken();
 				if (token === '') {
 					setLogged(false);
