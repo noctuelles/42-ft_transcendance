@@ -1,0 +1,76 @@
+:root {
+	--message-border-radius: 20px;
+}
+
+.other .message {
+	order: 1;
+	background-color: var(--yellow-primary-color);
+	border-top-right-radius: var(--message-border-radius);
+	border-bottom-right-radius: var(--message-border-radius);
+	border-bottom-left-radius: var(--message-border-radius);
+}
+
+.other .message address {
+	text-align: left;
+	font-size: 0.8rem;
+}
+
+.other::before {
+	content: '';
+	position: relative;
+	width: 0px;
+	height: 0px;
+	border: 8px solid var(--yellow-primary-color);
+	border-left-color: transparent;
+	border-bottom-color: transparent;
+}
+
+.self .notch {
+	order: 2;
+}
+
+.self {
+	justify-content: flex-end;
+	align-items: flex-start;
+}
+
+.self .message {
+	order: 1;
+	background-color: var(--blue-primary-color);
+	border-top-left-radius: var(--message-border-radius);
+	border-bottom-left-radius: var(--message-border-radius);
+	border-bottom-right-radius: var(--message-border-radius);
+}
+
+.self .message address {
+	text-align: right;
+	font-size: 0.8rem;
+}
+
+.self .notch::after {
+	content: '';
+	display: inline-block;
+	position: relative;
+	bottom: 2px;
+	width: 0px;
+	height: 0px;
+	border: 8px solid var(--blue-primary-color);
+	border-right-color: transparent;
+	border-bottom-color: transparent;
+}
+
+.message {
+	padding: 10px;
+	background-color: lightgray;
+	box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.12);
+}
+
+.self .message address::after {
+	content: '\01F464';
+	margin: 5px;
+}
+
+.other .message address::before {
+	content: '\01F464';
+	margin: 5px;
+}
