@@ -1,42 +1,81 @@
-nav {
+.navbar {
+	position: fixed;
 	display: flex;
-	border: 2px solid;
-	border-radius: 30px;
-	margin-top: 20px;
-	margin-bottom: 20px;
-	padding-left: 5%;
-	padding-right: 1em;
+	height: var(--navbar-size);
+	width: 100%;
 
 	justify-content: space-between;
-	box-shadow: 0px 0px 2px black;
 	align-items: center;
 	background-color: lightgray;
+
+	-webkit-box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.41);
+	box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.41);
 }
 
-.navLinks {
+.navbar-logo {
 	display: flex;
-	margin: 0;
+	align-items: center;
+	padding-right: 10px;
+}
+
+.navbar-logo span {
+	font-size: 1.1rem;
+	text-align: left;
+}
+
+.navbar-logo .logo-portal {
+	width: 64px;
+	height: 54px;
+	transform: rotate(25deg);
+	fill: var(--blue-primary-color);
+	animation: glow-logo 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-logo {
+	0% {
+		-webkit-filter: drop-shadow(2px 12px 5px #48dafe8f);
+		filter: drop-shadow(2px 12px 7px #48dafe8f);
+		fill: #34b9db;
+	}
+	100% {
+		-webkit-filter: drop-shadow(-2px 12px 5px #1d91ae8f);
+		filter: drop-shadow(2px 10px 5px #1d91ae8f);
+		fill: #138fae;
+	}
+}
+
+.navbar-nav {
 	list-style: none;
+	display: flex;
+	align-items: center;
+	gap: 50px;
 }
 
-.navLinks a {
-	color: black;
+.nav-link {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	justify-content: space-evenly;
 	text-decoration: none;
-	font-size: 30px;
-
-	-o-transition: 0.3s;
-	-ms-transition: 0.3s;
-	-moz-transition: 0.3s;
-	-webkit-transition: 0.3s;
-	transition: 0.3s;
 }
 
-.navLinks a:hover {
-	font-size: 31px;
+.nav-link svg {
+	width: 40px;
+	height: 40px;
 }
 
-.navItem {
-	margin: 10px;
+.nav-item {
+	transition: transform 0.3s;
+}
+
+.nav-item:hover {
+	transform: scale(105%);
+}
+
+.nav-link span {
+	font-size: 1.3rem;
+	color: black;
+	letter-spacing: 0.03rem;
 }
 
 .navRight {

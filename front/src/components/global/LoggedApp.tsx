@@ -25,8 +25,13 @@ function LoggedApp() {
 				</div>
 			) : (
 				<div className="app">
-					<NavBar />
-					<Outlet />
+					<header>
+						<NavBar />
+					</header>
+					<main>
+						<Outlet />
+					</main>
+					<footer></footer>
 				</div>
 			)}
 		</div>
