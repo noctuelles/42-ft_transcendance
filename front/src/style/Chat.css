@@ -5,12 +5,14 @@
 .chat-page {
 	/* Center the chat page */
 	margin: auto;
-	height: 500px;
+	height: 700px;
+	width: 1200px;
 	display: flex;
 	border: 1px solid black;
 }
 
 .chat-page-left-side {
+	min-width: 20%;
 	text-align: center;
 	border-right: 1px solid black;
 	background-color: lightgray;
@@ -18,22 +20,24 @@
 }
 
 .chat-page-center {
+	min-width: 60%;
 }
 
 .chat-page-right-side {
+	min-width: 20%;
 	text-align: center;
 	border-left: 1px solid black;
 	background-color: lightgray;
 }
 
 .chat-container {
-	height: 100%;
 	margin: 0;
+	height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
 	list-style: none;
 	background: lightgray;
-	padding: 0 0 60px 0;
+	padding: 10px 0 60px 0;
 }
 
 .chat-container li {

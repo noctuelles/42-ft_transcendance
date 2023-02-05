@@ -28,7 +28,7 @@ export default function ChannelCreationForm({
 			.max(25, '25 characters or less')
 			.min(10, 'At least 10 characters')
 			.required('Requiered')
-			.matches(/^ ?[a-zA-Z]+(?: [a-zA-Z]+)*$/i, 'Invalid channel name'),
+			.matches(/^[a-zA-Z]+(?: [a-zA-Z]+)*$/i, 'Invalid channel name'),
 		channelType: Yup.string().required('Requiered'),
 		channelPassword: Yup.string().when('channelType', {
 			is: 'Password Protected',
