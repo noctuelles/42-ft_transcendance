@@ -32,6 +32,11 @@
 	color: rgb(170, 94, 17);
 }
 
+.ranking-users a {
+	text-decoration: none;
+	color: black;
+}
+
 .ranking-element {
 	display: flex;
 	flex-direction: row;
