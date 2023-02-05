@@ -41,7 +41,7 @@ export const UserContext = React.createContext<IUserContext>(
 
 function UserContextProvider(props: any) {
 	const infoBoxContext = useContext(InfoBoxContext);
-  
+
 	const [logged, setLogged] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [updating, setUpdating] = useState(true);
@@ -53,7 +53,7 @@ function UserContextProvider(props: any) {
 		profile_picture: '',
 	});
 	const [twoFaStatus, setTwoFaStatus] = useState<boolean | null>(null);
-  
+
 	useWebSocket(WS_URL, {
 		share: true,
 		onError: (event) => {
@@ -66,7 +66,11 @@ function UserContextProvider(props: any) {
 			});
 		},
 		onClose: (event) => {
-			if (event.code !== 1001 && event.code !== 1000) {
+			if (
+				event.code !== 1001 &&
+				event.code !== 1000 &&
+				event.code !== 1005
+			) {
 				setUpdating(true);
 				setUser({ id: -1, name: '', profile_picture: '' });
 				infoBoxContext.addInfo({
@@ -77,12 +81,15 @@ function UserContextProvider(props: any) {
 			}
 		},
 		reconnectAttempts: 3,
-		reconnectInterval: 5000,
+		reconnectInterval: 6000,
 		shouldReconnect: (closeEvent) => {
-			if (closeEvent.code === 1001 || closeEvent.code === 1000) {
+			if (
+				closeEvent.code === 1001 ||
+				closeEvent.code === 1000 ||
+				closeEvent.code === 1005
+			) {
 				return false;
 			}
-			console.log('reconnect');
 			return true;
 		},
 	});
