@@ -7,7 +7,7 @@ function NavBar(props: any) {
 	const userContext = React.useContext(UserContext);
 
 	return (
-		<nav className="navBar">
+		<nav>
 			<ul className="navLinks">
 				<li className="navItem">
 					<Link to="/">Play</Link>
