@@ -17,6 +17,8 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
+
+	--navbar-size: 50px;
 }
 
 html {
@@ -61,6 +63,13 @@ body {
 
 	--blue-primary-color: #17c0e9;
 	--yellow-primary-color: #ffb800;
+}
+
+main {
+	margin-top: calc(var(--navbar-size) + 30px);
+}
+
+footer {
 }
 
 .app {
