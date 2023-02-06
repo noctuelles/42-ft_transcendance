@@ -632,74 +632,42 @@ export class Game {
 			[AchievementType.STREAKER, AchievementType.MASTER_STREAKER],
 			0,
 		);
-		this._achievementsService.progressAchievement(
+		this._achievementsService.progressAchievements(
 			user1.profile.id,
-			AchievementType.BOUNCER,
+			[AchievementType.BOUNCER, AchievementType.PROFESIONAL_BOUNCER],
 			this._bounceP1,
 		);
-		this._achievementsService.progressAchievement(
-			user1.profile.id,
-			AchievementType.PROFESIONAL_BOUNCER,
-			this._bounceP1,
-		);
-		this._achievementsService.progressAchievement(
+		this._achievementsService.progressAchievements(
 			user2.profile.id,
-			AchievementType.BOUNCER,
+			[AchievementType.BOUNCER, AchievementType.PROFESIONAL_BOUNCER],
 			this._bounceP2,
 		);
-		this._achievementsService.progressAchievement(
-			user2.profile.id,
-			AchievementType.PROFESIONAL_BOUNCER,
-			this._bounceP2,
-		);
-		this._achievementsService.progressAchievement(
+		this._achievementsService.progressAchievements(
 			user1.profile.id,
-			AchievementType.PORTALS_USER,
+			[AchievementType.PORTALS_USER, AchievementType.PORTALS_ADDICT],
 			this._portalsUsedP1,
 		);
-		this._achievementsService.progressAchievement(
-			user1.profile.id,
-			AchievementType.PORTALS_ADDICT,
-			this._portalsUsedP1,
-		);
-		this._achievementsService.progressAchievement(
+		this._achievementsService.progressAchievements(
 			user2.profile.id,
-			AchievementType.PORTALS_USER,
+			[AchievementType.PORTALS_USER, AchievementType.PORTALS_ADDICT],
 			this._portalsUsedP2,
 		);
-		this._achievementsService.progressAchievement(
-			user2.profile.id,
-			AchievementType.PORTALS_ADDICT,
-			this._portalsUsedP2,
-		);
-		this._achievementsService.setAchievement(
+		this._achievementsService.setAchievements(
 			winner.profile.user.profile.id,
-			AchievementType.CHAMPION,
+			[
+				AchievementType.CHAMPION,
+				AchievementType.MASTER,
+				AchievementType.LEGEND,
+			],
 			winner.profile.user.profile.elo + eloChange,
 		);
-		this._achievementsService.setAchievement(
+		this._achievementsService.setAchievements(
 			loser.profile.user.profile.id,
-			AchievementType.CHAMPION,
-			winner.profile.user.profile.elo - eloChange,
-		);
-		this._achievementsService.setAchievement(
-			winner.profile.user.profile.id,
-			AchievementType.MASTER,
-			winner.profile.user.profile.elo + eloChange,
-		);
-		this._achievementsService.setAchievement(
-			loser.profile.user.profile.id,
-			AchievementType.MASTER,
-			winner.profile.user.profile.elo - eloChange,
-		);
-		this._achievementsService.setAchievement(
-			winner.profile.user.profile.id,
-			AchievementType.LEGEND,
-			winner.profile.user.profile.elo + eloChange,
-		);
-		this._achievementsService.setAchievement(
-			loser.profile.user.profile.id,
-			AchievementType.LEGEND,
+			[
+				AchievementType.CHAMPION,
+				AchievementType.MASTER,
+				AchievementType.LEGEND,
+			],
 			winner.profile.user.profile.elo - eloChange,
 		);
 		if (timeInSeconds > GameParams.GAME_TIME) {
