@@ -71,9 +71,7 @@ body {
 
 main {
 	margin-top: var(--navbar-size);
-}
-
-footer {
+	height: 95vh;
 }
 
 .app {
