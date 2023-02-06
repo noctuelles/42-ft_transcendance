@@ -11,7 +11,7 @@ export interface IAchievement {
 }
 
 function generateAchievmentCdnUrl(imageName: string) {
-	return `${process.env.SELF_URL}/cdn/achievments/${imageName}`;
+	return `${process.env.SELF_URL}/cdn/achievements/${imageName}`;
 }
 
 export const achievmentsList: IAchievement[] = [
@@ -96,10 +96,10 @@ export const achievmentsList: IAchievement[] = [
 		xpEarned: 100,
 	},
 	{
-		type: AchievementType.PROFESIONAL_BOUNCER,
-		name: 'Profesional Bouncer',
+		type: AchievementType.PROFFESIONAL_BOUNCER,
+		name: 'Proffesional Bouncer',
 		description: 'Make a total of 500 bounce on your paddle',
-		image: generateAchievmentCdnUrl('profesional_bouncer.svg'),
+		image: generateAchievmentCdnUrl('proffesional_bouncer.svg'),
 		neededProgress: 500,
 		xpEarned: 200,
 	},

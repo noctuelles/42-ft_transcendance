@@ -634,12 +634,12 @@ export class Game {
 		);
 		this._achievementsService.progressAchievements(
 			user1.profile.id,
-			[AchievementType.BOUNCER, AchievementType.PROFESIONAL_BOUNCER],
+			[AchievementType.BOUNCER, AchievementType.PROFFESIONAL_BOUNCER],
 			this._bounceP1,
 		);
 		this._achievementsService.progressAchievements(
 			user2.profile.id,
-			[AchievementType.BOUNCER, AchievementType.PROFESIONAL_BOUNCER],
+			[AchievementType.BOUNCER, AchievementType.PROFFESIONAL_BOUNCER],
 			this._bounceP2,
 		);
 		this._achievementsService.progressAchievements(

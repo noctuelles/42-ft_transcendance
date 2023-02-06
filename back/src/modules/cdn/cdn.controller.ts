@@ -15,7 +15,7 @@ export class CdnController {
 		}
 	}
 
-	@Get('achievments/:name')
+	@Get('achievements/:name')
 	async achievment(@Param('name') name: string, @Res() res) {
 		const imgPath = `./public/cdn/achievments/${name}`;
 		if (fs.existsSync(imgPath)) {
