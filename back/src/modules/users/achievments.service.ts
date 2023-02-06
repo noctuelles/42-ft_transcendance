@@ -64,4 +64,44 @@ export class AchievementsService {
 			data,
 		});
 	}
+
+	async setAchievement(
+		userProfileId: number,
+		type: AchievementType,
+		value: number,
+	) {
+		const achievments = await this.prismaService.userAchievement.findMany({
+			where: {
+				userProfileId,
+				type,
+			},
+		});
+		if (achievments.length !== 1) {
+			throw new NotFoundException('Achievement not found');
+		}
+		const achievement = achievments[0];
+		if (value > achievement.progress) {
+			let data = {
+				progress: {
+					set: value,
+				},
+				bestProgress: {
+					set: Math.max(achievement.bestProgress, value),
+				},
+			};
+			if (
+				!achievement.unlocked &&
+				value >= this.getAchievment(type).neededProgress
+			) {
+				data['unlocked'] = true;
+				data['unlockedAt'] = new Date();
+			}
+			await this.prismaService.userAchievement.update({
+				where: {
+					id: achievement.id,
+				},
+				data,
+			});
+		}
+	}
 }
