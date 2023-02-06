@@ -3,6 +3,7 @@ import '@/style/global/Button.css';
 const Button = (props: any) => {
 	return (
 		<button
+			{...props}
 			className="btn"
 			type={props.type}
 			onClick={props.onClick}

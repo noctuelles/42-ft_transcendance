@@ -1,10 +1,11 @@
-import { Controller, Patch, Body, UseGuards } from '@nestjs/common';
+import { Controller, Patch, Body, UseGuards, Post } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
 import { User } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { JoinChannelDTO } from './JoinChannel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
+import { CreateChannelValidationPipe } from './validation.pipe';
 
 @Controller('chat')
 export class ChatController {

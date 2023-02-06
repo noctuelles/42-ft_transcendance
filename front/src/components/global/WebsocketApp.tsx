@@ -58,7 +58,10 @@ function WebsocketApp() {
 		<div className="app">
 			<NavBar />
 			<MessagesContextProvider>
-				<Outlet />
+				<main>
+					<Outlet />
+				</main>
+				<footer></footer>
 			</MessagesContextProvider>
 		</div>
 	);

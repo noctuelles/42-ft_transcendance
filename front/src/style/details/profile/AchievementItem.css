@@ -1,16 +1,14 @@
 .achievement-item-container {
-	overflow: hidden;
 	padding: 5px;
-	max-width: 260px;
+	overflow: hidden;
+	max-width: 250px;
 	border: solid 1.5px black;
 	border-radius: 10px;
 	box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.71);
-	margin: 15px;
 }
 
 .achievement-item-container h3 {
 	margin: 0;
-	text-align: center;
 }
 
 .achievement-item-container hr {
@@ -19,20 +17,18 @@
 
 .achievement-item-top {
 	display: flex;
-	flex-wrap: wrap;
+	flex-shrink: 1;
 	align-items: center;
-	justify-content: space-evenly;
 }
 
 .achievement-item-top img {
 	margin: 5px 8px 5px 5px;
 	width: 50px;
 	height: 50px;
-	border-radius: 25px;
 }
 
 .achievement-item-top p {
-	text-align: center;
+	text-align: left;
 }
 
 .achievement-item-bottom {
