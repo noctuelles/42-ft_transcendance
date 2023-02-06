@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AchievementsService } from '../users/achievments.service';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { Game } from './Game.class';
 import { GameType } from './Game.interfaces';
@@ -13,6 +14,7 @@ export class GameService {
 	constructor(
 		private readonly websocketsService: WebsocketsService,
 		private readonly prismaService: PrismaService,
+		private readonly achievementsService: AchievementsService,
 	) {}
 
 	private _treatQueue(queue, type: GameType) {
@@ -37,6 +39,7 @@ export class GameService {
 				{ socket: player2, user: player2.user },
 				this.websocketsService,
 				this.prismaService,
+				this.achievementsService,
 				type,
 			);
 			this.games.push(game);

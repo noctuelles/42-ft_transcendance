@@ -6,6 +6,7 @@ import {
 import { AchievementMap } from './Data';
 import AchievementItem from './AchievementItem';
 import '@/style/details/profile/AchievementTable.css';
+import { JsxElement } from 'typescript';
 
 interface AchievementTableProps {
 	profile: ProfileData;
@@ -28,58 +29,17 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 		</div>
 	);
 
-	//TODO: remove this if forest.
-	function mapProfileValueToAchievement(target: ProfileDataTarget): number {
-		if (target === ProfileDataTarget.PROFILE_MATCH)
-			return profile.wonMatches + profile.lostMatches;
-		else if (target == ProfileDataTarget.PROFILE_MATCH_WON)
-			return profile.wonMatches;
-		return 0;
-	}
-
 	function generateAchievementItem() {
-		const unlockedAchievementType: string[] = profile.achievements.map(
-			(achievement) => achievement.type,
-		);
+		let unlockedAchievement: any[] = [];
+		let lockedAchievement: any[] = [];
 
-		const lockedAchievementType: string[] = Object.values(
-			AchievementType,
-		).filter((s) => !unlockedAchievementType.includes(s));
-
-		const unlockedAchievement = profile.achievements.map(
-			(achievementData) => {
-				const profileAchievement = AchievementMap.get(
-					achievementData.type,
-				)!;
-				return (
-					<AchievementItem
-						key={profileAchievement.title}
-						unlocked={true}
-						unlockedDate={new Date(achievementData.unlockedAt)}
-						progress={mapProfileValueToAchievement(
-							profileAchievement.data,
-						)}
-						threeshold={profileAchievement.threeshold}
-						achievement={profileAchievement}
-					/>
-				);
-			},
-		);
-
-		const lockedAchievement = lockedAchievementType.map((type) => {
-			const profileAchievement = AchievementMap.get(type.toString())!;
-
-			return (
-				<AchievementItem
-					key={profileAchievement.title}
-					unlocked={false}
-					progress={mapProfileValueToAchievement(
-						profileAchievement.data,
-					)}
-					threeshold={profileAchievement.threeshold}
-					achievement={profileAchievement}
-				/>
-			);
+		profile.achievements.forEach((a) => {
+			const elem = <AchievementItem key={a.id} achievement={a} />;
+			if (a.unlocked) {
+				unlockedAchievement.push(elem);
+			} else {
+				lockedAchievement.push(elem);
+			}
 		});
 
 		return [unlockedAchievement, lockedAchievement];

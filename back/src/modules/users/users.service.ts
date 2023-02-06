@@ -3,6 +3,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Match } from '@prisma/client';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
+import { achievmentsList } from './achievments.interface';
+import { AchievementsService } from './achievments.service';
 const fs = require('fs');
 
 interface ICreatingUser {
@@ -17,7 +19,10 @@ interface IMatchData {}
 export class UsersService {
 	private creatingUsers: ICreatingUser[] = [];
 
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly achievmentsService: AchievementsService,
+	) {}
 
 	async isUserWithLogin(login: string) {
 		const user = await this.prismaService.user.findUnique({
@@ -84,7 +89,7 @@ export class UsersService {
 				() => {},
 			);
 		}
-		return await this.prismaService.user.create({
+		const createdUser = await this.prismaService.user.create({
 			data: {
 				login: user.login,
 				name: user.name,
@@ -98,11 +103,13 @@ export class UsersService {
 				profile: true,
 			},
 		});
+		this.achievmentsService.initAchievements(createdUser.profile.id);
+		return createdUser;
 	}
 
 	//TODO: Remove this function
 	async createDevUser(name: string) {
-		await this.prismaService.user.create({
+		const user = await this.prismaService.user.create({
 			data: {
 				login: name,
 				name: name,
@@ -113,7 +120,11 @@ export class UsersService {
 					},
 				},
 			},
+			include: {
+				profile: true,
+			},
 		});
+		this.achievmentsService.initAchievements(user.profile.id);
 	}
 
 	//TODO: AuthGuard.
@@ -181,12 +192,40 @@ export class UsersService {
 
 		user.profile.wonMatches;
 		if (!user) return null;
+		const achievements = user.profile.achievements
+			.map((a) => {
+				const achievement = this.achievmentsService.getAchievment(
+					a.type,
+				);
+				return {
+					id: a.id,
+					name: achievement.name,
+					description: achievement.description,
+					image: achievement.image,
+					progress: a.bestProgress,
+					objective: achievement.neededProgress,
+					unlocked: a.unlocked,
+					unlockedAt: a.unlockedAt,
+					type: a.type,
+				};
+			})
+			.sort(
+				(a, b) =>
+					achievmentsList.indexOf(
+						this.achievmentsService.getAchievment(a.type),
+					) -
+					achievmentsList.indexOf(
+						this.achievmentsService.getAchievment(b.type),
+					),
+			);
+
 		return {
 			matches: user.matches.map((match) =>
 				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
 			),
 			name: user.name,
 			...user.profile,
+			achievements,
 		};
 	}
 

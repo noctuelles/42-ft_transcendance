@@ -14,4 +14,16 @@ export class CdnController {
 			});
 		}
 	}
+
+	@Get('achievements/:name')
+	async achievment(@Param('name') name: string, @Res() res) {
+		const imgPath = `./public/cdn/achievments/${name}`;
+		if (fs.existsSync(imgPath)) {
+			return res.sendFile(imgPath, { root: './' });
+		} else {
+			return res.sendFile('default.svg', {
+				root: 'public/cdn/achievments',
+			});
+		}
+	}
 }
