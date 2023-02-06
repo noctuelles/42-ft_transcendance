@@ -9,6 +9,6 @@ import { GameService } from './game.service';
 	imports: [UsersModule, WebsocketsModule, PrismaModule],
 	controllers: [],
 	providers: [GameGateway, GameService],
-	exports: [],
+	exports: [GameService],
 })
 export class GameModule {}

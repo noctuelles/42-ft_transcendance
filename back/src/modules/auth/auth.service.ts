@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from './DTO/CreateUserDTO';
 import { Prisma } from '@prisma/client';
 import { TwoFAService } from './TwoFA.service';
+import { GameService } from '../game/game.service';
 
 type UserWithProfile = Prisma.UserGetPayload<{
 	include: {
@@ -27,6 +28,7 @@ export class AuthService {
 		private readonly prismaService: PrismaService,
 		private readonly jwtService: JwtService,
 		private readonly twoFAService: TwoFAService,
+		private readonly gameService: GameService,
 	) {}
 
 	/*
@@ -263,6 +265,7 @@ export class AuthService {
 			) {
 				throw new BadRequestException('Invalid refresh token');
 			}
+			this.gameService.leaveGameById(decode.user.id);
 			await Promise.all([
 				this.prismaService.authIdentifier.deleteMany({
 					where: {

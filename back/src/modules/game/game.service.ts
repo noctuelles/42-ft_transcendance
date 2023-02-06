@@ -88,4 +88,10 @@ export class GameService {
 		if (!game) return;
 		game.leave(socket.user.id);
 	}
+
+	leaveGameById(userId: number) {
+		const game = this.getGameWherePlayerIs(userId);
+		if (!game) return;
+		game.leave(userId);
+	}
 }

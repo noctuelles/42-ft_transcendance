@@ -1,6 +1,5 @@
 import {
 	OnGatewayConnection,
-	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer,
 } from '@nestjs/websockets';
@@ -20,7 +19,9 @@ export class WebsocketGateway implements OnGatewayConnection {
 	}
 
 	async handleConnection(socket) {
-		await this.websocketsService.registerSocket(socket);
+		setTimeout(async () => {
+			await this.websocketsService.registerSocket(socket);
+		}, 200);
 	}
 
 	async handleDisconnect(socket) {

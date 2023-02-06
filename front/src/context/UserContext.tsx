@@ -1,10 +1,7 @@
 import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { back_url } from '@/config.json';
-import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
-import { ws_url as WS_URL } from '@/config.json';
-import { InfoBoxContext, InfoType } from './InfoBoxContext';
 
 interface IUserContext {
 	auth: {
@@ -33,6 +30,7 @@ interface IUserContext {
 		name: string;
 		profile_picture: string;
 	};
+	setUser: (user: any) => void;
 }
 
 export const UserContext = React.createContext<IUserContext>(
@@ -40,8 +38,6 @@ export const UserContext = React.createContext<IUserContext>(
 );
 
 function UserContextProvider(props: any) {
-	const infoBoxContext = useContext(InfoBoxContext);
-
 	const [logged, setLogged] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [updating, setUpdating] = useState(true);
@@ -53,49 +49,6 @@ function UserContextProvider(props: any) {
 		profile_picture: '',
 	});
 	const [twoFaStatus, setTwoFaStatus] = useState<boolean | null>(null);
-
-	useWebSocket(WS_URL, {
-		share: true,
-		onError: (event) => {
-			setUpdating(true);
-			setUser({ id: -1, name: '', profile_picture: '' });
-			infoBoxContext.addInfo({
-				type: InfoType.ERROR,
-				message:
-					'Impossible to join backend. You can try again in a few seconds',
-			});
-		},
-		onClose: (event) => {
-			if (
-				event.code !== 1001 &&
-				event.code !== 1000 &&
-				event.code !== 1005
-			) {
-				setUpdating(true);
-				setUser({ id: -1, name: '', profile_picture: '' });
-				infoBoxContext.addInfo({
-					type: InfoType.ERROR,
-					message:
-						'Connection with backend lost. You can try again in a few seconds',
-				});
-			}
-		},
-		reconnectAttempts: 3,
-		reconnectInterval: 6000,
-		shouldReconnect: (closeEvent) => {
-			if (
-				closeEvent.code === 1001 ||
-				closeEvent.code === 1000 ||
-				closeEvent.code === 1005
-			) {
-				return false;
-			}
-			return true;
-		},
-		onOpen: () => {
-			updateUser();
-		},
-	});
 
 	async function refreshToken(): Promise<string> {
 		const refresh_token = Cookies.get('transcendance_session_cookie');
@@ -230,6 +183,7 @@ function UserContextProvider(props: any) {
 				updateUser,
 				getAccessToken,
 				user: user,
+				setUser,
 			}}
 		>
 			{props.children}
