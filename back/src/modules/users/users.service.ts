@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Match } from '@prisma/client';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
+import { AchievementsService } from './achievments.service';
 const fs = require('fs');
 
 interface ICreatingUser {
@@ -17,7 +18,10 @@ interface IMatchData {}
 export class UsersService {
 	private creatingUsers: ICreatingUser[] = [];
 
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly achievmentsService: AchievementsService,
+	) {}
 
 	async isUserWithLogin(login: string) {
 		const user = await this.prismaService.user.findUnique({
@@ -84,7 +88,7 @@ export class UsersService {
 				() => {},
 			);
 		}
-		return await this.prismaService.user.create({
+		const createdUser = await this.prismaService.user.create({
 			data: {
 				login: user.login,
 				name: user.name,
@@ -98,11 +102,13 @@ export class UsersService {
 				profile: true,
 			},
 		});
+		this.achievmentsService.initAchievements(createdUser.profile.id);
+		return createdUser;
 	}
 
 	//TODO: Remove this function
 	async createDevUser(name: string) {
-		await this.prismaService.user.create({
+		const user = await this.prismaService.user.create({
 			data: {
 				login: name,
 				name: name,
@@ -113,7 +119,11 @@ export class UsersService {
 					},
 				},
 			},
+			include: {
+				profile: true,
+			},
 		});
+		this.achievmentsService.initAchievements(user.profile.id);
 	}
 
 	//TODO: AuthGuard.

@@ -74,7 +74,8 @@ model UserAchievement {
     type          AchievementType
     progress      Int             @default(0)
     bestProgress  Int             @default(0)
-    unlockedAt    DateTime
+    unlocked      Boolean         @default(false)
+    unlockedAt    DateTime?
     UserProfile   UserProfile     @relation(fields: [userProfileId], references: [id])
     userProfileId Int
 }

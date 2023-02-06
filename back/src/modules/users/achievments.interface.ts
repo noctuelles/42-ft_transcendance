@@ -7,14 +7,15 @@ export interface IAchievement {
 	image: string;
 	neededProgress: number;
 	xpEarned: number;
+	defaultProgress?: number;
 }
 
 function generateAchievmentCdnUrl(imageName: string) {
 	return `${process.env.SELF_URL}/cdn/achievements/${imageName}}`;
 }
 
-export const achievmentsList = {
-	[AchievementType.NEW_SUBJECT]: {
+export const achievmentsList: IAchievement[] = [
+	{
 		type: AchievementType.NEW_SUBJECT,
 		name: 'New Subject',
 		description: 'Win your first game',
@@ -22,7 +23,7 @@ export const achievmentsList = {
 		neededProgress: 1,
 		xpEarned: 25,
 	},
-	[AchievementType.WHEATLEY]: {
+	{
 		type: AchievementType.WHEATLEY,
 		name: 'Wheatley',
 		description: 'Play 20 games',
@@ -30,7 +31,7 @@ export const achievmentsList = {
 		neededProgress: 20,
 		xpEarned: 100,
 	},
-	[AchievementType.P_BODY]: {
+	{
 		type: AchievementType.P_BODY,
 		name: 'P-Body',
 		description: 'Play 50 games',
@@ -38,7 +39,7 @@ export const achievmentsList = {
 		neededProgress: 50,
 		xpEarned: 300,
 	},
-	[AchievementType.GLADOS]: {
+	{
 		type: AchievementType.GLADOS,
 		name: 'GLaDOS',
 		description: 'Play 100 games',
@@ -46,7 +47,7 @@ export const achievmentsList = {
 		neededProgress: 100,
 		xpEarned: 500,
 	},
-	[AchievementType.APPRENTICE]: {
+	{
 		type: AchievementType.APPRENTICE,
 		name: 'Apprentice',
 		description: 'Win 10 games',
@@ -54,7 +55,7 @@ export const achievmentsList = {
 		neededProgress: 10,
 		xpEarned: 150,
 	},
-	[AchievementType.LEARNER]: {
+	{
 		type: AchievementType.LEARNER,
 		name: 'Learner',
 		description: 'Win 25 games',
@@ -62,7 +63,7 @@ export const achievmentsList = {
 		neededProgress: 25,
 		xpEarned: 300,
 	},
-	[AchievementType.EXPERT]: {
+	{
 		type: AchievementType.EXPERT,
 		name: 'Expert',
 		description: 'Win 50 games',
@@ -70,7 +71,7 @@ export const achievmentsList = {
 		neededProgress: 50,
 		xpEarned: 500,
 	},
-	[AchievementType.STREAKER]: {
+	{
 		type: AchievementType.STREAKER,
 		name: 'Streaker',
 		description: 'Win 5 games in a row',
@@ -78,7 +79,7 @@ export const achievmentsList = {
 		neededProgress: 5,
 		xpEarned: 200,
 	},
-	[AchievementType.MASTER_STREAKER]: {
+	{
 		type: AchievementType.MASTER_STREAKER,
 		name: 'Master Streaker',
 		description: 'Win 10 games in a row',
@@ -86,7 +87,7 @@ export const achievmentsList = {
 		neededProgress: 10,
 		xpEarned: 500,
 	},
-	[AchievementType.BOUNCER]: {
+	{
 		type: AchievementType.BOUNCER,
 		name: 'Bouncer',
 		description: 'Make a total of 200 bounce on your paddle',
@@ -94,7 +95,7 @@ export const achievmentsList = {
 		neededProgress: 200,
 		xpEarned: 100,
 	},
-	[AchievementType.PROFESIONAL_BOUNCER]: {
+	{
 		type: AchievementType.PROFESIONAL_BOUNCER,
 		name: 'Profesional Bouncer',
 		description: 'Make a total of 500 bounce on your paddle',
@@ -102,31 +103,34 @@ export const achievmentsList = {
 		neededProgress: 500,
 		xpEarned: 200,
 	},
-	[AchievementType.CHAMPION]: {
+	{
 		type: AchievementType.CHAMPION,
 		name: 'Champion',
 		description: 'Have an ELO of 1250 or more',
 		image: generateAchievmentCdnUrl('champion.svg'),
 		neededProgress: 1250,
 		xpEarned: 200,
+		defaultProgress: 1000,
 	},
-	[AchievementType.MASTER]: {
+	{
 		type: AchievementType.MASTER,
 		name: 'Master',
 		description: 'Have an ELO of 1500 or more',
 		image: generateAchievmentCdnUrl('master.svg'),
 		neededProgress: 1500,
 		xpEarned: 500,
+		defaultProgress: 1000,
 	},
-	[AchievementType.LEGEND]: {
+	{
 		type: AchievementType.LEGEND,
 		name: 'Legend',
 		description: 'Have an ELO of 1750 or more',
 		image: generateAchievmentCdnUrl('legend.svg'),
 		neededProgress: 1750,
 		xpEarned: 1000,
+		defaultProgress: 1000,
 	},
-	[AchievementType.PORTALS_USER]: {
+	{
 		type: AchievementType.PORTALS_USER,
 		name: 'Portals User',
 		description: 'Use portals 10 times',
@@ -134,7 +138,7 @@ export const achievmentsList = {
 		neededProgress: 10,
 		xpEarned: 100,
 	},
-	[AchievementType.PORTALS_ADDICT]: {
+	{
 		type: AchievementType.PORTALS_ADDICT,
 		name: 'Portals Addict',
 		description: 'Use portals 50 times',
@@ -142,7 +146,7 @@ export const achievmentsList = {
 		neededProgress: 50,
 		xpEarned: 300,
 	},
-	[AchievementType.ENDURANT]: {
+	{
 		type: AchievementType.ENDURANT,
 		name: 'Endurant',
 		description: 'Reach the prolongations',
@@ -150,7 +154,7 @@ export const achievmentsList = {
 		neededProgress: 1,
 		xpEarned: 100,
 	},
-	[AchievementType.SEMI_MARATHON]: {
+	{
 		type: AchievementType.SEMI_MARATHON,
 		name: 'Semi-Marathon',
 		description: 'Make a unique game of 10 minutes or more',
@@ -158,7 +162,7 @@ export const achievmentsList = {
 		neededProgress: 1,
 		xpEarned: 500,
 	},
-	[AchievementType.MARATHON]: {
+	{
 		type: AchievementType.MARATHON,
 		name: 'Marathon',
 		description: 'Make a unique game of 20 minutes or more',
@@ -166,4 +170,4 @@ export const achievmentsList = {
 		neededProgress: 1,
 		xpEarned: 1000,
 	},
-};
+];
