@@ -4,10 +4,10 @@
 
 .chat-page {
 	/* Center the chat page */
-	margin: auto;
-	height: 700px;
-	width: 1200px;
 	display: flex;
+	margin-right: 2%;
+	margin-left: 2%;
+	height: 100%;
 	border: 1px solid black;
 }
 
