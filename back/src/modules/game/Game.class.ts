@@ -1,4 +1,5 @@
 import { AchievementType } from '@prisma/client';
+import { time } from 'console';
 import { PrismaService } from '../prisma/prisma.service';
 import { AchievementsService } from '../users/achievments.service';
 import { WebsocketsService } from '../websockets/websockets.service';
@@ -119,7 +120,10 @@ export class Game {
 		);
 		this._status = GameStatus.ABORTED;
 		if (this._gameStartTime) {
-			this._registerGame(otherPlayer, leaved);
+			const now = new Date();
+			const timePlayed = now.getTime() - this._gameStartTime.getTime();
+			const timeInSeconds = Math.floor(timePlayed / 1000);
+			this._registerGame(otherPlayer, leaved, timeInSeconds);
 		}
 		this._setPlayersStatus('ONLINE');
 		this.onEnd();
@@ -466,7 +470,7 @@ export class Game {
 			winner == this._gameState.player1
 				? this._gameState.player2
 				: this._gameState.player1;
-		this._registerGame(winner, loser);
+		this._registerGame(winner, loser, timeInSeconds);
 		const res = {
 			winner: {
 				id: winner.profile.user.id,
@@ -496,7 +500,11 @@ export class Game {
 		this.onEnd();
 	}
 
-	private async _registerGame(winner: IPlayer, loser: IPlayer) {
+	private async _registerGame(
+		winner: IPlayer,
+		loser: IPlayer,
+		timeInSeconds: number,
+	) {
 		const winnerXP = 50;
 		const loserXP = 0;
 		let eloChange = 0;
@@ -594,11 +602,137 @@ export class Game {
 				},
 			}),
 		);
-		this._achievementsService.progressAchievement(
+		this._achievementsService.progressAchievements(
 			winner.profile.user.profile.id,
-			AchievementType.NEW_SUBJECT,
+			[
+				AchievementType.NEW_SUBJECT,
+				AchievementType.WHEATLEY,
+				AchievementType.P_BODY,
+				AchievementType.GLADOS,
+				AchievementType.APPRENTICE,
+				AchievementType.LEARNER,
+				AchievementType.EXPERT,
+				AchievementType.STREAKER,
+				AchievementType.MASTER_STREAKER,
+			],
 			1,
 		);
+		this._achievementsService.progressAchievements(
+			loser.profile.user.profile.id,
+			[
+				AchievementType.NEW_SUBJECT,
+				AchievementType.WHEATLEY,
+				AchievementType.P_BODY,
+				AchievementType.GLADOS,
+			],
+			1,
+		);
+		this._achievementsService.setAchievements(
+			loser.profile.user.profile.id,
+			[AchievementType.STREAKER, AchievementType.MASTER_STREAKER],
+			0,
+		);
+		this._achievementsService.progressAchievement(
+			user1.profile.id,
+			AchievementType.BOUNCER,
+			this._bounceP1,
+		);
+		this._achievementsService.progressAchievement(
+			user1.profile.id,
+			AchievementType.PROFESIONAL_BOUNCER,
+			this._bounceP1,
+		);
+		this._achievementsService.progressAchievement(
+			user2.profile.id,
+			AchievementType.PROFESIONAL_BOUNCER,
+			this._bounceP2,
+		);
+		this._achievementsService.progressAchievement(
+			user1.profile.id,
+			AchievementType.PORTALS_USER,
+			this._portalsUsedP1,
+		);
+		this._achievementsService.progressAchievement(
+			user1.profile.id,
+			AchievementType.PORTALS_ADDICT,
+			this._portalsUsedP1,
+		);
+		this._achievementsService.progressAchievement(
+			user2.profile.id,
+			AchievementType.PORTALS_USER,
+			this._portalsUsedP2,
+		);
+		this._achievementsService.progressAchievement(
+			user2.profile.id,
+			AchievementType.PORTALS_ADDICT,
+			this._portalsUsedP2,
+		);
+		this._achievementsService.setAchievement(
+			winner.profile.user.profile.id,
+			AchievementType.CHAMPION,
+			winner.profile.user.profile.elo + eloChange,
+		);
+		this._achievementsService.setAchievement(
+			loser.profile.user.profile.id,
+			AchievementType.CHAMPION,
+			winner.profile.user.profile.elo - eloChange,
+		);
+		this._achievementsService.setAchievement(
+			winner.profile.user.profile.id,
+			AchievementType.MASTER,
+			winner.profile.user.profile.elo + eloChange,
+		);
+		this._achievementsService.setAchievement(
+			loser.profile.user.profile.id,
+			AchievementType.MASTER,
+			winner.profile.user.profile.elo - eloChange,
+		);
+		this._achievementsService.setAchievement(
+			winner.profile.user.profile.id,
+			AchievementType.LEGEND,
+			winner.profile.user.profile.elo + eloChange,
+		);
+		this._achievementsService.setAchievement(
+			loser.profile.user.profile.id,
+			AchievementType.LEGEND,
+			winner.profile.user.profile.elo - eloChange,
+		);
+		if (timeInSeconds > GameParams.GAME_TIME) {
+			this._achievementsService.setAchievement(
+				winner.profile.user.profile.id,
+				AchievementType.ENDURANT,
+				1,
+			);
+			this._achievementsService.setAchievement(
+				loser.profile.user.profile.id,
+				AchievementType.ENDURANT,
+				1,
+			);
+		}
+		if (timeInSeconds > 10 * 60) {
+			this._achievementsService.setAchievement(
+				winner.profile.user.profile.id,
+				AchievementType.SEMI_MARATHON,
+				1,
+			);
+			this._achievementsService.setAchievement(
+				loser.profile.user.profile.id,
+				AchievementType.SEMI_MARATHON,
+				1,
+			);
+		}
+		if (timeInSeconds > 20 * 60) {
+			this._achievementsService.setAchievement(
+				winner.profile.user.profile.id,
+				AchievementType.MARATHON,
+				1,
+			);
+			this._achievementsService.setAchievement(
+				loser.profile.user.profile.id,
+				AchievementType.MARATHON,
+				1,
+			);
+		}
 		await Promise.all(promises);
 	}
 }

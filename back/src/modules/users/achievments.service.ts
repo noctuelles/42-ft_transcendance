@@ -75,6 +75,16 @@ export class AchievementsService {
 		});
 	}
 
+	async progressAchievements(
+		userProfileId: number,
+		type: AchievementType[],
+		progress: number,
+	) {
+		type.forEach((type) => {
+			this.progressAchievement(userProfileId, type, progress);
+		});
+	}
+
 	async setAchievement(
 		userProfileId: number,
 		type: AchievementType,
@@ -123,5 +133,15 @@ export class AchievementsService {
 				data,
 			});
 		}
+	}
+
+	async setAchievements(
+		userProfileId: number,
+		type: AchievementType[],
+		value: number,
+	) {
+		type.forEach((type) => {
+			this.setAchievement(userProfileId, type, value);
+		});
 	}
 }
