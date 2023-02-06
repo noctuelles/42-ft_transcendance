@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Match } from '@prisma/client';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
+import { achievmentsList } from './achievments.interface';
 import { AchievementsService } from './achievments.service';
 const fs = require('fs');
 
@@ -190,13 +191,8 @@ export class UsersService {
 		});
 
 		if (!user) return null;
-		return {
-			matches: user.matches.map((match) =>
-				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
-			),
-			name: user.name,
-			...user.profile,
-			achievements: user.profile.achievements.map((a) => {
+		const achievements = user.profile.achievements
+			.map((a) => {
 				const achievement = this.achievmentsService.getAchievment(
 					a.type,
 				);
@@ -209,8 +205,26 @@ export class UsersService {
 					objective: achievement.neededProgress,
 					unlocked: a.unlocked,
 					unlockedAt: a.unlockedAt,
+					type: a.type,
 				};
-			}),
+			})
+			.sort(
+				(a, b) =>
+					achievmentsList.indexOf(
+						this.achievmentsService.getAchievment(a.type),
+					) -
+					achievmentsList.indexOf(
+						this.achievmentsService.getAchievment(b.type),
+					),
+			);
+
+		return {
+			matches: user.matches.map((match) =>
+				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
+			),
+			name: user.name,
+			...user.profile,
+			achievements,
 		};
 	}
 

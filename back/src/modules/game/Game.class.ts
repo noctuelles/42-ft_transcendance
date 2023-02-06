@@ -644,6 +644,11 @@ export class Game {
 		);
 		this._achievementsService.progressAchievement(
 			user2.profile.id,
+			AchievementType.BOUNCER,
+			this._bounceP2,
+		);
+		this._achievementsService.progressAchievement(
+			user2.profile.id,
 			AchievementType.PROFESIONAL_BOUNCER,
 			this._bounceP2,
 		);
