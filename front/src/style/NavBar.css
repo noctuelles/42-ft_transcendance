@@ -14,19 +14,20 @@
 
 .navbar-logo {
 	display: flex;
+	gap: 10px;
 	align-items: center;
 	padding-right: 10px;
 }
 
 .navbar-logo span {
-	font-size: 1.1rem;
-	text-align: left;
+	font-size: 1.7rem;
+	letter-spacing: 0.075em;
 }
 
 .navbar-logo .logo-portal {
-	width: 64px;
-	height: 54px;
-	transform: rotate(25deg);
+	width: calc(var(--navbar-size) + 5px);
+	height: calc(var(--navbar-size) + 5px);
+	transform: rotate(35deg);
 	fill: var(--blue-primary-color);
 	animation: glow-logo 2s ease-in-out infinite alternate;
 }
@@ -60,8 +61,8 @@
 }
 
 .nav-link svg {
-	width: 40px;
-	height: 40px;
+	width: calc(var(--navbar-size) / 1.5);
+	height: calc(var(--navbar-size) / 1.5);
 }
 
 .nav-item {
@@ -73,38 +74,35 @@
 }
 
 .nav-link span {
-	font-size: 1.3rem;
+	font-size: calc(var(--navbar-size) * 0.4);
 	color: black;
 	letter-spacing: 0.03rem;
 }
 
+.nav-profile {
+	color: black;
+	font-size: calc(var(--navbar-size) * 0.3);
+	text-decoration: underline;
+}
+
 .navRight {
 	display: flex;
+	gap: 10px;
 	align-items: center;
 }
 
 .navRight img {
-	margin-top: 3px;
-	margin-bottom: 3px;
-	border-radius: 30px;
-	width: 40px;
-	height: 40px;
-
-	-o-transition: 0.3s;
-	-ms-transition: 0.3s;
-	-moz-transition: 0.3s;
-	-webkit-transition: 0.3s;
-	transition: 0.3s;
+	border-radius: 20px;
+	width: calc(var(--navbar-size) / 1.2);
+	height: calc(var(--navbar-size) / 1.2);
+	box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.75) inset;
+	-moz-box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.75) inset;
+	-webkit-box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.75) inset;
 }
 
 .nav-logout {
-	margin-left: 10px;
-	border: solid 2px transparent;
+	background-color: transparent;
 	cursor: pointer;
-	background-color: var(--blue-primary-color);
+	border: none;
 	border-radius: 20px;
-}
-
-.nav-logout:hover {
-	border: solid 2px black;
 }
