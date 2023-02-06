@@ -10,7 +10,7 @@ import {
 import LoggedApp from '../global/LoggedApp';
 import Profile from '../pages/Profile';
 import Play from '../pages/Play';
-import Chat from '@/components/chat/Chat';
+import Chat from '@/components/pages/Chat';
 import Login from '../pages/auth/Login';
 import Social from '../pages/Social';
 import { back_url } from '../../config.json';

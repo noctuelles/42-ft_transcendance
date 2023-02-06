@@ -179,6 +179,7 @@ export class UsersService {
 			},
 		});
 
+		user.profile.wonMatches;
 		if (!user) return null;
 		return {
 			matches: user.matches.map((match) =>

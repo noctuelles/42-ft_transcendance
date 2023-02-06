@@ -4,6 +4,7 @@
 
 .profile-container {
 	border-radius: 20px;
+	margin: 0 4% 4% 4%;
 	background-color: lightgray;
 	padding: 1rem;
 	border: 2px solid;

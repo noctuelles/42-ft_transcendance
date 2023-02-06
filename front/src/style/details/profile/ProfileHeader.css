@@ -17,3 +17,19 @@
 	padding: 0.2em;
 	font-size: 0.7em;
 }
+
+.profile-header-searchbar {
+	display: flex;
+	align-items: flex-end;
+}
+
+.profile-header-searchbar button {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.profile-header-searchbar button svg {
+	width: 35px;
+	height: 35px;
+}

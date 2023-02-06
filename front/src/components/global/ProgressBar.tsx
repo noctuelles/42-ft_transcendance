@@ -10,26 +10,23 @@ interface ProgressBarProps {
 }
 
 const ProgressBar = (props: ProgressBarProps) => {
+	const containerStyle: React.CSSProperties = {
+		width: props.width ? props.width : '100%',
+		height: props.height ? props.height : '1.5rem',
+		backgroundColor: props.barColor ? props.barColor : 'darkgray',
+	};
+	const progressBarInnerStyle: React.CSSProperties = {
+		width: `${props.percent}%`,
+		backgroundColor: props.innerBarColor ? props.innerBarColor : '#3399ff',
+	};
+
 	return (
-		<div
-			className="progress-bar-container"
-			style={{
-				width: props.width ? props.width : '100%',
-				height: props.height ? props.height : '25px',
-				backgroundColor: props.barColor ? props.barColor : 'darkgray',
-			}}
-		>
+		<div className="progress-bar-container" style={containerStyle}>
 			<div
 				className="progress-bar-inner"
-				style={{
-					width: `${props.percent}%`,
-					backgroundColor: props.innerBarColor
-						? props.innerBarColor
-						: '#3399ff',
-				}}
-			>
-				<span className="progress-bar-text">{props.text}</span>
-			</div>
+				style={progressBarInnerStyle}
+				data-value={props.text}
+			></div>
 		</div>
 	);
 };

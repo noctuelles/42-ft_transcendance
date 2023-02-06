@@ -1,20 +1,24 @@
 .progress-bar-container {
+	position: relative;
 	display: flex;
-	flex-wrap: nowrap;
-	justify-content: flex-start;
-	width: 100%;
 
-	border-radius: 15px;
+	border-radius: 1em;
 	box-shadow: inset 0px 0px 15px 1px rgba(0, 0, 0, 0.92);
 }
 
 .progress-bar-inner {
+	max-width: 100%;
 	box-shadow: inset 0px 0px 10px 0px #000000;
-	border-radius: 15px;
+	border-radius: 1em;
 }
 
-.progress-bar-text {
+.progress-bar-inner::before {
+	display: flex;
+	align-items: center;
+	content: attr(data-value);
 	position: absolute;
 	left: 50%;
+	top: 0.5em;
+	bottom: 0.5em;
 	transform: translateX(-50%);
 }

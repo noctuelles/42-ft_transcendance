@@ -1,7 +1,6 @@
 import ProfileHeader from './details/profile/ProfileHeader';
 import MatchHistoryTable from './details/profile/MatchHistoryTable';
 import '@/style/Profile.css';
-import { UserContext } from '@/context/UserContext';
 import React, { useEffect, useState } from 'react';
 import Loader from '../global/Loader';
 import ProfileSummary from './details/profile/ProfileSummary';
