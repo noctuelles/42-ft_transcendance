@@ -27,11 +27,6 @@
 	background-color: transparent;
 	border: none;
 	cursor: pointer;
-	transition: transform 0.2s;
-}
-
-.profile-header-searchbar button:hover {
-	transform: scale(105%);
 }
 
 .profile-header-searchbar button svg {
