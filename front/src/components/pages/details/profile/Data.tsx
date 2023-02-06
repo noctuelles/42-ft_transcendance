@@ -14,7 +14,8 @@ export const AchievementMap = new Map<AchievementType, ProfileAchievement>([
 		{
 			title: 'New Subject',
 			img: NoviceBallIcon,
-			description: 'Win your first match',
+			description:
+				'Make a total of 200 bounces on your paddle lolololoqrichwerweerrul',
 			earnings: 10,
 			data: ProfileDataTarget.PROFILE_MATCH,
 			threeshold: 1,
@@ -25,7 +26,7 @@ export const AchievementMap = new Map<AchievementType, ProfileAchievement>([
 		{
 			title: 'Apprentice Juggler',
 			img: RegularBallIcon,
-			description: 'Play at least 10 match',
+			description: 'Play at lewerwewejirj  ewhrci',
 			earnings: 15,
 			data: ProfileDataTarget.PROFILE_MATCH,
 			threeshold: 10,
