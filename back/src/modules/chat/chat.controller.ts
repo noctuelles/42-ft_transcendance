@@ -5,7 +5,7 @@ import { User } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { JoinChannelDTO } from './JoinChannel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
-import {CreateChannelValidationPipe} from './validation.pipe';
+import { CreateChannelValidationPipe } from './validation.pipe';
 
 @Controller('chat')
 export class ChatController {
@@ -29,9 +29,4 @@ export class ChatController {
 			// TODO: Return error to tell why not allowed
 		}
 	}
-
-	@UseGuards(AuthGuard)
-	@UsePipes(new CreateChannelValidationPipe())
-	@Post('channel/create')
-	async createChannel(@Body() ) {}
 }

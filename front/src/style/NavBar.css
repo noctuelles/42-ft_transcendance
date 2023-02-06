@@ -1,8 +1,10 @@
 .navbar {
-	position: fixed;
+	position: sticky;
+	top: 0;
+	width: 100%;
 	display: flex;
 	height: var(--navbar-size);
-	width: 100%;
+	z-index: 100;
 
 	justify-content: space-between;
 	align-items: center;
