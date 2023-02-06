@@ -8,6 +8,7 @@ interface Props {
 	id: string;
 	type: string;
 	name: string;
+	placeholder?: string;
 }
 
 const TextField = ({ label, helpText, ...props }: Props) => {
