@@ -28,59 +28,18 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 		</div>
 	);
 
-	//TODO: remove this if forest.
-	function mapProfileValueToAchievement(target: ProfileDataTarget): number {
-		if (target === ProfileDataTarget.PROFILE_MATCH)
-			return profile.wonMatches + profile.lostMatches;
-		else if (target == ProfileDataTarget.PROFILE_MATCH_WON)
-			return profile.wonMatches;
-		return 0;
-	}
-
 	function generateAchievementItem() {
-		const unlockedAchievementType: string[] = profile.achievements.map(
-			(achievement) => achievement.type,
-		);
+		const unlockedAchievement = profile.achievements
+			.filter((a) => a.unlocked)
+			.map((a) => {
+				return <AchievementItem key={a.id} achievement={a} />;
+			});
 
-		const lockedAchievementType: string[] = Object.values(
-			AchievementType,
-		).filter((s) => !unlockedAchievementType.includes(s));
-
-		const unlockedAchievement = profile.achievements.map(
-			(achievementData) => {
-				const profileAchievement = AchievementMap.get(
-					achievementData.type,
-				)!;
-				return (
-					<AchievementItem
-						key={profileAchievement.title}
-						unlocked={true}
-						unlockedDate={new Date(achievementData.unlockedAt)}
-						progress={mapProfileValueToAchievement(
-							profileAchievement.data,
-						)}
-						threeshold={profileAchievement.threeshold}
-						achievement={profileAchievement}
-					/>
-				);
-			},
-		);
-
-		const lockedAchievement = lockedAchievementType.map((type) => {
-			const profileAchievement = AchievementMap.get(type.toString())!;
-
-			return (
-				<AchievementItem
-					key={profileAchievement.title}
-					unlocked={false}
-					progress={mapProfileValueToAchievement(
-						profileAchievement.data,
-					)}
-					threeshold={profileAchievement.threeshold}
-					achievement={profileAchievement}
-				/>
-			);
-		});
+		const lockedAchievement = profile.achievements
+			.filter((a) => !a.unlocked)
+			.map((a) => {
+				return <AchievementItem key={a.id} achievement={a} />;
+			});
 
 		return [unlockedAchievement, lockedAchievement];
 	}

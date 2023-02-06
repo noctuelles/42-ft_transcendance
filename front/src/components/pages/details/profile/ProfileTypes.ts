@@ -18,8 +18,13 @@ export interface UserMatchData {
 
 export interface ProfileAchievementData {
 	id: number;
-	type: AchievementType;
-	unlockedAt: string;
+	name: string;
+	description: string;
+	image: string;
+	progress: number;
+	objective: number;
+	unlocked: boolean;
+	unlockedAt: Date;
 }
 
 export interface ProfileMatchData {
@@ -57,14 +62,4 @@ export enum AchievementType {
 export enum MatchType {
 	FUN = 'FUN',
 	RANKED = 'RANKED',
-}
-
-export interface ProfileAchievement {
-	achieveAt?: Date;
-	title: string;
-	img: object;
-	description: string;
-	earnings: number;
-	data: ProfileDataTarget;
-	threeshold: number;
 }
