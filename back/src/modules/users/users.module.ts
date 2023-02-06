@@ -9,6 +9,6 @@ import { UsersService } from './users.service';
 	imports: [PrismaModule, forwardRef(() => AuthModule)],
 	controllers: [UsersController],
 	providers: [UsersService, AchievementsService],
-	exports: [UsersService],
+	exports: [UsersService, AchievementsService],
 })
 export class UsersModule {}

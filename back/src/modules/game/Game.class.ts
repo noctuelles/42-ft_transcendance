@@ -1,4 +1,6 @@
+import { AchievementType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AchievementsService } from '../users/achievments.service';
 import { WebsocketsService } from '../websockets/websockets.service';
 import {
 	convertStateToSendable,
@@ -19,6 +21,7 @@ import {
 export class Game {
 	private _websocketsService: WebsocketsService;
 	private _prismaService: PrismaService;
+	private _achievementsService: AchievementsService;
 
 	private _player1Profile: IProfile;
 	private _player2Profile: IProfile;
@@ -42,12 +45,14 @@ export class Game {
 		player2Profile: IProfile,
 		websocketsService: WebsocketsService,
 		prismaService: PrismaService,
+		achievementsService: AchievementsService,
 		type: GameType,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
 		this._websocketsService = websocketsService;
 		this._prismaService = prismaService;
+		this._achievementsService = achievementsService;
 		this._type = type;
 		this._gameState = getDefaultGameState(
 			player1Profile,
@@ -588,6 +593,11 @@ export class Game {
 					},
 				},
 			}),
+		);
+		this._achievementsService.progressAchievement(
+			winner.profile.user.profile.id,
+			AchievementType.NEW_SUBJECT,
+			1,
 		);
 		await Promise.all(promises);
 	}
