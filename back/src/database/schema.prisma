@@ -72,6 +72,8 @@ model UserProfile {
 model UserAchievement {
     id            Int             @id @default(autoincrement())
     type          AchievementType
+    progress      Int             @default(0)
+    bestProgress  Int             @default(0)
     unlockedAt    DateTime
     UserProfile   UserProfile     @relation(fields: [userProfileId], references: [id])
     userProfileId Int
@@ -120,8 +122,24 @@ enum MatchType {
 
 enum AchievementType {
     NEW_SUBJECT
-    APPRENTICE_JUGGLER
-    DAUTING_SUBJECT
+    WHEATLEY
+    P_BODY
+    GLADOS
+    APPRENTICE
+    LEARNER
+    EXPERT
+    STREAKER
+    MASTER_STREAKER
+    BOUNCER
+    PROFESIONAL_BOUNCER
+    CHAMPION
+    MASTER
+    LEGEND
+    PORTALS_USER
+    PORTALS_ADDICT
+    ENDURANT
+    SEMI_MARATHON
+    MARATHON
 }
 
 enum UserStatus {
