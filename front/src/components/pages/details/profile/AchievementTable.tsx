@@ -19,7 +19,7 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 		<div className="achievements-table">
 			<h2>
 				{`Achievements (${unlockedAchievement.length}/${
-					Object.values(AchievementType).length
+					unlockedAchievement.length + lockedAchievement.length
 				})`}
 			</h2>
 			<hr />
