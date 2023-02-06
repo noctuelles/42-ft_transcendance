@@ -11,7 +11,7 @@ export interface IAchievement {
 }
 
 function generateAchievmentCdnUrl(imageName: string) {
-	return `${process.env.SELF_URL}/cdn/achievements/${imageName}}`;
+	return `${process.env.SELF_URL}/cdn/achievments/${imageName}`;
 }
 
 export const achievmentsList: IAchievement[] = [

@@ -196,6 +196,21 @@ export class UsersService {
 			),
 			name: user.name,
 			...user.profile,
+			achievements: user.profile.achievements.map((a) => {
+				const achievement = this.achievmentsService.getAchievment(
+					a.type,
+				);
+				return {
+					id: a.id,
+					name: achievement.name,
+					description: achievement.description,
+					image: achievement.image,
+					progress: a.bestProgress,
+					objective: achievement.neededProgress,
+					unlocked: a.unlocked,
+					unlockedAt: a.unlockedAt,
+				};
+			}),
 		};
 	}
 

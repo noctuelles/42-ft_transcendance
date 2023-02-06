@@ -56,6 +56,16 @@ export class AchievementsService {
 		) {
 			data['unlocked'] = true;
 			data['unlockedAt'] = new Date();
+			await this.prismaService.userProfile.update({
+				where: {
+					id: userProfileId,
+				},
+				data: {
+					xp: {
+						increment: this.getAchievment(type).xpEarned,
+					},
+				},
+			});
 		}
 		await this.prismaService.userAchievement.update({
 			where: {
@@ -95,6 +105,16 @@ export class AchievementsService {
 			) {
 				data['unlocked'] = true;
 				data['unlockedAt'] = new Date();
+				await this.prismaService.userProfile.update({
+					where: {
+						id: userProfileId,
+					},
+					data: {
+						xp: {
+							increment: this.getAchievment(type).xpEarned,
+						},
+					},
+				});
 			}
 			await this.prismaService.userAchievement.update({
 				where: {
