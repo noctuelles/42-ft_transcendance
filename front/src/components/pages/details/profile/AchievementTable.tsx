@@ -6,6 +6,7 @@ import {
 import { AchievementMap } from './Data';
 import AchievementItem from './AchievementItem';
 import '@/style/details/profile/AchievementTable.css';
+import { JsxElement } from 'typescript';
 
 interface AchievementTableProps {
 	profile: ProfileData;
@@ -29,17 +30,17 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 	);
 
 	function generateAchievementItem() {
-		const unlockedAchievement = profile.achievements
-			.filter((a) => a.unlocked)
-			.map((a) => {
-				return <AchievementItem key={a.id} achievement={a} />;
-			});
+		let unlockedAchievement: any[] = [];
+		let lockedAchievement: any[] = [];
 
-		const lockedAchievement = profile.achievements
-			.filter((a) => !a.unlocked)
-			.map((a) => {
-				return <AchievementItem key={a.id} achievement={a} />;
-			});
+		profile.achievements.forEach((a) => {
+			const elem = <AchievementItem key={a.id} achievement={a} />;
+			if (a.unlocked) {
+				unlockedAchievement.push(elem);
+			} else {
+				lockedAchievement.push(elem);
+			}
+		});
 
 		return [unlockedAchievement, lockedAchievement];
 	}
