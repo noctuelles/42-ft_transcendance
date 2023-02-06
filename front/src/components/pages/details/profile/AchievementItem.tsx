@@ -26,17 +26,15 @@ const AchievementItem = ({ achievement }: AchievementItemProps) => {
 				<p>{achievement.description}</p>
 			</div>
 			<ProgressBar
-				width="100%"
-				height="20px"
-				percent={
+				height="1.3em"
+				percent={Math.round(
+					(achievement.progress / achievement.objective) * 100,
+				)}
+				text={
 					achievement.progress > achievement.objective
-						? 100
-						: Math.round(
-								(achievement.progress / achievement.objective) *
-									100,
-						  )
+						? `${achievement.objective}/${achievement.objective}`
+						: `${achievement.progress}/${achievement.objective}`
 				}
-				text={`${achievement.progress}/${achievement.objective}`}
 				innerBarColor="rgb(255, 153, 0)"
 			/>
 			<div className="achievement-item-bottom">

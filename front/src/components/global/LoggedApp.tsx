@@ -1,8 +1,7 @@
-import { Outlet } from 'react-router';
-import NavBar from '@/components/global/NavBar';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
 import Loader from './Loader';
+import WebsocketApp from './WebsocketApp';
 
 function LoggedApp() {
 	const [ready, setReady] = useState(false);
@@ -24,10 +23,7 @@ function LoggedApp() {
 					<p>Data loading... Please wait</p>
 				</div>
 			) : (
-				<div className="app">
-					<NavBar />
-					<Outlet />
-				</div>
+				<WebsocketApp />
 			)}
 		</div>
 	);

@@ -7,6 +7,10 @@
 	font-style: normal;
 }
 
+* {
+	box-sizing: border-box;
+}
+
 :root {
 	font-family: 'Viga', sans-serif;
 	font-size: 16px;
@@ -17,6 +21,8 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	-webkit-text-size-adjust: 100%;
+
+	--navbar-size: 75px;
 }
 
 html {
@@ -63,6 +69,13 @@ body {
 	--yellow-primary-color: #ffb800;
 }
 
+main {
+	margin-top: var(--navbar-size);
+}
+
+footer {
+}
+
 .app {
 	height: 95vh;
 	display: flex;
@@ -75,4 +88,10 @@ body {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+}
+
+.help-text {
+	font-size: 0.7rem;
+	font-style: italic;
+	text-align: right;
 }

@@ -190,6 +190,7 @@ export class UsersService {
 			},
 		});
 
+		user.profile.wonMatches;
 		if (!user) return null;
 		const achievements = user.profile.achievements
 			.map((a) => {
