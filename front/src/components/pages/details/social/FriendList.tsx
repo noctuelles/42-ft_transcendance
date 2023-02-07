@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import FriendItem from './FriendItem';
 import IFriendData from './Types';
 import TextField from '@/components/global/TextField';
 import '@/style/details/social/FriendList.css';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
+import { back_url } from '@/config.json';
+import { UserContext } from '@/context/UserContext';
+import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
+import { ws_url } from '@/config.json';
 
 interface IProps {}
 
@@ -13,25 +17,79 @@ interface IState {
 	friends: IFriendData[];
 }
 
+interface IValues {
+	username: string;
+}
+
 const FriendList = (props: IProps) => {
+	const userContext = useContext(UserContext);
 	const [friends, setFriends] = useState<IFriendData[] | null>(null);
 	const validation = Yup.object().shape({
-		userName: Yup.string().required('Requiered'),
+		username: Yup.string().required('Requiered'),
 	});
 	const values = {
-		userName: '',
+		username: '',
 	};
 
-	useEffect(() => {
-		fetch('https://63dce19f367aa5a7a403e78b.mockapi.io/users')
-			.then((response) => {
-				if (response.ok) return response.json();
-				return Promise.reject(response);
-			})
-			.then((data: IFriendData[]) => {
-				setFriends(data);
-			});
+	useWebSocket(ws_url, {
+		share: true,
+		onMessage: (event) => {
+			const content = JSON.parse(event.data);
+
+			if (content.event === 'user-status') {
+				let updatedList = friends?.map((friend) => {
+					if (friend.id === content.data.id)
+						friend.status = content.data.status;
+					return friend;
+				});
+
+				if (updatedList) setFriends(updatedList);
+			}
+		},
 	});
+
+	useEffect(() => {
+		async function fetchData() {
+			const token = await userContext.getAccessToken();
+
+			//TODO: when we cannot fetch.
+			const response = fetch(back_url + '/users/friends', {
+				method: 'GET',
+				headers: {
+					Authorization: 'Bearer ' + token,
+				},
+			})
+				.then((response) => {
+					if (response.ok) return response.json();
+					return Promise.reject(response);
+				})
+				.then((data: IFriendData[]) => {
+					setFriends(data);
+				});
+		}
+		fetchData();
+	}, []);
+
+	async function handleAddFriend(values: IValues) {
+		const token = await userContext.getAccessToken();
+
+		const response = fetch(back_url + '/users/friends/add', {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json; charset=UTF-8',
+				Authorization: 'Bearer ' + token,
+			},
+			body: JSON.stringify(values),
+		})
+			.then((response) => {
+				if (!response.ok)
+					return response.text().then((text) => {
+						throw new Error(text);
+					});
+				if (response.ok) return response.json();
+			})
+			.catch((err) => {});
+	}
 
 	return (
 		<div className="friend-list">
@@ -39,13 +97,13 @@ const FriendList = (props: IProps) => {
 			<Formik
 				validationSchema={validation}
 				initialValues={values}
-				onSubmit={() => {}}
+				onSubmit={handleAddFriend}
 			>
 				<Form className="add-friend-form">
 					<TextField
 						label="Username"
-						id="userName"
-						name="userName"
+						id="username"
+						name="username"
 						helpText="Having friends is cool !"
 						type="text"
 						placeholder="Friend name..."

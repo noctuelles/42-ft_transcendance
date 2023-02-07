@@ -5,6 +5,7 @@ import { CollapseArrow } from '@/components/global/CollapseArrow';
 import '@/style/details/social/FriendItem.css';
 import Button from '@/components/global/Button';
 import { Link } from 'react-router-dom';
+import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 
 interface IProps {
 	friend: IFriendData;
@@ -25,11 +26,12 @@ class FriendItem extends React.Component<IProps, IState> {
 	}
 
 	render() {
+		console.log(this.props.friend.status);
 		return (
 			<li className="friend-item">
 				<div className="friend-item-top">
 					<img
-						src="http://localhost:3000/cdn/user/plouvel.jpg"
+						src={this.props.friend.profile.picture}
 						draggable={false}
 					/>
 					<Link
@@ -40,7 +42,7 @@ class FriendItem extends React.Component<IProps, IState> {
 					</Link>
 				</div>
 				<div className="friend-item-center">
-					<StatusDot status={EUserStatus.ONLINE} />
+					<StatusDot status={this.props.friend.status} />
 				</div>
 			</li>
 		);

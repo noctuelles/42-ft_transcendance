@@ -328,6 +328,7 @@ export class UsersService {
 	}
 
 	async addFriend(currentUser: User, username: string) {
+		console.log(currentUser);
 		const { friends } = await this.prismaService.user.findUnique({
 			where: {
 				id: currentUser.id,
@@ -365,6 +366,7 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async validate(value: string): Promise<boolean> {
+		console.log(value);
 		return this.prisma.user
 			.findUnique({
 				where: {
