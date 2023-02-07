@@ -1,6 +1,6 @@
 .player-card {
-	padding-left: 20px;
-	padding-right: 20px;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 .card-before-game {
@@ -8,7 +8,7 @@
 }
 
 .card-during-game {
-	width: 200px;
+	width: 300px;
 }
 
 .card-left {

@@ -8,6 +8,7 @@ import Game from '../play/Game';
 import GameResult from '../play/GameResult';
 import { IGameResult } from '../play/GameInterfaces';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import { useLocation } from 'react-router';
 
 export enum GameState {
 	NO_GAME = 'no-game',
@@ -16,6 +17,7 @@ export enum GameState {
 	PREGAME = 'pregame',
 	PLAYING = 'playing',
 	RESULTS = 'results',
+	SPECTATE = 'spectate',
 }
 
 export interface IPlayerInfo {
@@ -34,6 +36,8 @@ const Play = () => {
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
 	const [result, setResult] = useState<IGameResult | null>(null);
 	const infoBoxContext = useContext(InfoBoxContext);
+	const location = useLocation();
+	const [spectator, setSpectator] = useState(false);
 
 	function isGameAbortedEvent(data: any): boolean {
 		return data.event === 'game-aborted';
@@ -61,6 +65,10 @@ const Play = () => {
 	});
 
 	useEffect(() => {
+		const spec = location.search.includes('spectate');
+		setSpectator(spec);
+		setGameState(spec ? GameState.SPECTATE : GameState.LOBBY);
+		if (spec) return;
 		return () => {
 			if (
 				stateRef.current == GameState.PREGAME ||
@@ -148,11 +156,12 @@ const Play = () => {
 				<PreGame players={players} setGameState={setGameState} />
 			)}
 			{gameState === GameState.PLAYING && (
-				<Game players={players} endMatch={endMatch} />
+				<Game spectator={false} players={players} endMatch={endMatch} />
 			)}
 			{gameState === GameState.RESULTS && result && (
 				<GameResult result={result} />
 			)}
+			{gameState === GameState.SPECTATE && <Game spectator={true} />}
 		</div>
 	);
 };
