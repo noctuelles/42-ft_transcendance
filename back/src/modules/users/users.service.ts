@@ -1,5 +1,15 @@
 import { LoggedUser } from '42.js/dist/structures/logged_user';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	ForbiddenException,
+	Injectable,
+} from '@nestjs/common';
+import { User } from '@prisma/client';
+import {
+	ValidationArguments,
+	ValidatorConstraint,
+	ValidatorConstraintInterface,
+} from 'class-validator';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
 import { achievmentsList } from './achievments.interface';
@@ -124,10 +134,10 @@ export class UsersService {
 		this.achievmentsService.initAchievements(user.profile.id);
 	}
 
-	async fetchFriendList(username: string) {
-		const user = await this.prismaService.user.findUnique({
+	async fetchFriendList(userId: number) {
+		const { friends } = await this.prismaService.user.findUnique({
 			where: {
-				name: username,
+				id: userId,
 			},
 			select: {
 				friends: {
@@ -145,7 +155,7 @@ export class UsersService {
 			},
 		});
 
-		return user.friends;
+		return friends;
 	}
 
 	//TODO: AuthGuard.
@@ -315,5 +325,59 @@ export class UsersService {
 		}));
 		users.sort((a, b) => b.elo - a.elo);
 		return users;
+	}
+
+	async addFriend(currentUser: User, username: string) {
+		const { friends } = await this.prismaService.user.findUnique({
+			where: {
+				id: currentUser.id,
+			},
+			include: {
+				friends: true,
+			},
+		});
+
+		if (friends.find((user) => user.name === username))
+			throw new ForbiddenException(
+				'User already have a friend with that name',
+			);
+
+		await this.prismaService.user.update({
+			where: {
+				id: currentUser.id,
+			},
+			data: {
+				friends: {
+					connect: {
+						name: username,
+					},
+				},
+			},
+		});
+
+		return null;
+	}
+}
+
+@ValidatorConstraint({ name: 'UserExists', async: true })
+@Injectable()
+export class UserExistsRule implements ValidatorConstraintInterface {
+	constructor(private readonly prisma: PrismaService) {}
+
+	async validate(value: string): Promise<boolean> {
+		return this.prisma.user
+			.findUnique({
+				where: {
+					name: value,
+				},
+			})
+			.then((user) => {
+				if (user) return true;
+				return false;
+			});
+	}
+
+	defaultMessage(): string {
+		return "The user doesn't exist";
 	}
 }
