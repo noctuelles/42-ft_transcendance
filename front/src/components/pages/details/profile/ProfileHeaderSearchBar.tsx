@@ -1,5 +1,3 @@
-import { useRef, useState } from 'react';
-import Button from '@/components/global/Button';
 import TextField from '@/components/global/TextField';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -7,7 +5,6 @@ import * as Yup from 'yup';
 //TODO: interface here, but this is subject to changes.
 
 const ProfileHeaderSearchBar = (props: any) => {
-	const searchInput = useRef<HTMLInputElement>(null);
 	const validation = Yup.object().shape({
 		searchValue: Yup.string().required('Requiered'),
 	});
@@ -23,7 +20,10 @@ const ProfileHeaderSearchBar = (props: any) => {
 		<Formik
 			validationSchema={validation}
 			initialValues={values}
-			onSubmit={handleSubmit}
+			onSubmit={(values, { resetForm }) => {
+				handleSubmit(values);
+				resetForm();
+			}}
 		>
 			<Form className="profile-header-searchbar">
 				<TextField
