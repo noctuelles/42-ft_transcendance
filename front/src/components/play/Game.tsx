@@ -20,6 +20,7 @@ function Game(props: IGameProps) {
 	const [players, setPlayers] = useState<IGamePlayer[]>(
 		props.spectator || !props.players ? [] : [...props.players],
 	);
+	const stateRef = useRef(false);
 
 	function isGameStateEvent(data: any) {
 		return data.event === 'game-state';
@@ -104,7 +105,19 @@ function Game(props: IGameProps) {
 	}
 
 	useEffect(() => {
-		if (props.spectator) return;
+		if (!stateRef.current) {
+			stateRef.current = true;
+			return;
+		}
+		if (props.spectator) {
+			return () => {
+				sendMessage(
+					JSON.stringify({
+						event: 'spectate-leave',
+					}),
+				);
+			};
+		}
 		window.addEventListener('keydown', onKeyPress);
 		window.addEventListener('keyup', onKeyRelease);
 

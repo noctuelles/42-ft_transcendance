@@ -37,7 +37,6 @@ const Play = () => {
 	const [result, setResult] = useState<IGameResult | null>(null);
 	const infoBoxContext = useContext(InfoBoxContext);
 	const location = useLocation();
-	const [spectator, setSpectator] = useState(false);
 
 	function isGameAbortedEvent(data: any): boolean {
 		return data.event === 'game-aborted';
@@ -66,35 +65,35 @@ const Play = () => {
 
 	useEffect(() => {
 		const spec = location.search.includes('spectate');
-		setSpectator(spec);
 		setGameState(spec ? GameState.SPECTATE : GameState.LOBBY);
-		if (spec) return;
-		return () => {
-			if (
-				stateRef.current == GameState.PREGAME ||
-				stateRef.current == GameState.PLAYING
-			) {
-				stateRef.current = GameState.NO_GAME;
-				infoBoxContext.addInfo({
-					type: InfoType.ERROR,
-					message: 'You left the game and lost',
-				});
-				sendMessage(
-					JSON.stringify({
-						event: 'matchmaking',
-						data: { action: 'leave' },
-					}),
-				);
-			}
-			if (stateRef.current == GameState.MATCHMAKING) {
-				sendMessage(
-					JSON.stringify({
-						event: 'matchmaking',
-						data: { action: 'cancel' },
-					}),
-				);
-			}
-		};
+		if (spec) {
+			return () => {
+				if (
+					stateRef.current == GameState.PREGAME ||
+					stateRef.current == GameState.PLAYING
+				) {
+					stateRef.current = GameState.NO_GAME;
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: 'You left the game and lost',
+					});
+					sendMessage(
+						JSON.stringify({
+							event: 'matchmaking',
+							data: { action: 'leave' },
+						}),
+					);
+				}
+				if (stateRef.current == GameState.MATCHMAKING) {
+					sendMessage(
+						JSON.stringify({
+							event: 'matchmaking',
+							data: { action: 'cancel' },
+						}),
+					);
+				}
+			};
+		}
 	}, []);
 
 	useEffect(() => {
@@ -161,7 +160,9 @@ const Play = () => {
 			{gameState === GameState.RESULTS && result && (
 				<GameResult result={result} />
 			)}
-			{gameState === GameState.SPECTATE && <Game spectator={true} />}
+			{gameState === GameState.SPECTATE && (
+				<Game spectator={true} endMatch={endMatch} />
+			)}
 		</div>
 	);
 };

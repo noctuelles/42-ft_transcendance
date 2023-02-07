@@ -5,7 +5,7 @@ import getLevelByXP from './Utils';
 import { UserStatus } from './ProfileTypes';
 import { ws_url as WS_URL } from '@/config.json';
 import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
@@ -58,6 +58,10 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
 			);
 		},
 	});
+
+	useEffect(() => {
+		setStatus(props.status);
+	}, [props.status]);
 
 	function spectateMatch() {
 		sendMessage(
