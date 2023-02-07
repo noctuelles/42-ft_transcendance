@@ -33,3 +33,30 @@
 	width: 35px;
 	height: 35px;
 }
+
+.profile-header-user {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.profile-status {
+	margin-left: 20px;
+	padding: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-radius: 50px;
+	font-size: 15px;
+}
+
+.status-ONLINE {
+	border: solid 4px #04b204;
+}
+
+.status-OFFLINE {
+	border: solid 4px #b20404;
+}
+
+.status-PLAYING {
+	border: solid 4px #04b2b2;
+}
