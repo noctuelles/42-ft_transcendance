@@ -129,6 +129,8 @@ export class Game {
 		this.onEnd();
 	}
 
+	addSpectator(socket: any) {}
+
 	private async _wait(ms: number) {
 		return new Promise<void>((resolve) => {
 			setTimeout(() => {
