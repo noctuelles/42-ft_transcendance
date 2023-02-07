@@ -45,9 +45,9 @@ model UserOnChannel {
 
     role             UserOnChannelRole   @default(USER)
     status           UserOnChannelStatus @default(CLEAN)
-    punishmentEndsAt DateTime?
+	statusEnd DateTime?
 
-    @@id([userId, channelId])
+    @@id([userId, channelId], name: "id")
 }
 
 model UserChannel {

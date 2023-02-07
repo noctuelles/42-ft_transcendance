@@ -1,3 +1,9 @@
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { UserChannelVisibility } from '@prisma/client';
+import { UserOnChannelRole } from '@prisma/client';
+import { UserOnChannelStatus } from '@prisma/client';
+
 export enum ChannelType {
 	PUBLIC,
 	PROTECTED,
@@ -15,31 +21,64 @@ export interface IMessage {
 	message: string;
 }
 
+type ChannelWithUser = Prisma.UserChannelGetPayload<{
+	include: Prisma.UserChannelInclude;
+}>;
+
 export default class Channel {
 	id: number;
 	name: string;
-	type: ChannelType;
+	type: UserChannelVisibility;
 	ownerId: number;
 	membersId: number[];
 	adminsId: number[];
 	muted: IPunishment[];
 	banned: IPunishment[];
-	constructor(id: number, name: string, type: ChannelType, ownerId: number) {
+	constructor(id: number) {
 		this.id = id;
-		this.name = name;
-		this.type = type;
-		this.ownerId = ownerId;
-		this.membersId = [ownerId];
-		this.adminsId = [ownerId];
-		this.muted = [];
-		this.banned = [];
 	}
 
-	canUserSendMessage(userId: number): boolean {
+	convertFromUserChannel(userChannel: ChannelWithUser): void {
+		if (!userChannel) {
+			return;
+		}
+		this.id = userChannel.id;
+		this.name = userChannel.name;
+		this.type = userChannel.visibility;
+		this.ownerId = userChannel.participants.filter((user) => {
+			return user.role === UserOnChannelRole.OPERATOR;
+		})[0]?.userId;
+		this.membersId = userChannel.participants.map((user) => {
+			return user.userId;
+		});
+		this.adminsId = userChannel.participants
+			.filter((user) => {
+				return user.role === UserOnChannelRole.ADMIN;
+			})
+			.map((user) => {
+				return user.userId;
+			});
+		this.muted = userChannel.participants
+			.filter((user) => {
+				return user.status === UserOnChannelStatus.MUTED;
+			})
+			.map((user) => {
+				return { userId: user.userId, endDate: user.statusEnd };
+			});
+		this.banned = userChannel.participants
+			.filter((user) => {
+				return user.status === UserOnChannelStatus.BANNED;
+			})
+			.map((user) => {
+				return { userId: user.userId, endDate: user.statusEnd };
+			});
+	}
+
+	canUserSendMessage(prismaService: PrismaService, userId: number): boolean {
 		return (
 			this.containsUser(userId) &&
-			!this.isUserMuted(userId) &&
-			!this.isUserBanned(userId)
+			!this.isUserMuted(prismaService, userId) &&
+			!this.isUserBanned(prismaService, userId)
 		);
 	}
 
@@ -47,66 +86,92 @@ export default class Channel {
 		return this.membersId.includes(userId);
 	}
 
-	addUser(userId: number): boolean {
+	async addUser(
+		prismaService: PrismaService,
+		userId: number,
+	): Promise<boolean> {
 		if (this.containsUser(userId)) {
 			return false;
 		}
-		this.membersId.push(userId);
+		await prismaService.userOnChannel.create({
+			data: { userId: userId, channelId: this.id },
+		});
 		return true;
 	}
 
-	canUserJoin(userId: number, password: string): boolean {
-		if (this.type === ChannelType.PRIVATE) {
+	canUserJoin(
+		prismaService: PrismaService,
+		userId: number,
+		password: string,
+	): boolean {
+		if (this.type === UserChannelVisibility.PRIVATE) {
 			return false;
 		}
-		if (this.isUserBanned(userId)) {
+		if (this.isUserBanned(prismaService, userId)) {
 			return false;
 		}
 		// TODO: Check password
 		return true;
 	}
 
-	isUserBanned(userId: number): boolean {
-		this.purgeEndedPunishment(this.banned);
+	isUserBanned(prismaService: PrismaService, userId: number): boolean {
+		this.purgeEndedPunishment(prismaService, this.banned);
 		return this.banned.some((bannedInfos) => {
 			return bannedInfos.userId === userId;
 		});
 	}
 
-	isUserMuted(userId: number) {
-		this.purgeEndedPunishment(this.muted);
+	isUserMuted(prismaService: PrismaService, userId: number) {
+		this.purgeEndedPunishment(prismaService, this.muted);
 		return this.muted.some((mutedInfos) => {
 			return mutedInfos.userId === userId;
 		});
 	}
 
-	purgeEndedPunishment(punishments: IPunishment[]) {
+	async purgeEndedPunishment(
+		prismaService: PrismaService,
+		punishments: IPunishment[],
+	) {
+		await prismaService.userOnChannel.updateMany({
+			where: { statusEnd: { lte: new Date() } },
+			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
+		});
 		this.removeAllMatches(punishments, (punishment) => {
 			return punishment.endDate < new Date(Date.now());
 		});
 	}
 
-	ban(userId: number, unbanDate: Date): void {
-		if (this.isUserBanned(userId)) {
-			this.pardon(userId);
-		}
+	ban(prismaService: PrismaService, userId: number, unbanDate: Date): void {
+		prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: { status: UserOnChannelStatus.BANNED, statusEnd: unbanDate },
+		});
 		this.banned.push({ userId: userId, endDate: unbanDate });
 	}
 
-	pardon(userId: number): boolean {
+	pardon(prismaService: PrismaService, userId: number): boolean {
+		prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
+		});
 		return this.removeAllMatches(this.banned, (punishment) => {
 			return punishment.userId === userId;
 		});
 	}
 
-	mute(userId: number, unmuteDate: Date): void {
-		if (this.isUserMuted(userId)) {
-			this.unmute(userId);
-		}
+	mute(prismaService: PrismaService, userId: number, unmuteDate: Date): void {
+		prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: { status: UserOnChannelStatus.MUTED, statusEnd: unmuteDate },
+		});
 		this.muted.push({ userId: userId, endDate: unmuteDate });
 	}
 
-	unmute(userId: number): boolean {
+	unmute(prismaService: PrismaService, userId: number): boolean {
+		prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
+		});
 		return this.removeAllMatches(this.muted, (punishment) => {
 			return punishment.userId === userId;
 		});
