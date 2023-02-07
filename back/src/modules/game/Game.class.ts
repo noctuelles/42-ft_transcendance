@@ -92,6 +92,10 @@ export class Game {
 		}
 	}
 
+	getSpectator(userId: number): IPlayer | null {
+		return this._spectatorSockets.find((s) => s.user.id === userId);
+	}
+
 	processInput(userId: number, data: IKeyEvent) {
 		const player = this.getPlayer(userId);
 		if (!player) return;
@@ -134,6 +138,12 @@ export class Game {
 
 	addSpectator(socket: any) {
 		this._spectatorSockets.push(socket);
+	}
+
+	removeSpectator(socket: any) {
+		this._spectatorSockets = this._spectatorSockets.filter(
+			(s) => s !== socket,
+		);
 	}
 
 	private async _wait(ms: number) {
@@ -517,6 +527,11 @@ export class Game {
 			duration: timeInSeconds,
 		};
 		this._sendToPlayers('game-result', res);
+		this._websocketsService.sendToAll(
+			this._spectatorSockets,
+			'game-result',
+			res,
+		);
 		this.onEnd();
 	}
 

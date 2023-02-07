@@ -49,4 +49,11 @@ export class GameGateway {
 		});
 		game.addSpectator(socket);
 	}
+
+	@SubscribeMessage('spectate-leave')
+	async spectateLeave(socket: any, payload: any) {
+		const game = this.gameService.getGameWhereSpectatorIs(socket.user.id);
+		if (!game) return;
+		game.removeSpectator(socket);
+	}
 }
