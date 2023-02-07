@@ -223,7 +223,9 @@ export class UsersService {
 			matches: user.matches.map((match) =>
 				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
 			),
+			id: user.id,
 			name: user.name,
+			status: user.status,
 			...user.profile,
 			achievements,
 		};
