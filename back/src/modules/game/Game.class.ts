@@ -17,6 +17,7 @@ import {
 	IPlayer,
 	GameType,
 	IPortal,
+	convertStateToSendableForSpectators,
 } from './Game.interfaces';
 
 export class Game {
@@ -28,6 +29,8 @@ export class Game {
 	private _player2Profile: IProfile;
 	private _status: GameStatus = GameStatus.STARTING;
 	private _type: GameType;
+
+	private _spectatorSockets: any[] = [];
 
 	private _startCounter: number = 10;
 	private _gameStartTime: Date | null = null;
@@ -129,7 +132,9 @@ export class Game {
 		this.onEnd();
 	}
 
-	addSpectator(socket: any) {}
+	addSpectator(socket: any) {
+		this._spectatorSockets.push(socket);
+	}
 
 	private async _wait(ms: number) {
 		return new Promise<void>((resolve) => {
@@ -176,6 +181,18 @@ export class Game {
 		res.player2.current = true;
 		this._websocketsService.send(
 			this._player2Profile.socket,
+			'game-state',
+			res,
+		);
+	}
+
+	private _sendStateToSpectators(timeInSeconds: number) {
+		const res = convertStateToSendableForSpectators(
+			this._gameState,
+			timeInSeconds,
+		);
+		this._websocketsService.sendToAll(
+			this._spectatorSockets,
 			'game-state',
 			res,
 		);
@@ -445,6 +462,7 @@ export class Game {
 			const timeInSeconds = Math.floor(timePlayed / 1000);
 			this._updateState();
 			this._sendStateToPlayers(timeInSeconds);
+			this._sendStateToSpectators(timeInSeconds);
 			if (timeInSeconds >= GameParams.GAME_TIME) {
 				if (
 					this._gameState.player1.score !=
