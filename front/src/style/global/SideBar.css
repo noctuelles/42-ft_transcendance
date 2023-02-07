@@ -1,6 +1,7 @@
 :root {
 	--side-bar-radius: 25px;
-	--side-bar-content-size: 300px;
+	--side-bar-height-size: 75%;
+	--side-bar-width-size: 330px;
 }
 
 .side-bar {
@@ -24,7 +25,7 @@
 }
 
 .expanded {
-	left: var(--side-bar-content-size);
+	left: var(--side-bar-width-size);
 }
 
 .side-bar span {
@@ -57,22 +58,4 @@
 .side-bar .expand-side-bar {
 	background-color: transparent;
 	border: none;
-}
-
-.side-bar-content {
-	background-color: lightgray;
-	height: 75%;
-	width: var(--side-bar-content-size);
-	position: fixed;
-	top: 50%;
-	z-index: 2;
-	border-top-right-radius: calc(var(--side-bar-radius) * 1.2);
-	border-bottom-right-radius: calc(var(--side-bar-radius) * 1.2);
-	-webkit-transform: translateY(-50%);
-	-ms-transform: translateY(-50%);
-	transform: translateY(-50%);
-
-	-webkit-box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.45);
-	box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.45);
-	transition: 0.3s;
 }

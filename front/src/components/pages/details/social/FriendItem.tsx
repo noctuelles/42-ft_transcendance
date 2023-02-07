@@ -13,7 +13,9 @@ interface IProps {
 interface IState {}
 
 const linkStyle: React.CSSProperties = {
-	textDecoration: 'underline',
+	textDecoration: 'none',
+	fontSize: '1.3rem',
+	letterSpacing: '0.03em',
 	color: 'black',
 };
 
@@ -27,27 +29,18 @@ class FriendItem extends React.Component<IProps, IState> {
 			<li className="friend-item">
 				<div className="friend-item-top">
 					<img
-						src="https://cdn.iconscout.com/icon/free/png-512/friend-couple-gemini-hand-hold-man-twins-37761.png"
-						width={50}
-						height={50}
+						src="http://localhost:3000/cdn/user/plouvel.jpg"
+						draggable={false}
 					/>
-					<span id="friend-name">
-						<Link
-							to={`/profile/${this.props.friend.name}`}
-							style={linkStyle}
-						>
-							{this.props.friend.name}
-						</Link>
-					</span>
+					<Link
+						to={`/profile/${this.props.friend.name}`}
+						style={linkStyle}
+					>
+						{this.props.friend.name}
+					</Link>
 				</div>
 				<div className="friend-item-center">
 					<StatusDot status={EUserStatus.ONLINE} />
-				</div>
-				<div className="friend-item-bottom">
-					<Button>Remove</Button>
-					{this.props.friend.status == EUserStatus.ONLINE && (
-						<Button>Invite</Button>
-					)}
 				</div>
 			</li>
 		);

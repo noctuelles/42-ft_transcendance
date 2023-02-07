@@ -1,8 +1,9 @@
 import '@/style/global/SideBar.css';
 import { useState } from 'react';
+import FriendList from '../pages/details/social/FriendList';
 
 const SideBarContent = () => {
-	return <div className="side-bar-content"></div>;
+	return <FriendList />;
 };
 
 const SideBar = () => {
