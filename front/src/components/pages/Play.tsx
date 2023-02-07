@@ -66,7 +66,7 @@ const Play = () => {
 	useEffect(() => {
 		const spec = location.search.includes('spectate');
 		setGameState(spec ? GameState.SPECTATE : GameState.LOBBY);
-		if (spec) {
+		if (!spec) {
 			return () => {
 				if (
 					stateRef.current == GameState.PREGAME ||
