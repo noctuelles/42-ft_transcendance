@@ -36,6 +36,16 @@ export class ChatService {
 			'chat',
 			message,
 		);
+		const sender = await this.prismaService.user.findUnique({
+			where: { name: message.username },
+		});
+		await this.prismaService.messageOnChannel.create({
+			data: {
+				channelId: channelId,
+				authorId: sender.id,
+				content: message.message,
+			},
+		});
 	}
 
 	async getChannel(channelId: number): Promise<Channel | undefined> {
