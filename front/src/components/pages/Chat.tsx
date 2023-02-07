@@ -58,7 +58,10 @@ export default function Chat() {
 					Create new channel
 				</Button>
 				<hr />
-				<ChannelList />
+				<ChannelList
+					setSelectedChannel={setSelectedChannel}
+					selectedChannel={selectedChannel}
+				/>
 			</div>
 			<div className="chat-page-center">
 				<ol className="chat-container">

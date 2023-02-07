@@ -7,3 +7,7 @@
 .channel-list-item :hover {
 	background-color: darkgrey;
 }
+
+#channel-list-item-selected {
+	background-color: red;
+}
