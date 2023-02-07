@@ -6,6 +6,7 @@ import { ws_url as WS_URL } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { useContext } from 'react';
 import { UserContext } from '@/context/UserContext';
+import SideBar from './SideBar';
 
 function WebsocketApp() {
 	const infoBoxContext = useContext(InfoBoxContext);
@@ -57,6 +58,7 @@ function WebsocketApp() {
 	return (
 		<div className="app">
 			<NavBar />
+			<SideBar />
 			<MessagesContextProvider>
 				<main>
 					<Outlet />

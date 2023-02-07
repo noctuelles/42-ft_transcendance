@@ -30,4 +30,9 @@ export class UsersController {
 	async getUserFriendsRanking(@CurrentUser() user) {
 		return await this.usersService.fetchFriendsRanking(user);
 	}
+
+	@Get('friends/:userName')
+	async getUserFriendList(@Param('userName') username: string) {
+		return await this.usersService.fetchFriendList(username);
+	}
 }

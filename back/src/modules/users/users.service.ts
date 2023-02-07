@@ -1,6 +1,5 @@
 import { LoggedUser } from '42.js/dist/structures/logged_user';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Match } from '@prisma/client';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
 import { PrismaService } from '../prisma/prisma.service';
 import { achievmentsList } from './achievments.interface';
@@ -12,8 +11,6 @@ interface ICreatingUser {
 	name: string;
 	profile_picture: string;
 }
-
-interface IMatchData {}
 
 @Injectable()
 export class UsersService {
@@ -125,6 +122,30 @@ export class UsersService {
 			},
 		});
 		this.achievmentsService.initAchievements(user.profile.id);
+	}
+
+	async fetchFriendList(username: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				name: username,
+			},
+			select: {
+				friends: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		return user.friends;
 	}
 
 	//TODO: AuthGuard.
