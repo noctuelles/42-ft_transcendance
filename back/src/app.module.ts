@@ -7,6 +7,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WebsocketsModule } from './modules/websockets/websockets.module';
 import { GameModule } from './modules/game/game.module';
+import { UserExistsRule } from './modules/users/users.service';
 
 @Global()
 @Module({
@@ -24,7 +25,7 @@ import { GameModule } from './modules/game/game.module';
 		}),
 	],
 	controllers: [],
-	providers: [],
+	providers: [UserExistsRule],
 	exports: [JwtModule],
 })
 export class AppModule {}

@@ -1,7 +1,17 @@
 import { LoggedUser } from '42.js/dist/structures/logged_user';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Match } from '@prisma/client';
+import {
+	BadRequestException,
+	ForbiddenException,
+	Injectable,
+} from '@nestjs/common';
+import { User } from '@prisma/client';
+import {
+	ValidationArguments,
+	ValidatorConstraint,
+	ValidatorConstraintInterface,
+} from 'class-validator';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
+import { CurrentUser } from '../auth/guards/currentUser.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { achievmentsList } from './achievments.interface';
 import { AchievementsService } from './achievments.service';
@@ -12,8 +22,6 @@ interface ICreatingUser {
 	name: string;
 	profile_picture: string;
 }
-
-interface IMatchData {}
 
 @Injectable()
 export class UsersService {
@@ -125,6 +133,30 @@ export class UsersService {
 			},
 		});
 		this.achievmentsService.initAchievements(user.profile.id);
+	}
+
+	async fetchFriendList(userId: number) {
+		const { friends } = await this.prismaService.user.findUnique({
+			where: {
+				id: userId,
+			},
+			select: {
+				friends: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		return friends;
 	}
 
 	//TODO: AuthGuard.
@@ -294,5 +326,122 @@ export class UsersService {
 		}));
 		users.sort((a, b) => b.elo - a.elo);
 		return users;
+	}
+
+	async addFriend(currentUser: User, username: string) {
+		await this.prismaService.user
+			.findUnique({
+				where: {
+					id: currentUser.id,
+				},
+				include: {
+					friends: true,
+				},
+			})
+			.then((obj) => {
+				if (obj.friends.find((user) => user.name === username))
+					throw new ForbiddenException('Duplicate friend');
+			});
+
+		const { friends } = await this.prismaService.user.update({
+			where: {
+				id: currentUser.id,
+			},
+			data: {
+				friends: {
+					connect: {
+						name: username,
+					},
+				},
+			},
+			select: {
+				friends: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		return friends;
+	}
+
+	async removeFriend(currentUser: User, username: string) {
+		await this.prismaService.user
+			.findUnique({
+				where: {
+					id: currentUser.id,
+				},
+				include: {
+					friends: true,
+				},
+			})
+			.then((obj) => {
+				if (
+					!obj.friends.find((friend) => {
+						return friend.name === username;
+					})
+				)
+					throw new ForbiddenException("Friend doesn't exist");
+			});
+
+		const { friends } = await this.prismaService.user.update({
+			where: {
+				id: currentUser.id,
+			},
+			data: {
+				friends: {
+					disconnect: {
+						name: username,
+					},
+				},
+			},
+			select: {
+				friends: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
+		});
+		return friends;
+	}
+}
+
+@ValidatorConstraint({ name: 'UserExists', async: true })
+@Injectable()
+export class UserExistsRule implements ValidatorConstraintInterface {
+	constructor(private readonly prisma: PrismaService) {}
+
+	async validate(value: string): Promise<boolean> {
+		if (!value) return false;
+		return this.prisma.user
+			.findUnique({
+				where: {
+					name: value,
+				},
+			})
+			.then((user) => {
+				if (user) return true;
+				return false;
+			});
+	}
+
+	defaultMessage(): string {
+		return "User doesn't exist";
 	}
 }

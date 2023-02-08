@@ -1,0 +1,40 @@
+.friend-list .friend-item {
+	display: flex;
+	flex-direction: column;
+}
+
+.friend-item {
+	margin-top: 30px;
+}
+
+.friend-list .friend-item-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.friend-list .friend-item-top img {
+	box-shadow: 2px 2px 5px 3px rgba(0, 0, 0, 0.29);
+	width: 70px;
+	height: 70px;
+}
+
+.friend-list .friend-item-center {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.friend-list .friend-item-center button {
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+}
+
+.friend-list .friend-item-center button svg {
+	width: 40px;
+	height: 40px;
+}
+
+.friend-section .friend-item-bottom {
+}
