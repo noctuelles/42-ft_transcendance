@@ -10,13 +10,19 @@ export enum ChannelJoinType {
 	INVITED = 'INVITED',
 }
 
-function ChannelJoinList({ closeModal }: { closeModal: () => void }) {
+interface IChannelJoinListProps {
+	closeModal: () => void;
+	selectedChannel: number;
+	setSelectedChannel: (channelId: number) => void;
+}
+
+function ChannelJoinList(props: IChannelJoinListProps) {
 	const [joinType, setJoinType] = useState(ChannelJoinType.PUBLIC);
 
 	return (
 		<div className="channel-join-list">
 			<Button
-				onClick={closeModal}
+				onClick={props.closeModal}
 				width="80px"
 				height="40px"
 				fontSize="20px"
@@ -27,7 +33,11 @@ function ChannelJoinList({ closeModal }: { closeModal: () => void }) {
 				joinType={joinType}
 				setJoinType={setJoinType}
 			/>
-			<ChannelJoinDisplay joinType={joinType} />
+			<ChannelJoinDisplay
+				joinType={joinType}
+				selectedChannel={props.selectedChannel}
+				setSelectedChannel={props.setSelectedChannel}
+			/>
 		</div>
 	);
 }

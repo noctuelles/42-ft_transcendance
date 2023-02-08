@@ -13,7 +13,13 @@ interface IJoinnableChannel {
 	joined: boolean;
 }
 
-function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
+interface IChannelJoinListProps {
+	joinType: ChannelJoinType;
+	selectedChannel: number;
+	setSelectedChannel: (channelId: number) => void;
+}
+
+function ChannelJoinDisplay(props: IChannelJoinListProps) {
 	const [channels, setChannels] = useState<IJoinnableChannel[]>([]);
 	const [fetched, setFetched] = useState(false);
 	const fetching = useRef(false);
@@ -25,7 +31,7 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 			fetch(
 				back_url +
 					'/chat/channels/' +
-					joinType.toLowerCase().replace(' ', '-'),
+					props.joinType.toLowerCase().replace(' ', '-'),
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -44,7 +50,7 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 			setFetched(false);
 			fetchData();
 		}
-	}, [joinType]);
+	}, [props.joinType]);
 
 	async function joinChannel(channelId: number) {
 		const accessToken: string = await userContext.getAccessToken();
@@ -96,6 +102,8 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 						newChannels[index].joined = false;
 						return newChannels;
 					});
+					if (channelId == props.selectedChannel)
+						props.setSelectedChannel(0);
 				}
 			});
 	}

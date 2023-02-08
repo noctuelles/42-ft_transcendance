@@ -44,6 +44,8 @@ export default function Chat() {
 					{chatState === ChatState.JOINING_CHANNEL && (
 						<ChannelJoinList
 							closeModal={() => setChatState(ChatState.DEFAULT)}
+							selectedChannel={selectedChannel}
+							setSelectedChannel={setSelectedChannel}
 						/>
 					)}
 				</div>
