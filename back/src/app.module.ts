@@ -21,7 +21,7 @@ import { UserExistsRule } from './modules/users/users.service';
 		GameModule,
 		JwtModule.register({
 			secret: `${process.env.JWT_SECRET}`,
-			signOptions: { expiresIn: '99999s' },
+			signOptions: { expiresIn: '180s' },
 		}),
 	],
 	controllers: [],
