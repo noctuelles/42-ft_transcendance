@@ -120,6 +120,17 @@ export class ChatService {
 			channels = invitations.map((invitation) => {
 				return { ...invitation.channel };
 			});
+			channels.push(
+				...(await this.prismaService.userChannel.findMany({
+					where: {
+						participants: { some: { userId: user.id } },
+						visibility: channelVisibility,
+					},
+					include: {
+						participants: true,
+					},
+				})),
+			);
 		} else {
 			channels = await this.prismaService.userChannel.findMany({
 				where: { visibility: channelVisibility },
