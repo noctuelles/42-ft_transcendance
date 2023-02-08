@@ -1,5 +1,6 @@
+import { MessagesContext } from '@/context/MessagesContext';
 import '@/style/Chat.css';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Button from '../global/Button';
 import ChannelCreationForm from './details/chat/ChannelCreationForm';
 import ChannelJoinList from './details/chat/ChannelJoinList';
@@ -16,6 +17,7 @@ enum ChatState {
 export default function Chat() {
 	const [selectedChannel, setSelectedChannel] = useState<number>(0);
 	const [chatState, setChatState] = useState(ChatState.DEFAULT);
+	const messagesContext = useContext(MessagesContext);
 
 	function handleNewChannelClick() {
 		setChatState(ChatState.CREATING_CHANNEL);
@@ -30,6 +32,13 @@ export default function Chat() {
 			chatState === ChatState.CREATING_CHANNEL ||
 			chatState === ChatState.JOINING_CHANNEL
 		);
+	}
+
+	async function selectChannel(channelId: number) {
+		if (!messagesContext.data.has(channelId)) {
+			await messagesContext.fetchMessages(channelId);
+		}
+		setSelectedChannel(channelId);
 	}
 
 	return (
@@ -59,7 +68,7 @@ export default function Chat() {
 				</Button>
 				<hr />
 				<ChannelList
-					setSelectedChannel={setSelectedChannel}
+					setSelectedChannel={selectChannel}
 					selectedChannel={selectedChannel}
 				/>
 			</div>
