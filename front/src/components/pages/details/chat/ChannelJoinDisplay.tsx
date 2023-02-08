@@ -3,6 +3,8 @@ import { ChannelJoinType } from './ChannelJoinList';
 import { back_url } from '@/config.json';
 import { UserContext } from '@/context/UserContext';
 import Loader from '@/components/global/Loader';
+import usersGroupIcon from '@/assets/users-group.svg';
+import Button from '@/components/global/Button';
 
 interface IJoinnableChannel {
 	id: number;
@@ -59,7 +61,21 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 								i == channels.length - 1 && 'last-channel'
 							}`}
 						>
-							{c.name}
+							<div className="joinable-part joinable-left">
+								<h2 className="joinable-name">{c.name}</h2>
+								<img
+									src={usersGroupIcon}
+									alt="users group icon"
+								/>
+								<h2 className="joinable-members">
+									{c.members} members
+								</h2>
+							</div>
+							<div className="joinable-part joinable-right">
+								<Button color={!c.joined && '#17c0e9'}>
+									{c.joined ? 'Leave' : 'Join'}
+								</Button>
+							</div>
 						</div>
 					))}
 				</div>

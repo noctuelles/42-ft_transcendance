@@ -14,6 +14,9 @@ const Button = (props: any) => {
 				...(props.fontWeight && {
 					'font-weight': `${props.fontWeight}`,
 				}),
+				...(props.color
+					? { backgroundColor: `${props.color}` }
+					: { backgroundColor: '#ffb800' }),
 			}}
 		>
 			{props.children}
