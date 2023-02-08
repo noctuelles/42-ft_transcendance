@@ -6,20 +6,47 @@ import ChannelList from './details/chat/ChannelList';
 import Messages from './details/chat/Messages';
 import UserInput from './details/chat/UserInput';
 
+enum ChatState {
+	DEFAULT = 'DEFAULT',
+	CREATING_CHANNEL = 'CREATING_CHANNEL',
+	JOINING_CHANNEL = 'JOINING_CHANNEL',
+}
+
 export default function Chat() {
-	const [showCreationForm, setShowCreationForm] = useState(false);
 	const [selectedChannel, setSelectedChannel] = useState<number>(0);
+	const [chatState, setChatState] = useState(ChatState.DEFAULT);
 
 	function handleNewChannelClick() {
-		setShowCreationForm(true);
+		setChatState(ChatState.CREATING_CHANNEL);
 	}
 
-	return !showCreationForm ? (
+	function handleJoinChannelClick() {
+		setChatState(ChatState.JOINING_CHANNEL);
+	}
+
+	function isModalOpen() {
+		return (
+			chatState === ChatState.CREATING_CHANNEL ||
+			chatState === ChatState.JOINING_CHANNEL
+		);
+	}
+
+	return (
 		<div className="chat-page">
+			{isModalOpen() && (
+				<div className="chat-modal">
+					{chatState === ChatState.CREATING_CHANNEL && (
+						<ChannelCreationForm
+							closeModal={() => setChatState(ChatState.DEFAULT)}
+						/>
+					)}
+				</div>
+			)}
 			<div className="chat-page-left-side">
 				<Button onClick={handleNewChannelClick}>
 					Create new channel
 				</Button>
+				<Button onClick={handleJoinChannelClick}>Join channel</Button>
 				<hr />
 				<ChannelList
 					setSelectedChannel={setSelectedChannel}
@@ -34,7 +61,5 @@ export default function Chat() {
 				<h3>Channel name</h3>
 			</div>
 		</div>
-	) : (
-		<ChannelCreationForm setter={setShowCreationForm} />
 	);
 }

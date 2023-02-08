@@ -19,9 +19,9 @@ const msgMap = new Map<ChannelRadioType, string>([
 ]);
 
 export default function ChannelCreationForm({
-	setter,
+	closeModal,
 }: {
-	setter: React.Dispatch<React.SetStateAction<boolean>>;
+	closeModal: () => void;
 }) {
 	const validation = Yup.object().shape({
 		channelName: Yup.string()
@@ -119,7 +119,7 @@ export default function ChannelCreationForm({
 						{msgMap.get(values.channelType)}
 					</div>
 					<div className="creation-form-btns">
-						<Button onClick={() => setter(false)}>Back</Button>
+						<Button onClick={closeModal}>Back</Button>
 						<Button type="submit" disabled={isSubmitting}>
 							Submit
 						</Button>

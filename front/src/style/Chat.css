@@ -61,3 +61,13 @@ input.textarea {
 	color: #666;
 	font-size: 1rem;
 }
+
+.chat-modal {
+	position: absolute;
+	top: var(--navbar-size);
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 999;
+}
