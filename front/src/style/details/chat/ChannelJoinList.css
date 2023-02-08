@@ -1,0 +1,88 @@
+.chat-modal-JOINING_CHANNEL {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.channel-join-list {
+	width: 40%;
+	height: 90%;
+	background: lightgray;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.channel-join-selector {
+	margin-top: 20px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	font-size: 20px;
+}
+
+.channel-join-selector-item {
+	border: solid 1px black;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.channel-join-selector-selected {
+	background-color: rgb(141, 141, 141);
+}
+
+.channel-join-display {
+	width: 100%;
+	margin-top: 20px;
+	overflow-y: scroll;
+}
+
+.channel-join-fetching {
+	display: flex;
+	justify-content: center;
+}
+
+.last-channel {
+	border-bottom: solid 1px black;
+}
+
+.joinable-channel {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: 50px;
+	width: 100%;
+	border-top: solid 1px black;
+	padding: 10px;
+	font-size: 20px;
+}
+
+.joinable-channel img {
+	width: auto;
+	height: 30px;
+	margin-left: 20px;
+}
+
+.joinable-part {
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.joinable-left {
+	width: 70%;
+	justify-content: flex-start;
+}
+
+.joinable-right {
+	width: 30%;
+	justify-content: flex-end;
+}
+
+.joinable-members {
+	top: 0;
+	margin-left: 5px;
+	font-size: 20px;
+}

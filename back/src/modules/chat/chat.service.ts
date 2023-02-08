@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import Channel from './Channel';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserChannel } from '@prisma/client';
+import { UserChannel, UserChannelVisibility } from '@prisma/client';
 import { UserOnChannel } from '@prisma/client';
 
 export class Message {
@@ -74,8 +74,11 @@ export class ChatService {
 		);
 	}
 
-	async sendChannelListToSocket(socket: any): Promise<void> {
-		const channels = await this.getChannelList();
+	async sendChannelListWhereUserIsToSocket(
+		socket: any,
+		userId: number,
+	): Promise<void> {
+		const channels = await this.getChannelWehreUserIs(userId);
 		this.websocketsService.send(
 			socket,
 			'channels',
@@ -86,10 +89,15 @@ export class ChatService {
 		);
 	}
 
-	async getChannelList(): Promise<Channel[]> {
-		const rawChannelList: (UserChannel & {
-			participants: UserOnChannel[];
-		})[] = await this.prismaService.userChannel.findMany({
+	async getChannelWehreUserIs(userId: number): Promise<Channel[]> {
+		const rawChannelList = await this.prismaService.userChannel.findMany({
+			where: {
+				participants: {
+					some: {
+						userId: userId,
+					},
+				},
+			},
 			include: {
 				participants: true,
 			},
@@ -101,9 +109,62 @@ export class ChatService {
 		});
 	}
 
-	sendChannelListToUser(userId: number) {
-		this.sendChannelListToSocket(
+	sendChannelListWhereUserIs(userId: number) {
+		this.sendChannelListWhereUserIsToSocket(
 			this.websocketsService.getSocketsFromUsersId([userId])[0],
+			userId,
 		);
+	}
+
+	async getChannelsAvailableForUser(
+		user,
+		channelVisibility: UserChannelVisibility,
+	) {
+		let channels = [];
+		if (channelVisibility == UserChannelVisibility.PRIVATE) {
+			const invitations =
+				await this.prismaService.userChannelInvitation.findMany({
+					where: { userId: user.id },
+					include: { channel: { include: { participants: true } } },
+				});
+			channels = invitations.map((invitation) => {
+				return { ...invitation.channel };
+			});
+			channels.push(
+				...(await this.prismaService.userChannel.findMany({
+					where: {
+						participants: { some: { userId: user.id } },
+						visibility: channelVisibility,
+					},
+					include: {
+						participants: true,
+					},
+				})),
+			);
+		} else {
+			channels = await this.prismaService.userChannel.findMany({
+				where: { visibility: channelVisibility },
+				include: {
+					participants: true,
+				},
+			});
+		}
+		return channels
+			.map((channel) => {
+				return {
+					id: channel.id,
+					name: channel.name,
+					members: channel.participants.length,
+					joined: channel.participants.find(
+						(p) => p.userId === user.id,
+					)
+						? true
+						: false,
+				};
+			})
+			.sort((a, b) => {
+				if (a.joined == b.joined) return b.members - a.members;
+				return a.joined ? 1 : -1;
+			});
 	}
 }

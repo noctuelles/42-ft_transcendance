@@ -33,8 +33,10 @@ model User {
     // such as the nickname, the status of the User on a particural Channel etc...
     // See https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations
 
-    onChannels UserOnChannel[]
-    matches    UserOnMatch[]
+    onChannels         UserOnChannel[]
+    matches            UserOnMatch[]
+    channelInvitations UserChannelInvitation[]
+    MessageOnChannel   MessageOnChannel[]
 }
 
 model UserOnChannel {
@@ -52,14 +54,28 @@ model UserOnChannel {
     @@id([userId, channelId], name: "id")
 }
 
-model MessageOnChannel {
-    id        Int           @id @default(autoincrement())
-    postedAt  DateTime      @default(now())
-    content   String
-    channel   UserChannel   @relation(fields: [channelId], references: [id])
+model UserChannelInvitation {
+    createdAt DateTime @default(now())
+
+    channel   UserChannel @relation(fields: [channelId], references: [id])
     channelId Int
-    author    UserOnChannel @relation(fields: [authorId, channelId], references: [userId, channelId])
-    authorId  Int
+    user      User        @relation(fields: [userId], references: [id])
+    userId    Int
+
+    @@id([channelId, userId], name: "id")
+}
+
+model MessageOnChannel {
+    id                     Int            @id @default(autoincrement())
+    postedAt               DateTime       @default(now())
+    content                String
+    channel                UserChannel    @relation(fields: [channelId], references: [id])
+    channelId              Int
+    author                 User           @relation(fields: [authorId], references: [id])
+    authorId               Int
+    UserOnChannel          UserOnChannel? @relation(fields: [userOnChannelUserId, userOnChannelChannelId], references: [userId, channelId])
+    userOnChannelUserId    Int?
+    userOnChannelChannelId Int?
 }
 
 model UserChannel {
@@ -67,10 +83,11 @@ model UserChannel {
 
     createdAt DateTime @default(now())
 
-    visibility   UserChannelVisibility @default(PUBLIC)
+    visibility   UserChannelVisibility   @default(PUBLIC)
     password     String?
     name         String?
     participants UserOnChannel[]
+    invitations  UserChannelInvitation[]
     messages     MessageOnChannel[]
 }
 

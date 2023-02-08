@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, Length, Matches } from 'class-validator';
+import {
+	IsEnum,
+	IsNotEmpty,
+	IsOptional,
+	Length,
+	Matches,
+} from 'class-validator';
 
 enum EChannelType {
 	PUBLIC = 'Public',
@@ -10,7 +16,13 @@ export class JoinChannelDTO {
 	@IsNotEmpty()
 	channelId: number;
 
-	password: string | undefined;
+	@IsOptional()
+	password: string;
+}
+
+export class LeaveChannelDTO {
+	@IsNotEmpty()
+	channelId: number;
 }
 
 export class CreateChannelDTO {

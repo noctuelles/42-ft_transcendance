@@ -99,19 +99,72 @@ export default class Channel {
 		return true;
 	}
 
-	canUserJoin(
+	async removeUser(
+		prismaService: PrismaService,
+		userId: number,
+	): Promise<boolean> {
+		if (!this.containsUser(userId)) {
+			return false;
+		}
+		await prismaService.userChannel.update({
+			where: { id: this.id },
+			data: {
+				participants: {
+					delete: { id: { userId: userId, channelId: this.id } },
+				},
+			},
+		});
+		return true;
+	}
+
+	async canUserJoin(
 		prismaService: PrismaService,
 		userId: number,
 		password: string,
-	): boolean {
+	): Promise<boolean> {
 		if (this.type === UserChannelVisibility.PRIVATE) {
-			return false;
+			const invitation =
+				await prismaService.userChannelInvitation.findUnique({
+					where: { id: { userId: userId, channelId: this.id } },
+				});
+			if (!invitation) {
+				return false;
+			}
+			await prismaService.userChannelInvitation.delete({
+				where: { id: { userId: userId, channelId: this.id } },
+			});
+			return true;
 		}
 		if (this.isUserBanned(prismaService, userId)) {
 			return false;
 		}
-		// TODO: Check password
+		//TODO: Change this with password verification
+		if (
+			this.type === UserChannelVisibility.PWD_PROTECTED &&
+			password !== 'password'
+		) {
+			return false;
+		}
 		return true;
+	}
+
+	getJoinError(
+		prismaService: PrismaService,
+		userId: number,
+		password: string,
+	) {
+		if (this.type === UserChannelVisibility.PRIVATE) {
+			return 'This channel is private';
+		}
+		if (this.isUserBanned(prismaService, userId)) {
+			return 'You are banned from this channel';
+		}
+		if (
+			this.type === UserChannelVisibility.PWD_PROTECTED &&
+			password !== 'password'
+		) {
+			return 'Wrong password';
+		}
 	}
 
 	isUserBanned(prismaService: PrismaService, userId: number): boolean {
@@ -193,16 +246,12 @@ export default class Channel {
 			where: { channelId: this.id },
 			orderBy: { postedAt: 'asc' },
 			include: {
-				author: {
-					include: {
-						user: true,
-					},
-				},
+				author: true,
 			},
 		});
 		return messages.map((message) => {
 			return {
-				username: message.author.user.name,
+				username: message.author.name,
 				channel: message.channelId,
 				message: message.content,
 			};

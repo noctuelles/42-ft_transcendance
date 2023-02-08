@@ -3,17 +3,35 @@ import '@/style/Chat.css';
 import { useContext, useState } from 'react';
 import Button from '../global/Button';
 import ChannelCreationForm from './details/chat/ChannelCreationForm';
+import ChannelJoinList from './details/chat/ChannelJoinList';
 import ChannelList from './details/chat/ChannelList';
 import Messages from './details/chat/Messages';
 import UserInput from './details/chat/UserInput';
 
+enum ChatState {
+	DEFAULT = 'DEFAULT',
+	CREATING_CHANNEL = 'CREATING_CHANNEL',
+	JOINING_CHANNEL = 'JOINING_CHANNEL',
+}
+
 export default function Chat() {
-	const [showCreationForm, setShowCreationForm] = useState(false);
 	const [selectedChannel, setSelectedChannel] = useState<number>(0);
+	const [chatState, setChatState] = useState(ChatState.DEFAULT);
 	const messagesContext = useContext(MessagesContext);
 
 	function handleNewChannelClick() {
-		setShowCreationForm(true);
+		setChatState(ChatState.CREATING_CHANNEL);
+	}
+
+	function handleJoinChannelClick() {
+		setChatState(ChatState.JOINING_CHANNEL);
+	}
+
+	function isModalOpen() {
+		return (
+			chatState === ChatState.CREATING_CHANNEL ||
+			chatState === ChatState.JOINING_CHANNEL
+		);
 	}
 
 	async function selectChannel(channelId: number) {
@@ -23,11 +41,30 @@ export default function Chat() {
 		setSelectedChannel(channelId);
 	}
 
-	return !showCreationForm ? (
+	return (
 		<div className="chat-page">
+			{isModalOpen() && (
+				<div className={`chat-modal chat-modal-${chatState}`}>
+					{chatState === ChatState.CREATING_CHANNEL && (
+						<ChannelCreationForm
+							closeModal={() => setChatState(ChatState.DEFAULT)}
+						/>
+					)}
+					{chatState === ChatState.JOINING_CHANNEL && (
+						<ChannelJoinList
+							closeModal={() => setChatState(ChatState.DEFAULT)}
+							selectedChannel={selectedChannel}
+							setSelectedChannel={setSelectedChannel}
+						/>
+					)}
+				</div>
+			)}
 			<div className="chat-page-left-side">
 				<Button onClick={handleNewChannelClick}>
 					Create new channel
+				</Button>
+				<Button onClick={handleJoinChannelClick}>
+					Manage channels
 				</Button>
 				<hr />
 				<ChannelList
@@ -43,7 +80,5 @@ export default function Chat() {
 				<h3>Channel name</h3>
 			</div>
 		</div>
-	) : (
-		<ChannelCreationForm setter={setShowCreationForm} />
 	);
 }
