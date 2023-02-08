@@ -91,8 +91,6 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 							(c) => c.id == channelId,
 						);
 						newChannels[index].joined = true;
-						if (props.joinType == ChannelJoinType.INVITED)
-							newChannels.splice(index, 1);
 						return newChannels;
 					});
 				} else {
@@ -125,6 +123,8 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 							(c) => c.id == channelId,
 						);
 						newChannels[index].joined = false;
+						if (props.joinType == ChannelJoinType.INVITED)
+							newChannels.splice(index, 1);
 						return newChannels;
 					});
 					if (channelId == props.selectedChannel)
