@@ -43,6 +43,7 @@
 	border-top-left-radius: var(--message-border-radius);
 	border-bottom-left-radius: var(--message-border-radius);
 	border-bottom-right-radius: var(--message-border-radius);
+	overflow-wrap: anywhere;
 }
 
 .self .message address {
