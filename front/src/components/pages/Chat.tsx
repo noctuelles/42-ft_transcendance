@@ -54,7 +54,9 @@ export default function Chat() {
 				<Button onClick={handleNewChannelClick}>
 					Create new channel
 				</Button>
-				<Button onClick={handleJoinChannelClick}>Manage channel</Button>
+				<Button onClick={handleJoinChannelClick}>
+					Manage channels
+				</Button>
 				<hr />
 				<ChannelList
 					setSelectedChannel={setSelectedChannel}
