@@ -5,6 +5,7 @@ import { UserContext } from '@/context/UserContext';
 import Loader from '@/components/global/Loader';
 import usersGroupIcon from '@/assets/users-group.svg';
 import Button from '@/components/global/Button';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IJoinnableChannel {
 	id: number;
@@ -21,9 +22,12 @@ interface IChannelJoinListProps {
 
 function ChannelJoinDisplay(props: IChannelJoinListProps) {
 	const [channels, setChannels] = useState<IJoinnableChannel[]>([]);
+	const [choose, setChoose] = useState(-1);
+	const [password, setPassword] = useState('');
 	const [fetched, setFetched] = useState(false);
 	const fetching = useRef(false);
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -52,7 +56,23 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 		}
 	}, [props.joinType]);
 
-	async function joinChannel(channelId: number) {
+	async function joinWithoutPassword(channelId: number) {
+		if (props.joinType == ChannelJoinType.PASSWORD_PROTECTED) {
+			setChoose(channelId);
+			return;
+		}
+		joinChannel({ channelId: channelId }, channelId);
+	}
+
+	async function joinWithPassword() {
+		if (password.length < 1) return;
+		if (choose == -1) return;
+		await joinChannel({ channelId: choose, password: password }, choose);
+		setChoose(-1);
+		setPassword('');
+	}
+
+	async function joinChannel(body: any, channelId: number) {
 		const accessToken: string = await userContext.getAccessToken();
 		fetch(back_url + '/chat/channel/join', {
 			method: 'PATCH',
@@ -60,9 +80,7 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 				'Content-Type': 'application/json',
 				Authorization: 'Bearer ' + accessToken,
 			},
-			body: JSON.stringify({
-				channelId: channelId,
-			}),
+			body: JSON.stringify(body),
 		})
 			.then((res) => res.json())
 			.then((data) => {
@@ -74,6 +92,11 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 						);
 						newChannels[index].joined = true;
 						return newChannels;
+					});
+				} else {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: data.reason,
 					});
 				}
 			});
@@ -134,16 +157,38 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 								</h2>
 							</div>
 							<div className="joinable-part joinable-right">
-								<Button
-									color={c.joined ? null : '#17c0e9'}
-									onClick={
-										c.joined
-											? () => leaveChannel(c.id)
-											: () => joinChannel(c.id)
-									}
-								>
-									{c.joined ? 'Leave' : 'Join'}
-								</Button>
+								{choose == c.id ? (
+									<>
+										<input
+											type="password"
+											placeholder="Enter password"
+											value={password}
+											onChange={(e) =>
+												setPassword(e.target.value)
+											}
+										/>
+										<Button
+											onClick={joinWithPassword}
+											color="#17c0e9"
+										>
+											Validate
+										</Button>
+									</>
+								) : (
+									<Button
+										color={c.joined ? null : '#17c0e9'}
+										onClick={
+											c.joined
+												? () => leaveChannel(c.id)
+												: () =>
+														joinWithoutPassword(
+															c.id,
+														)
+										}
+									>
+										{c.joined ? 'Leave' : 'Join'}
+									</Button>
+								)}
 							</div>
 						</div>
 					))}
