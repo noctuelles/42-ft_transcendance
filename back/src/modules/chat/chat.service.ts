@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import Channel from './Channel';
-import { ChannelType, IPunishment } from './Channel';
+import { PrismaService } from '../prisma/prisma.service';
+import { UserChannel } from '@prisma/client';
+import { UserOnChannel } from '@prisma/client';
 
 export class Message {
 	channel: number;
@@ -22,27 +24,29 @@ export interface IMessage {
 
 @Injectable()
 export class ChatService {
-	private channels: Map<number, Channel> = new Map([
-		[1, new Channel(1, 'Channel 1', ChannelType.PUBLIC, 3)],
-		[2, new Channel(2, 'Channel 2', ChannelType.PUBLIC, 3)],
-		[3, new Channel(3, 'Channel 3', ChannelType.PUBLIC, 3)],
-		[4, new Channel(4, 'Channel 4', ChannelType.PUBLIC, 3)],
-	]);
-	constructor(private readonly websocketsService: WebsocketsService) {
-		this.channels.get(4).ban(1, new Date(Date.now() + 1000 * 10)); // TODO: Remove this
-		this.channels.get(3).mute(1, new Date(Date.now() + 1000 * 10));
-	}
+	constructor(
+		private readonly websocketsService: WebsocketsService,
+		private readonly prismaService: PrismaService,
+	) {}
 
-	sendMessage(message: IMessage, channelId: number): void {
+	async sendMessage(message: IMessage, channelId: number): Promise<void> {
+		const channel: Channel = await this.getChannel(channelId);
 		this.websocketsService.sendToAllUsers(
-			this.channels.get(channelId).membersId,
+			channel.membersId,
 			'chat',
 			message,
 		);
 	}
 
-	getChannel(channelId: number): Channel | undefined {
-		return this.channels.get(channelId);
+	async getChannel(channelId: number): Promise<Channel | undefined> {
+		const chann = new Channel(channelId);
+		chann.convertFromUserChannel(
+			await this.prismaService.userChannel.findUnique({
+				where: { id: channelId },
+				include: { participants: true },
+			}),
+		);
+		return chann;
 	}
 
 	isIMessage(data: any) {
@@ -53,37 +57,43 @@ export class ChatService {
 	}
 
 	channelExists(channelId: number) {
-		return [...this.channels.keys()].includes(channelId);
+		return (
+			this.prismaService.userChannel.findUnique({
+				where: { id: channelId },
+			}) !== null
+		);
 	}
 
-	sendChannelListToSocket(socket: any): void {
+	async sendChannelListToSocket(socket: any): Promise<void> {
+		const channels = await this.getChannelList();
 		this.websocketsService.send(
 			socket,
 			'channels',
-			[...this.channels.values()].map((channel) => {
+			channels.map((channel) => {
 				let { muted, banned, ...frontChannel } = channel;
 				return frontChannel;
 			}),
 		);
 	}
 
+	async getChannelList(): Promise<Channel[]> {
+		const rawChannelList: (UserChannel & {
+			participants: UserOnChannel[];
+		})[] = await this.prismaService.userChannel.findMany({
+			include: {
+				participants: true,
+			},
+		});
+		return rawChannelList.map((rawChannel) => {
+			const channel = new Channel(rawChannel.id);
+			channel.convertFromUserChannel(rawChannel);
+			return channel;
+		});
+	}
+
 	sendChannelListToUser(userId: number) {
 		this.sendChannelListToSocket(
 			this.websocketsService.getSocketsFromUsersId([userId])[0],
 		);
-	}
-
-	addUserToChannel(userId: number, channelId: number): boolean {
-		// TODO: Check password
-		if (!this.channelExists(channelId)) {
-			return false;
-		}
-		const ret = this.channels.get(channelId).addUser(userId);
-		if (ret) {
-			this.sendChannelListToSocket(
-				this.websocketsService.getSocketsFromUsersId([userId])[0],
-			);
-		}
-		return ret;
 	}
 }
