@@ -1,6 +1,7 @@
 import Button from '@/components/global/Button';
 import '@/style/details/chat/ChannelJoinList.css';
 import { useState } from 'react';
+import ChannelJoinDisplay from './ChannelJoinDisplay';
 import ChannelJoinSelector from './ChannelJoinSelector';
 
 export enum ChannelJoinType {
@@ -26,6 +27,7 @@ function ChannelJoinList({ closeModal }: { closeModal: () => void }) {
 				joinType={joinType}
 				setJoinType={setJoinType}
 			/>
+			<ChannelJoinDisplay joinType={joinType} />
 		</div>
 	);
 }

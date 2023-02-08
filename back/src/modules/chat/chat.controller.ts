@@ -1,4 +1,4 @@
-import { Controller, Patch, Body, UseGuards, Post } from '@nestjs/common';
+import { Controller, Patch, Body, UseGuards, Post, Get } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
 import { User } from '@prisma/client';
@@ -29,5 +29,23 @@ export class ChatController {
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('channels/public')
+	async getPublicChannels(@CurrentUser() user: User) {
+		return await this.chatService.getPublicChannels(user);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('channels/password-protected')
+	async getpasswordProtectedChannels(@CurrentUser() user: User) {
+		return [];
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('channels/invited')
+	async getInvitedChannels(@CurrentUser() user: User) {
+		return [];
 	}
 }

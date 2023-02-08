@@ -96,4 +96,30 @@ export class ChatService {
 			this.websocketsService.getSocketsFromUsersId([userId])[0],
 		);
 	}
+
+	async getPublicChannels(user) {
+		const channels = await this.prismaService.userChannel.findMany({
+			where: { visibility: 'PUBLIC' },
+			include: {
+				participants: true,
+			},
+		});
+		return channels
+			.map((channel) => {
+				return {
+					id: channel.id,
+					name: channel.name,
+					members: channel.participants.length,
+					joined: channel.participants.find(
+						(p) => p.userId === user.id,
+					)
+						? true
+						: false,
+				};
+			})
+			.sort((a, b) => {
+				if (a.joined == b.joined) return a.members - b.members;
+				return a.joined ? -1 : 1;
+			});
+	}
 }

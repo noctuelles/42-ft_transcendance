@@ -10,7 +10,7 @@ const Button = (props: any) => {
 			style={{
 				...(props.width && { width: `${props.width}` }),
 				...(props.height && { height: `${props.height}` }),
-				...(props.fontSize && { 'font-size': `${props.fontSize}` }),
+				...(props.fontSize && { fontSize: `${props.fontSize}` }),
 				...(props.fontWeight && {
 					'font-weight': `${props.fontWeight}`,
 				}),
