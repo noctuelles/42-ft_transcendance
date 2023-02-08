@@ -1,18 +1,16 @@
 import {
 	Controller,
-	forwardRef,
 	Get,
 	Post,
-	Inject,
 	Param,
 	UseGuards,
 	Body,
-	DefaultValuePipe,
+	Patch,
+	BadRequestException,
 } from '@nestjs/common';
-import { ValidationPipe, UsePipes } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CurrentUser } from '../auth/guards/currentUser.decorator';
-import { AddFriendDto } from './add-friend.dto';
+import { FriendDto } from './friend.dto';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 
@@ -47,8 +45,20 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	async addFriend(
 		@CurrentUser() user: User,
-		@Body() addFriendDto: AddFriendDto,
+		@Body() addFriendDto: FriendDto,
 	) {
 		return await this.usersService.addFriend(user, addFriendDto.username);
+	}
+
+	@Patch('friends/remove')
+	@UseGuards(AuthGuard)
+	async removeFriend(
+		@CurrentUser() user: User,
+		@Body() removeFriendDto: FriendDto,
+	) {
+		return await this.usersService.removeFriend(
+			user,
+			removeFriendDto.username,
+		);
 	}
 }

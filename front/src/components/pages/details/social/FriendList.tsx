@@ -47,7 +47,6 @@ const FriendList = (props: IProps) => {
 			}
 		},
 	});
-
 	useEffect(() => {
 		async function fetchData() {
 			const token = await userContext.getAccessToken();
@@ -70,10 +69,15 @@ const FriendList = (props: IProps) => {
 		fetchData();
 	}, []);
 
-	async function handleAddFriend(values: IValues) {
+	async function handleAddFriend(
+		values: IValues,
+		{
+			setFieldError,
+		}: { setFieldError: (field: string, errorMsg: string) => void },
+	) {
 		const token = await userContext.getAccessToken();
 
-		const response = fetch(back_url + '/users/friends/add', {
+		fetch(back_url + '/users/friends/add', {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json; charset=UTF-8',
@@ -88,7 +92,13 @@ const FriendList = (props: IProps) => {
 					});
 				if (response.ok) return response.json();
 			})
-			.catch((err) => {});
+			.then((response) => {
+				setFriends(response);
+			})
+			.catch((err) => {
+				const errObj = JSON.parse(err.message);
+				setFieldError('username', errObj.message);
+			});
 	}
 
 	return (
@@ -118,11 +128,27 @@ const FriendList = (props: IProps) => {
 					</button>
 				</Form>
 			</Formik>
-			<ul className="friend-ul">
-				{friends?.map((friend) => (
-					<FriendItem key={friend.id} friend={friend} />
-				))}
-			</ul>
+			{friends ? (
+				<ul className="friend-ul">
+					{friends.length !== 0 ? (
+						friends.map((friend) => (
+							<FriendItem
+								key={friend.id}
+								friend={friend}
+								setFriends={setFriends}
+							/>
+						))
+					) : (
+						<li style={{ textAlign: 'center', fontSize: '1.2rem' }}>
+							You don't have any friends.
+						</li>
+					)}
+				</ul>
+			) : (
+				<h3 style={{ textAlign: 'center', fontSize: '1.2rem' }}>
+					Loading...
+				</h3>
+			)}
 		</div>
 	);
 };

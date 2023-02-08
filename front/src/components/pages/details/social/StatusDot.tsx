@@ -21,7 +21,7 @@ export default class StatusDot extends React.Component<IProps, IState> {
 
 	render() {
 		return (
-			<>
+			<div className="status-dot-container">
 				<span
 					className="status-dot"
 					style={{ backgroundColor: DotColor.get(this.props.status) }}
@@ -30,7 +30,7 @@ export default class StatusDot extends React.Component<IProps, IState> {
 					{this.props.status.charAt(0) +
 						this.props.status.slice(1).toLowerCase()}
 				</span>
-			</>
+			</div>
 		);
 	}
 }

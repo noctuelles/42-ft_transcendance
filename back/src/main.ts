@@ -7,12 +7,7 @@ require('dotenv').config();
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
-	app.useGlobalPipes(
-		new ValidationPipe({
-			whitelist: true,
-			transform: true,
-		}),
-	);
+	app.useGlobalPipes(new ValidationPipe());
 	useContainer(app.select(AppModule), { fallbackOnErrors: true });
 	app.enableCors();
 	app.useWebSocketAdapter(new WsAdapter(app));

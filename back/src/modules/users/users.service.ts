@@ -11,6 +11,7 @@ import {
 	ValidatorConstraintInterface,
 } from 'class-validator';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
+import { CurrentUser } from '../auth/guards/currentUser.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { achievmentsList } from './achievments.interface';
 import { AchievementsService } from './achievments.service';
@@ -328,22 +329,21 @@ export class UsersService {
 	}
 
 	async addFriend(currentUser: User, username: string) {
-		console.log(currentUser);
-		const { friends } = await this.prismaService.user.findUnique({
-			where: {
-				id: currentUser.id,
-			},
-			include: {
-				friends: true,
-			},
-		});
+		await this.prismaService.user
+			.findUnique({
+				where: {
+					id: currentUser.id,
+				},
+				include: {
+					friends: true,
+				},
+			})
+			.then((obj) => {
+				if (obj.friends.find((user) => user.name === username))
+					throw new ForbiddenException('Duplicate friend');
+			});
 
-		if (friends.find((user) => user.name === username))
-			throw new ForbiddenException(
-				'User already have a friend with that name',
-			);
-
-		await this.prismaService.user.update({
+		const { friends } = await this.prismaService.user.update({
 			where: {
 				id: currentUser.id,
 			},
@@ -354,9 +354,71 @@ export class UsersService {
 					},
 				},
 			},
+			select: {
+				friends: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
 		});
 
-		return null;
+		return friends;
+	}
+
+	async removeFriend(currentUser: User, username: string) {
+		await this.prismaService.user
+			.findUnique({
+				where: {
+					id: currentUser.id,
+				},
+				include: {
+					friends: true,
+				},
+			})
+			.then((obj) => {
+				if (
+					!obj.friends.find((friend) => {
+						return friend.name === username;
+					})
+				)
+					throw new ForbiddenException("Friend doesn't exist");
+			});
+
+		const { friends } = await this.prismaService.user.update({
+			where: {
+				id: currentUser.id,
+			},
+			data: {
+				friends: {
+					disconnect: {
+						name: username,
+					},
+				},
+			},
+			select: {
+				friends: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
+		});
+		return friends;
 	}
 }
 
@@ -366,7 +428,7 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async validate(value: string): Promise<boolean> {
-		console.log(value);
+		if (!value) return false;
 		return this.prisma.user
 			.findUnique({
 				where: {
@@ -380,6 +442,6 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 	}
 
 	defaultMessage(): string {
-		return "The user doesn't exist";
+		return "User doesn't exist";
 	}
 }
