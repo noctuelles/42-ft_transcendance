@@ -1,0 +1,32 @@
+.chat-modal-JOINING_CHANNEL {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.channel-join-list {
+	width: 80%;
+	height: 90%;
+	background: lightgray;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.channel-join-selector {
+	margin-top: 10px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	font-size: 20px;
+}
+
+.channel-join-selector-item {
+	border: solid 1px black;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.channel-join-selector-selected {
+	background-color: rgb(141, 141, 141);
+}

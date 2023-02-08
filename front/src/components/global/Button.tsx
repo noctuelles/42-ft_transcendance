@@ -9,7 +9,7 @@ const Button = (props: any) => {
 			onClick={props.onClick}
 			style={{
 				...(props.width && { width: `${props.width}` }),
-				...(props.height && { width: `${props.height}` }),
+				...(props.height && { height: `${props.height}` }),
 				...(props.fontSize && { 'font-size': `${props.fontSize}` }),
 				...(props.fontWeight && {
 					'font-weight': `${props.fontWeight}`,

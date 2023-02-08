@@ -2,6 +2,7 @@ import '@/style/Chat.css';
 import { useState } from 'react';
 import Button from '../global/Button';
 import ChannelCreationForm from './details/chat/ChannelCreationForm';
+import ChannelJoinList from './details/chat/ChannelJoinList';
 import ChannelList from './details/chat/ChannelList';
 import Messages from './details/chat/Messages';
 import UserInput from './details/chat/UserInput';
@@ -34,9 +35,14 @@ export default function Chat() {
 	return (
 		<div className="chat-page">
 			{isModalOpen() && (
-				<div className="chat-modal">
+				<div className={`chat-modal chat-modal-${chatState}`}>
 					{chatState === ChatState.CREATING_CHANNEL && (
 						<ChannelCreationForm
+							closeModal={() => setChatState(ChatState.DEFAULT)}
+						/>
+					)}
+					{chatState === ChatState.JOINING_CHANNEL && (
+						<ChannelJoinList
 							closeModal={() => setChatState(ChatState.DEFAULT)}
 						/>
 					)}
