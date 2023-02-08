@@ -18,6 +18,7 @@ export const MessagesContext = React.createContext<{
 export default function MessagesContextProvider(props: any) {
 	const userContext = useContext(UserContext);
 	const messages = useRef(new Map<number, IMessage[]>());
+	const fetching = useRef(false);
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
@@ -40,8 +41,13 @@ export default function MessagesContextProvider(props: any) {
 	);
 
 	async function registerMessage(newMessage: IMessage) {
+		while (fetching.current) {
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		}
 		if (!messages.current.has(newMessage.channel)) {
+			fetching.current = true;
 			await fetchMessages(newMessage.channel);
+			fetching.current = false;
 		}
 		messages.current.set(newMessage.channel, [
 			...(messages.current.get(newMessage.channel) || []),
