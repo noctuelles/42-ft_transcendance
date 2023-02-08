@@ -20,7 +20,12 @@ function ChannelJoinList(props: IChannelJoinListProps) {
 	const [joinType, setJoinType] = useState(ChannelJoinType.PUBLIC);
 
 	return (
-		<div className="channel-join-list">
+		<div
+			className="channel-join-list"
+			onClick={(e) => {
+				e.stopPropagation();
+			}}
+		>
 			<Button
 				onClick={props.closeModal}
 				width="80px"

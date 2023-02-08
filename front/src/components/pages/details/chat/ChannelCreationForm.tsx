@@ -67,7 +67,12 @@ export default function ChannelCreationForm({
 			onSubmit={handleSubmit}
 		>
 			{({ isSubmitting, values }) => (
-				<Form className="channel-creation-form">
+				<Form
+					className="channel-creation-form"
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
 					<h3>Create new channel</h3>
 					<h4>Channel Info</h4>
 					<TextField

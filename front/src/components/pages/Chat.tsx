@@ -44,7 +44,10 @@ export default function Chat() {
 	return (
 		<div className="chat-page">
 			{isModalOpen() && (
-				<div className={`chat-modal chat-modal-${chatState}`}>
+				<div
+					className={`chat-modal chat-modal-${chatState}`}
+					onClick={() => setChatState(ChatState.DEFAULT)}
+				>
 					{chatState === ChatState.CREATING_CHANNEL && (
 						<ChannelCreationForm
 							closeModal={() => setChatState(ChatState.DEFAULT)}
