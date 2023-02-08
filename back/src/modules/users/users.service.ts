@@ -329,6 +329,8 @@ export class UsersService {
 	}
 
 	async addFriend(currentUser: User, username: string) {
+		if (username === currentUser.name)
+			throw new ForbiddenException('Are you lonely ?');
 		await this.prismaService.user
 			.findUnique({
 				where: {
