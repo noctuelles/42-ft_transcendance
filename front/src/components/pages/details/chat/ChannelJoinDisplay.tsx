@@ -73,7 +73,32 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 			});
 	}
 
-	async function leaveChannel(channelId: number) {}
+	async function leaveChannel(channelId: number) {
+		const accessToken: string = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/leave', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + accessToken,
+			},
+			body: JSON.stringify({
+				channelId: channelId,
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.success) {
+					setChannels((prev) => {
+						const newChannels = [...prev];
+						const index = newChannels.findIndex(
+							(c) => c.id == channelId,
+						);
+						newChannels[index].joined = false;
+						return newChannels;
+					});
+				}
+			});
+	}
 
 	return (
 		<div
