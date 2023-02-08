@@ -110,12 +110,24 @@ export class ChatService {
 		user,
 		channelVisibility: UserChannelVisibility,
 	) {
-		const channels = await this.prismaService.userChannel.findMany({
-			where: { visibility: channelVisibility },
-			include: {
-				participants: true,
-			},
-		});
+		let channels = [];
+		if (channelVisibility == UserChannelVisibility.PRIVATE) {
+			const invitations =
+				await this.prismaService.userChannelInvitation.findMany({
+					where: { userId: user.id },
+					include: { channel: { include: { participants: true } } },
+				});
+			channels = invitations.map((invitation) => {
+				return { ...invitation.channel };
+			});
+		} else {
+			channels = await this.prismaService.userChannel.findMany({
+				where: { visibility: channelVisibility },
+				include: {
+					participants: true,
+				},
+			});
+		}
 		return channels
 			.map((channel) => {
 				return {

@@ -24,7 +24,7 @@ export class ChatController {
 		{ channelId, password }: JoinChannelDTO,
 	) {
 		const channel = await this.chatService.getChannel(channelId);
-		if (channel?.canUserJoin(this.prismaService, user.id, password)) {
+		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
 			return { success: true };
@@ -79,6 +79,9 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@Get('channels/invited')
 	async getInvitedChannels(@CurrentUser() user: User) {
-		return [];
+		return await this.chatService.getChannelsAvailableForUser(
+			user,
+			UserChannelVisibility.PRIVATE,
+		);
 	}
 }

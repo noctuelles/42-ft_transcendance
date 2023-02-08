@@ -117,13 +117,23 @@ export default class Channel {
 		return true;
 	}
 
-	canUserJoin(
+	async canUserJoin(
 		prismaService: PrismaService,
 		userId: number,
 		password: string,
-	): boolean {
+	): Promise<boolean> {
 		if (this.type === UserChannelVisibility.PRIVATE) {
-			return false;
+			const invitation =
+				await prismaService.userChannelInvitation.findUnique({
+					where: { id: { userId: userId, channelId: this.id } },
+				});
+			if (!invitation) {
+				return false;
+			}
+			await prismaService.userChannelInvitation.delete({
+				where: { id: { userId: userId, channelId: this.id } },
+			});
+			return true;
 		}
 		if (this.isUserBanned(prismaService, userId)) {
 			return false;
