@@ -1,6 +1,6 @@
 import { MessagesContext } from '@/context/MessagesContext';
 import '@/style/Chat.css';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Button from '../global/Button';
 import ChannelCreationForm from './details/chat/ChannelCreationForm';
 import ChannelJoinList from './details/chat/ChannelJoinList';
@@ -40,6 +40,17 @@ export default function Chat() {
 		}
 		setSelectedChannel(channelId);
 	}
+
+	useEffect(() => {
+		window.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setChatState(ChatState.DEFAULT);
+			}
+		});
+		return () => {
+			window.removeEventListener('keydown', () => {});
+		};
+	}, []);
 
 	return (
 		<div className="chat-page">
