@@ -4,7 +4,7 @@ import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
 import { User } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { JoinChannelDTO } from './JoinChannel.dto';
+import { JoinChannelDTO, LeaveChannelDTO } from './Channel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
 import { CreateChannelValidationPipe } from './validation.pipe';
 
@@ -14,6 +14,7 @@ export class ChatController {
 		private readonly chatService: ChatService,
 		private readonly prismaService: PrismaService,
 	) {}
+
 	@UseGuards(AuthGuard)
 	@UsePipes(ValidationPipe)
 	@Patch('channel/join')
@@ -26,6 +27,25 @@ export class ChatController {
 		if (channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
+			return { success: true };
+		} else {
+			// TODO: Return error to tell why not allowed
+		}
+	}
+
+	@UseGuards(AuthGuard)
+	@UsePipes(ValidationPipe)
+	@Patch('channel/leave')
+	async leaveChannel(
+		@CurrentUser() user: User,
+		@Body()
+		{ channelId }: LeaveChannelDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (channel?.containsUser(user.id)) {
+			await channel.removeUser(this.prismaService, user.id);
+			this.chatService.sendChannelListWhereUserIs(user.id);
+			return { success: true };
 		} else {
 			// TODO: Return error to tell why not allowed
 		}

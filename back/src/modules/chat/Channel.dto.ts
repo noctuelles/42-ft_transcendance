@@ -13,6 +13,11 @@ export class JoinChannelDTO {
 	password: string | undefined;
 }
 
+export class LeaveChannelDTO {
+	@IsNotEmpty()
+	channelId: number;
+}
+
 export class CreateChannelDTO {
 	@Length(10, 25)
 	@Matches('^[a-zA-Z]+(?: [a-zA-Z]+)*$')

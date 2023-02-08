@@ -1,7 +1,7 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { CreateChannelDTO } from './JoinChannel.dto';
+import { CreateChannelDTO } from './Channel.dto';
 
 @Injectable()
 export class CreateChannelValidationPipe implements PipeTransform {

@@ -99,6 +99,24 @@ export default class Channel {
 		return true;
 	}
 
+	async removeUser(
+		prismaService: PrismaService,
+		userId: number,
+	): Promise<boolean> {
+		if (!this.containsUser(userId)) {
+			return false;
+		}
+		await prismaService.userChannel.update({
+			where: { id: this.id },
+			data: {
+				participants: {
+					delete: { id: { userId: userId, channelId: this.id } },
+				},
+			},
+		});
+		return true;
+	}
+
 	canUserJoin(
 		prismaService: PrismaService,
 		userId: number,
