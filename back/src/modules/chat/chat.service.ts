@@ -119,7 +119,7 @@ export class ChatService {
 			})
 			.sort((a, b) => {
 				if (a.joined == b.joined) return b.members - a.members;
-				return a.joined ? -1 : 1;
+				return a.joined ? 1 : -1;
 			});
 	}
 }
