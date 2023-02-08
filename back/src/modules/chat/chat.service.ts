@@ -64,8 +64,11 @@ export class ChatService {
 		);
 	}
 
-	async sendChannelListToSocket(socket: any): Promise<void> {
-		const channels = await this.getChannelList();
+	async sendChannelListWhereUserIsToSocket(
+		socket: any,
+		userId: number,
+	): Promise<void> {
+		const channels = await this.getChannelWehreUserIs(userId);
 		this.websocketsService.send(
 			socket,
 			'channels',
@@ -76,10 +79,15 @@ export class ChatService {
 		);
 	}
 
-	async getChannelList(): Promise<Channel[]> {
-		const rawChannelList: (UserChannel & {
-			participants: UserOnChannel[];
-		})[] = await this.prismaService.userChannel.findMany({
+	async getChannelWehreUserIs(userId: number): Promise<Channel[]> {
+		const rawChannelList = await this.prismaService.userChannel.findMany({
+			where: {
+				participants: {
+					some: {
+						userId: userId,
+					},
+				},
+			},
 			include: {
 				participants: true,
 			},
@@ -91,9 +99,10 @@ export class ChatService {
 		});
 	}
 
-	sendChannelListToUser(userId: number) {
-		this.sendChannelListToSocket(
+	sendChannelListWhereUserIs(userId: number) {
+		this.sendChannelListWhereUserIsToSocket(
 			this.websocketsService.getSocketsFromUsersId([userId])[0],
+			userId,
 		);
 	}
 

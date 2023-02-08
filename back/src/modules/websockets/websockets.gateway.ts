@@ -13,16 +13,13 @@ export class WebsocketGateway implements OnGatewayConnection {
 	@WebSocketServer() server: Server;
 
 	async afterInit(server: Server) {
-		server.on('connection', (socket, request) => {
+		server.on('connection', async (socket, request) => {
 			socket['request'] = request;
+			await this.websocketsService.registerSocket(socket);
 		});
 	}
 
-	async handleConnection(socket) {
-		setTimeout(async () => {
-			await this.websocketsService.registerSocket(socket);
-		}, 200);
-	}
+	async handleConnection(socket) {}
 
 	async handleDisconnect(socket) {
 		this.websocketsService.unregisterSocket(socket);

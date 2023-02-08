@@ -25,7 +25,7 @@ export class ChatController {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
-			this.chatService.sendChannelListToUser(user.id);
+			this.chatService.sendChannelListWhereUserIs(user.id);
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
