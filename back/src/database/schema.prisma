@@ -33,9 +33,8 @@ model User {
     // such as the nickname, the status of the User on a particural Channel etc...
     // See https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations
 
-    onChannels       UserOnChannel[]
-    matches          UserOnMatch[]
-    MessageOnChannel MessageOnChannel[]
+    onChannels UserOnChannel[]
+    matches    UserOnMatch[]
 }
 
 model UserOnChannel {
@@ -48,16 +47,18 @@ model UserOnChannel {
     status    UserOnChannelStatus @default(CLEAN)
     statusEnd DateTime?
 
+    messages MessageOnChannel[]
+
     @@id([userId, channelId], name: "id")
 }
 
 model MessageOnChannel {
-    id        Int         @id @default(autoincrement())
-    postedAt  DateTime    @default(now())
+    id        Int           @id @default(autoincrement())
+    postedAt  DateTime      @default(now())
     content   String
-    channel   UserChannel @relation(fields: [channelId], references: [id])
+    channel   UserChannel   @relation(fields: [channelId], references: [id])
     channelId Int
-    author    User        @relation(fields: [authorId], references: [id])
+    author    UserOnChannel @relation(fields: [authorId, channelId], references: [userId, channelId])
     authorId  Int
 }
 
