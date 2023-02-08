@@ -28,31 +28,8 @@ const Channel = ({
 			}}
 		>
 			<span>{channel.name}</span>
-			{!hasJoined && (
-				<Button
-					onClick={() => {
-						joinChannel(channel.id);
-					}}
-				>
-					Join
-				</Button>
-			)}
 		</li>
 	);
-
-	async function joinChannel(channelId: number): Promise<void> {
-		const accessToken: string = await userContext.getAccessToken();
-		fetch(back_url + '/chat/channel/join', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: 'Bearer ' + accessToken,
-			},
-			body: JSON.stringify({
-				channelId: channelId,
-			}),
-		});
-	}
 };
 
 export default Channel;

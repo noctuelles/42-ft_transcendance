@@ -46,6 +46,35 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 		}
 	}, [joinType]);
 
+	async function joinChannel(channelId: number) {
+		const accessToken: string = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/join', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + accessToken,
+			},
+			body: JSON.stringify({
+				channelId: channelId,
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.success) {
+					setChannels((prev) => {
+						const newChannels = [...prev];
+						const index = newChannels.findIndex(
+							(c) => c.id == channelId,
+						);
+						newChannels[index].joined = true;
+						return newChannels;
+					});
+				}
+			});
+	}
+
+	async function leaveChannel(channelId: number) {}
+
 	return (
 		<div
 			className={`channel-join-display ${
@@ -72,7 +101,14 @@ function ChannelJoinDisplay({ joinType }: { joinType: ChannelJoinType }) {
 								</h2>
 							</div>
 							<div className="joinable-part joinable-right">
-								<Button color={!c.joined && '#17c0e9'}>
+								<Button
+									color={c.joined ? null : '#17c0e9'}
+									onClick={
+										c.joined
+											? () => leaveChannel(c.id)
+											: () => joinChannel(c.id)
+									}
+								>
 									{c.joined ? 'Leave' : 'Join'}
 								</Button>
 							</div>
