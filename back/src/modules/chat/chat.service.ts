@@ -118,7 +118,7 @@ export class ChatService {
 				};
 			})
 			.sort((a, b) => {
-				if (a.joined == b.joined) return a.members - b.members;
+				if (a.joined == b.joined) return b.members - a.members;
 				return a.joined ? -1 : 1;
 			});
 	}
