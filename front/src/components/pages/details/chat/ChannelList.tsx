@@ -16,11 +16,11 @@ export default function ChannelList({
 	const userContext = useContext(UserContext);
 	const channels = getChannels();
 
-	// useEffect(() => {
-	// 	if (selectedChannel === 0 && channels.length > 0) {
-	// 		setSelectedChannel(channels[0].id);
-	// 	}
-	// });
+	useEffect(() => {
+		if (selectedChannel === 0 && channels.length > 0) {
+			setSelectedChannel(channels[0].id);
+		}
+	}, [channels]);
 
 	return (
 		<ul className="channel-list">
