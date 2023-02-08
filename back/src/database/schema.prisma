@@ -43,11 +43,23 @@ model UserOnChannel {
     channel   UserChannel @relation(fields: [channelId], references: [id])
     channelId Int
 
-    role             UserOnChannelRole   @default(USER)
-    status           UserOnChannelStatus @default(CLEAN)
-	statusEnd DateTime?
+    role      UserOnChannelRole   @default(USER)
+    status    UserOnChannelStatus @default(CLEAN)
+    statusEnd DateTime?
+
+    messages MessageOnChannel[]
 
     @@id([userId, channelId], name: "id")
+}
+
+model MessageOnChannel {
+    id        Int           @id @default(autoincrement())
+    postedAt  DateTime      @default(now())
+    content   String
+    channel   UserChannel   @relation(fields: [channelId], references: [id])
+    channelId Int
+    author    UserOnChannel @relation(fields: [authorId, channelId], references: [userId, channelId])
+    authorId  Int
 }
 
 model UserChannel {
@@ -59,6 +71,7 @@ model UserChannel {
     password     String?
     name         String?
     participants UserOnChannel[]
+    messages     MessageOnChannel[]
 }
 
 model UserProfile {

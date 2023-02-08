@@ -1,4 +1,12 @@
-import { Controller, Patch, Body, UseGuards, Post } from '@nestjs/common';
+import {
+	Controller,
+	Patch,
+	Body,
+	UseGuards,
+	Get,
+	Param,
+	BadRequestException,
+} from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
 import { User } from '@prisma/client';
@@ -14,6 +22,7 @@ export class ChatController {
 		private readonly chatService: ChatService,
 		private readonly prismaService: PrismaService,
 	) {}
+
 	@UseGuards(AuthGuard)
 	@UsePipes(ValidationPipe)
 	@Patch('channel/join')
@@ -26,6 +35,23 @@ export class ChatController {
 		if (channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
 			this.chatService.sendChannelListToUser(user.id);
+		} else {
+			// TODO: Return error to tell why not allowed
+		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('channel/:channelId/messages')
+	async getChannelMessages(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (channel?.containsUser(user.id)) {
+			return await channel.getMessages(this.prismaService);
 		} else {
 			// TODO: Return error to tell why not allowed
 		}

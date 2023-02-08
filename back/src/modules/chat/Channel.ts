@@ -187,4 +187,25 @@ export default class Channel {
 		}
 		return didMatch;
 	}
+
+	async getMessages(prismaService: PrismaService) {
+		const messages = await prismaService.messageOnChannel.findMany({
+			where: { channelId: this.id },
+			orderBy: { postedAt: 'asc' },
+			include: {
+				author: {
+					include: {
+						user: true,
+					},
+				},
+			},
+		});
+		return messages.map((message) => {
+			return {
+				username: message.author.user.name,
+				channel: message.channelId,
+				message: message.content,
+			};
+		});
+	}
 }

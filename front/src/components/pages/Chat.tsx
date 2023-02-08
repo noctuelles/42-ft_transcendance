@@ -1,5 +1,6 @@
+import { MessagesContext } from '@/context/MessagesContext';
 import '@/style/Chat.css';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Button from '../global/Button';
 import ChannelCreationForm from './details/chat/ChannelCreationForm';
 import ChannelList from './details/chat/ChannelList';
@@ -9,9 +10,17 @@ import UserInput from './details/chat/UserInput';
 export default function Chat() {
 	const [showCreationForm, setShowCreationForm] = useState(false);
 	const [selectedChannel, setSelectedChannel] = useState<number>(0);
+	const messagesContext = useContext(MessagesContext);
 
 	function handleNewChannelClick() {
 		setShowCreationForm(true);
+	}
+
+	async function selectChannel(channelId: number) {
+		if (!messagesContext.data.has(channelId)) {
+			await messagesContext.fetchMessages(channelId);
+		}
+		setSelectedChannel(channelId);
 	}
 
 	return !showCreationForm ? (
@@ -22,7 +31,7 @@ export default function Chat() {
 				</Button>
 				<hr />
 				<ChannelList
-					setSelectedChannel={setSelectedChannel}
+					setSelectedChannel={selectChannel}
 					selectedChannel={selectedChannel}
 				/>
 			</div>
