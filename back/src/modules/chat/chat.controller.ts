@@ -1,7 +1,7 @@
 import { Controller, Patch, Body, UseGuards, Post, Get } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
-import { User } from '@prisma/client';
+import { User, UserChannelVisibility } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { JoinChannelDTO, LeaveChannelDTO } from './Channel.dto';
@@ -29,7 +29,14 @@ export class ChatController {
 			this.chatService.sendChannelListWhereUserIs(user.id);
 			return { success: true };
 		} else {
-			// TODO: Return error to tell why not allowed
+			return {
+				sucess: false,
+				reason: channel?.getJoinError(
+					this.prismaService,
+					user.id,
+					password,
+				),
+			};
 		}
 	}
 
@@ -54,13 +61,19 @@ export class ChatController {
 	@UseGuards(AuthGuard)
 	@Get('channels/public')
 	async getPublicChannels(@CurrentUser() user: User) {
-		return await this.chatService.getPublicChannels(user);
+		return await this.chatService.getChannelsAvailableForUser(
+			user,
+			UserChannelVisibility.PUBLIC,
+		);
 	}
 
 	@UseGuards(AuthGuard)
 	@Get('channels/password-protected')
 	async getpasswordProtectedChannels(@CurrentUser() user: User) {
-		return [];
+		return await this.chatService.getChannelsAvailableForUser(
+			user,
+			UserChannelVisibility.PWD_PROTECTED,
+		);
 	}
 
 	@UseGuards(AuthGuard)

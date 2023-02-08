@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import Channel from './Channel';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserChannel } from '@prisma/client';
+import { UserChannel, UserChannelVisibility } from '@prisma/client';
 import { UserOnChannel } from '@prisma/client';
 
 export class Message {
@@ -106,9 +106,12 @@ export class ChatService {
 		);
 	}
 
-	async getPublicChannels(user) {
+	async getChannelsAvailableForUser(
+		user,
+		channelVisibility: UserChannelVisibility,
+	) {
 		const channels = await this.prismaService.userChannel.findMany({
-			where: { visibility: 'PUBLIC' },
+			where: { visibility: channelVisibility },
 			include: {
 				participants: true,
 			},

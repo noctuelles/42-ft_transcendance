@@ -128,8 +128,33 @@ export default class Channel {
 		if (this.isUserBanned(prismaService, userId)) {
 			return false;
 		}
-		// TODO: Check password
+		//TODO: Change this with password verification
+		if (
+			this.type === UserChannelVisibility.PWD_PROTECTED &&
+			password !== 'password'
+		) {
+			return false;
+		}
 		return true;
+	}
+
+	getJoinError(
+		prismaService: PrismaService,
+		userId: number,
+		password: string,
+	) {
+		if (this.type === UserChannelVisibility.PRIVATE) {
+			return 'This channel is private';
+		}
+		if (this.isUserBanned(prismaService, userId)) {
+			return 'You are banned from this channel';
+		}
+		if (
+			this.type === UserChannelVisibility.PWD_PROTECTED &&
+			password !== 'password'
+		) {
+			return 'Wrong password';
+		}
 	}
 
 	isUserBanned(prismaService: PrismaService, userId: number): boolean {
