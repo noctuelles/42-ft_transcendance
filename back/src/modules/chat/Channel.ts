@@ -83,6 +83,7 @@ export default class Channel {
 	}
 
 	containsUser(userId: number): boolean {
+		if (!this.membersId) return false;
 		return this.membersId.includes(userId);
 	}
 
