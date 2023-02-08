@@ -8,6 +8,7 @@ import Game from '../play/Game';
 import GameResult from '../play/GameResult';
 import { IGameResult } from '../play/GameInterfaces';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import { useLocation } from 'react-router';
 
 export enum GameState {
 	NO_GAME = 'no-game',
@@ -16,6 +17,7 @@ export enum GameState {
 	PREGAME = 'pregame',
 	PLAYING = 'playing',
 	RESULTS = 'results',
+	SPECTATE = 'spectate',
 }
 
 export interface IPlayerInfo {
@@ -34,6 +36,7 @@ const Play = () => {
 	const [players, setPlayers] = useState<IGamePlayer[]>([]);
 	const [result, setResult] = useState<IGameResult | null>(null);
 	const infoBoxContext = useContext(InfoBoxContext);
+	const location = useLocation();
 
 	function isGameAbortedEvent(data: any): boolean {
 		return data.event === 'game-aborted';
@@ -61,32 +64,36 @@ const Play = () => {
 	});
 
 	useEffect(() => {
-		return () => {
-			if (
-				stateRef.current == GameState.PREGAME ||
-				stateRef.current == GameState.PLAYING
-			) {
-				stateRef.current = GameState.NO_GAME;
-				infoBoxContext.addInfo({
-					type: InfoType.ERROR,
-					message: 'You left the game and lost',
-				});
-				sendMessage(
-					JSON.stringify({
-						event: 'matchmaking',
-						data: { action: 'leave' },
-					}),
-				);
-			}
-			if (stateRef.current == GameState.MATCHMAKING) {
-				sendMessage(
-					JSON.stringify({
-						event: 'matchmaking',
-						data: { action: 'cancel' },
-					}),
-				);
-			}
-		};
+		const spec = location.search.includes('spectate');
+		setGameState(spec ? GameState.SPECTATE : GameState.LOBBY);
+		if (!spec) {
+			return () => {
+				if (
+					stateRef.current == GameState.PREGAME ||
+					stateRef.current == GameState.PLAYING
+				) {
+					stateRef.current = GameState.NO_GAME;
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: 'You left the game and lost',
+					});
+					sendMessage(
+						JSON.stringify({
+							event: 'matchmaking',
+							data: { action: 'leave' },
+						}),
+					);
+				}
+				if (stateRef.current == GameState.MATCHMAKING) {
+					sendMessage(
+						JSON.stringify({
+							event: 'matchmaking',
+							data: { action: 'cancel' },
+						}),
+					);
+				}
+			};
+		}
 	}, []);
 
 	useEffect(() => {
@@ -148,10 +155,13 @@ const Play = () => {
 				<PreGame players={players} setGameState={setGameState} />
 			)}
 			{gameState === GameState.PLAYING && (
-				<Game players={players} endMatch={endMatch} />
+				<Game spectator={false} players={players} endMatch={endMatch} />
 			)}
 			{gameState === GameState.RESULTS && result && (
 				<GameResult result={result} />
+			)}
+			{gameState === GameState.SPECTATE && (
+				<Game spectator={true} endMatch={endMatch} />
 			)}
 		</div>
 	);

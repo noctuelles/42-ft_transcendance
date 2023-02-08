@@ -9,14 +9,18 @@ import Timer from './Timer';
 import { IGameResult } from './GameInterfaces';
 
 interface IGameProps {
-	players: IGamePlayer[];
-	endMatch: (result: IGameResult) => void;
+	spectator: boolean;
+	players?: IGamePlayer[];
+	endMatch?: (result: IGameResult) => void;
 }
 
 function Game(props: IGameProps) {
 	const canvasRef = useRef(null);
 	const [time, setTime] = useState(300);
-	const [players, setPlayers] = useState([...props.players]);
+	const [players, setPlayers] = useState<IGamePlayer[]>(
+		props.spectator || !props.players ? [] : [...props.players],
+	);
+	const stateRef = useRef(false);
 
 	function isGameStateEvent(data: any) {
 		return data.event === 'game-state';
@@ -32,13 +36,34 @@ function Game(props: IGameProps) {
 			data = JSON.parse(data);
 			if (isGameStateEvent(data)) {
 				setTime(data.data.gameInfos.time);
-				setPlayers([
-					{ ...players[0], score: data.data.player1.score },
-					{ ...players[1], score: data.data.player2.score },
-				]);
+				if (props.spectator) {
+					setPlayers([
+						{
+							infos: {
+								name: data.data.player1.name,
+								profile_picture:
+									data.data.player1.profile_picture,
+							},
+							score: data.data.player1.score,
+						},
+						{
+							infos: {
+								name: data.data.player2.name,
+								profile_picture:
+									data.data.player2.profile_picture,
+							},
+							score: data.data.player2.score,
+						},
+					]);
+				} else {
+					setPlayers([
+						{ ...players[0], score: data.data.player1.score },
+						{ ...players[1], score: data.data.player2.score },
+					]);
+				}
 				drawState(data.data, canvasRef);
 			}
-			if (isGameResultMessage(data)) {
+			if (isGameResultMessage(data) && props.endMatch) {
 				props.endMatch(data.data);
 			}
 		},
@@ -80,6 +105,19 @@ function Game(props: IGameProps) {
 	}
 
 	useEffect(() => {
+		if (!stateRef.current) {
+			stateRef.current = true;
+			return;
+		}
+		if (props.spectator) {
+			return () => {
+				sendMessage(
+					JSON.stringify({
+						event: 'spectate-leave',
+					}),
+				);
+			};
+		}
 		window.addEventListener('keydown', onKeyPress);
 		window.addEventListener('keyup', onKeyRelease);
 
@@ -91,22 +129,26 @@ function Game(props: IGameProps) {
 
 	return (
 		<div className="game">
-			<div className="game-players">
-				<PlayerCard
-					player={players[0]}
-					position={PlayerPosition.LEFT}
-					type={PlayerCardType.DURING_GAME}
-				/>
-				<Timer time={time} />
-				<PlayerCard
-					player={players[1]}
-					position={PlayerPosition.RIGHT}
-					type={PlayerCardType.DURING_GAME}
-				/>
-			</div>
-			<div className="game-content">
-				<canvas ref={canvasRef} className="game-canvas" />
-			</div>
+			{players.length > 0 && (
+				<>
+					<div className="game-players">
+						<PlayerCard
+							player={players[0]}
+							position={PlayerPosition.LEFT}
+							type={PlayerCardType.DURING_GAME}
+						/>
+						<Timer time={time} />
+						<PlayerCard
+							player={players[1]}
+							position={PlayerPosition.RIGHT}
+							type={PlayerCardType.DURING_GAME}
+						/>
+					</div>
+					<div className="game-content">
+						<canvas ref={canvasRef} className="game-canvas" />
+					</div>
+				</>
+			)}
 		</div>
 	);
 }

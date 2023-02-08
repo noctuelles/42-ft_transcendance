@@ -36,13 +36,21 @@ export interface ProfileMatchData {
 	type: MatchType;
 }
 
+export enum UserStatus {
+	OFFLINE = 'OFFLINE',
+	ONLINE = 'ONLINE',
+	PLAYING = 'PLAYING',
+}
+
 export interface ProfileData {
+	id: number;
 	matches: ProfileMatchData[];
 	achievements: ProfileAchievementData[];
 	wonMatches: number;
 	lostMatches: number;
 	picture: string;
 	name: string;
+	status: UserStatus;
 	xp: number;
 }
 

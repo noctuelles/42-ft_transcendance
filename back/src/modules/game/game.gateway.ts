@@ -1,9 +1,13 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from './game.service';
 
 @WebSocketGateway()
 export class GameGateway {
-	constructor(private readonly gameService: GameService) {}
+	constructor(
+		private readonly gameService: GameService,
+		private readonly websocketsService: WebsocketsService,
+	) {}
 
 	@SubscribeMessage('matchmaking')
 	async matchmaking(socket: any, payload: any) {
@@ -27,5 +31,29 @@ export class GameGateway {
 		const game = this.gameService.getGameWherePlayerIs(socket.user.id);
 		if (!game) return;
 		game.processInput(socket.user.id, payload);
+	}
+
+	@SubscribeMessage('spectate-match')
+	async spectateMatch(socket: any, payload: any) {
+		if (!payload || !payload.id) return;
+		const game = this.gameService.getGameWherePlayerIs(payload.id);
+		if (!game) {
+			this.websocketsService.send(socket, 'spectate-match', {
+				status: 'error',
+				error: 'Game not found',
+			});
+			return;
+		}
+		this.websocketsService.send(socket, 'spectate-match', {
+			status: 'success',
+		});
+		game.addSpectator(socket);
+	}
+
+	@SubscribeMessage('spectate-leave')
+	async spectateLeave(socket: any, payload: any) {
+		const game = this.gameService.getGameWhereSpectatorIs(socket.user.id);
+		if (!game) return;
+		game.removeSpectator(socket);
 	}
 }

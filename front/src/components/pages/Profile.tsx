@@ -55,6 +55,8 @@ const Profile = () => {
 				total_xp={profile.xp}
 				picture={profile.picture}
 				onSearchClick={handleSearch}
+				status={profile.status}
+				userId={profile.id}
 			/>
 			<hr />
 			<div className="profile-top-summary">

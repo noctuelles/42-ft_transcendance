@@ -97,4 +97,10 @@ export class GameService {
 		if (!game) return;
 		game.leave(userId);
 	}
+
+	getGameWhereSpectatorIs(userId: number) {
+		return this.games.find(
+			(game: Game) => game.getSpectator(userId) != null,
+		);
+	}
 }

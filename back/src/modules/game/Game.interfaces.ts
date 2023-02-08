@@ -87,7 +87,7 @@ export const GameParams = {
 	BALL_MAX_SPEED: 15,
 	BALL_PERTURBATOR: 0.2,
 	//TODO: change to 300
-	GAME_TIME: 1000000,
+	GAME_TIME: 1000,
 	PORTAL_WIDTH: 20,
 	PORTAL_HEIGHT: 40,
 	PORTAL_OFFSET: 100,
@@ -198,7 +198,10 @@ export function getDefaultGameState(
 	return res;
 }
 
-export function convertStateToSendable(state: any, timeInSeconds: number) {
+export function convertStateToSendable(
+	state: IGameState,
+	timeInSeconds: number,
+) {
 	let res = {
 		gameInfos: {
 			originalWidth: state.gameInfos.width,
@@ -239,5 +242,17 @@ export function convertStateToSendable(state: any, timeInSeconds: number) {
 			};
 		});
 	}
+	return res;
+}
+
+export function convertStateToSendableForSpectators(
+	state: IGameState,
+	timeInSeconds: number,
+) {
+	let res = convertStateToSendable(state, timeInSeconds);
+	res.player1['name'] = state.player1.profile.user.name;
+	res.player1['profile_picture'] = state.player1.profile.user.profile.picture;
+	res.player2['name'] = state.player2.profile.user.name;
+	res.player2['profile_picture'] = state.player2.profile.user.profile.picture;
 	return res;
 }

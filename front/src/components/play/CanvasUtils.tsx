@@ -76,6 +76,7 @@ function drawPortal(ctx: any, portal: IPortal) {
 }
 
 export function drawState(state: IGameState, canvasRef: any) {
+	if (!canvasRef.current) return;
 	const canvas: any = canvasRef.current;
 	const ctx = canvas.getContext('2d');
 
