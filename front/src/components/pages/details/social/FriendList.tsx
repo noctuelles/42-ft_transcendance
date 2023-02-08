@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import FriendItem from './FriendItem';
 import IFriendData from './Types';
 import TextField from '@/components/global/TextField';
@@ -9,20 +9,15 @@ import { back_url } from '@/config.json';
 import { UserContext } from '@/context/UserContext';
 import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 import { ws_url } from '@/config.json';
-
-interface IProps {}
-
-interface IState {
-	friendSearchName: string;
-	friends: IFriendData[];
-}
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IValues {
 	username: string;
 }
 
-const FriendList = (props: IProps) => {
+const FriendList = () => {
 	const userContext = useContext(UserContext);
+	const infoContext = useContext(InfoBoxContext);
 	const [friends, setFriends] = useState<IFriendData[] | null>(null);
 	const validation = Yup.object().shape({
 		username: Yup.string().required('Requiered'),
@@ -47,23 +42,29 @@ const FriendList = (props: IProps) => {
 			}
 		},
 	});
+
 	useEffect(() => {
 		async function fetchData() {
 			const token = await userContext.getAccessToken();
 
-			//TODO: when we cannot fetch.
-			const response = fetch(back_url + '/users/friends', {
+			fetch(back_url + '/users/friends', {
 				method: 'GET',
 				headers: {
 					Authorization: 'Bearer ' + token,
 				},
 			})
 				.then((response) => {
+					if (!response.ok) throw new Error();
 					if (response.ok) return response.json();
-					return Promise.reject(response);
 				})
 				.then((data: IFriendData[]) => {
 					setFriends(data);
+				})
+				.catch(() => {
+					infoContext.addInfo({
+						type: InfoType.ERROR,
+						message: `Cannot load friend list`,
+					});
 				});
 		}
 		fetchData();
