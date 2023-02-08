@@ -50,7 +50,19 @@ export class ChatService {
 		chann.convertFromUserChannel(
 			await this.prismaService.userChannel.findUnique({
 				where: { id: channelId },
-				include: { participants: true },
+				include: {
+					participants: {
+						include: {
+							user: {
+								select: {
+									name: true,
+									status: true,
+									profile: { select: { picture: true } },
+								},
+							},
+						},
+					},
+				},
 			}),
 		);
 		return chann;
@@ -96,7 +108,40 @@ export class ChatService {
 				},
 			},
 			include: {
-				participants: true,
+				participants: {
+					include: {
+						user: {
+							select: {
+								name: true,
+								status: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
+			},
+		});
+		return rawChannelList.map((rawChannel) => {
+			const channel = new Channel(rawChannel.id);
+			channel.convertFromUserChannel(rawChannel);
+			return channel;
+		});
+	}
+
+	async getChannelList(): Promise<Channel[]> {
+		const rawChannelList = await this.prismaService.userChannel.findMany({
+			include: {
+				participants: {
+					include: {
+						user: {
+							select: {
+								name: true,
+								status: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
 			},
 		});
 		return rawChannelList.map((rawChannel) => {
