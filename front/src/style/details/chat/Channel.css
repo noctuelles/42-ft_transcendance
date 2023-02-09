@@ -1,13 +1,16 @@
 .channel-list-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	font-size: 1.1rem;
+	border-radius: 10px;
+	padding: 0.3rem;
+	margin-bottom: 3px;
+	cursor: pointer;
+	transition: background-color 0.3s linear;
 }
 
-.channel-list-item :hover {
-	background-color: darkgrey;
+.channel-list-item:hover {
+	background-color: var(--yellow-primary-color);
 }
 
 #channel-list-item-selected {
-	background-color: red;
+	background-color: var(--blue-primary-color);
 }

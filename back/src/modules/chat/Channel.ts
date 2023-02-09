@@ -5,6 +5,7 @@ import { UserOnChannelRole } from '@prisma/client';
 import { UserOnChannelStatus } from '@prisma/client';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
+import * as argon from 'argon2';
 
 export enum ChannelType {
 	PUBLIC,
@@ -38,6 +39,7 @@ export default class Channel {
 	adminsId: number[];
 	muted: IPunishment[];
 	banned: IPunishment[];
+	hashedPwd: string;
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -48,6 +50,7 @@ export default class Channel {
 		}
 		this.id = userChannel.id;
 		this.name = userChannel.name;
+		this.hashedPwd = userChannel.password;
 		this.type = userChannel.visibility;
 		this.ownerId = userChannel.participants.filter((user) => {
 			return user.role === UserOnChannelRole.OPERATOR;
@@ -143,31 +146,23 @@ export default class Channel {
 		if (this.isUserBanned(prismaService, userId)) {
 			return false;
 		}
-		//TODO: Change this with password verification
 		if (
 			this.type === UserChannelVisibility.PWD_PROTECTED &&
-			password !== 'password'
+			!(await argon.verify(this.hashedPwd, password))
 		) {
 			return false;
 		}
 		return true;
 	}
 
-	getJoinError(
-		prismaService: PrismaService,
-		userId: number,
-		password: string,
-	) {
+	getJoinError(prismaService: PrismaService, userId: number) {
 		if (this.type === UserChannelVisibility.PRIVATE) {
 			return 'This channel is private';
 		}
 		if (this.isUserBanned(prismaService, userId)) {
 			return 'You are banned from this channel';
 		}
-		if (
-			this.type === UserChannelVisibility.PWD_PROTECTED &&
-			password !== 'password'
-		) {
+		if (this.type === UserChannelVisibility.PWD_PROTECTED) {
 			return 'Wrong password';
 		}
 	}

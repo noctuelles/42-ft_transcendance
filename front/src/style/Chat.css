@@ -9,7 +9,8 @@
 	border: 5px solid var(--yellow-primary-color);
 	margin: auto;
 	border-radius: 40px;
-	height: 80%;
+	height: 70%;
+	max-height: 80%;
 	width: 70%;
 	background-color: lightgray;
 	display: flex;
@@ -21,12 +22,12 @@
 .chat-page-left-side {
 	min-width: 20%;
 	text-align: center;
-<<<<<<< HEAD
 	border-right: 2px solid black;
-=======
-	border-right: 1px solid black;
->>>>>>> e1ca102bc3df3ad50d8eb65dc296ee9cb9f45afa
 	padding: 0.5rem;
+}
+
+.chat-page-left-side hr {
+	border: 2.5px solid black;
 }
 
 .chat-page-center {

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useContext } from 'react';
+import { useRef, useEffect, useContext, useState } from 'react';
 import '@/style/details/chat/ChannelList.css';
 import Channel from './Channel';
 import IChannel from './IChannel';
