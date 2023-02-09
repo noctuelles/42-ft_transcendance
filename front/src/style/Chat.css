@@ -5,8 +5,10 @@
 .chat-page {
 	/* Center the chat page */
 	margin: auto;
-	height: 700px;
-	width: 1200px;
+	border-radius: 40px;
+	height: 100%;
+	width: 70%;
+	background-color: lightgray;
 	display: flex;
 	border: 1px solid black;
 }
@@ -15,7 +17,6 @@
 	min-width: 20%;
 	text-align: center;
 	border-right: 1px solid black;
-	background-color: lightgray;
 	padding: 0.5rem;
 }
 
@@ -27,7 +28,6 @@
 	min-width: 20%;
 	text-align: center;
 	border-left: 1px solid black;
-	background-color: lightgray;
 }
 
 .chat-container {
@@ -63,6 +63,9 @@ input.textarea {
 }
 
 .chat-modal {
+	display: flex;
+	align-items: center;
+	align-content: center;
 	position: absolute;
 	top: var(--navbar-size);
 	left: 0;

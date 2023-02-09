@@ -1,12 +1,15 @@
 .btn {
 	margin: 5px;
-	border: 2px solid transparent;
-	border-radius: 5px;
+	padding: 0.5rem;
+	border: 3px solid transparent;
+	border-radius: 10px;
 	color: #000;
 	cursor: pointer;
 	font-weight: 600;
+	letter-spacing: 0.04em;
+	transition: border 0.3s ease-in;
 }
 
 .btn:hover {
-	border: solid 2px black;
+	border: solid 3px black;
 }
