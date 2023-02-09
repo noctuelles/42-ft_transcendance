@@ -782,6 +782,31 @@ export class Game {
 				1,
 			);
 		}
+
+		if (this.invitation) {
+			this._websocketsService.sendToAllUsers(
+				this.invitation.message.channel.participants.map(
+					(p) => p.userId,
+				),
+				'chat-delete',
+				{
+					type: 'invitation',
+					createdBy: this.invitation.createdBy.name,
+					channel: this.invitation.message.channel.id,
+				},
+			);
+			promises.push(
+				this._prismaService.matchInvitation.deleteMany({
+					where: { id: this.invitation.id },
+				}),
+			);
+			promises.push(
+				this._prismaService.messageOnChannel.deleteMany({
+					where: { id: this.invitation.message.id },
+				}),
+			);
+		}
+
 		await Promise.all(promises);
 	}
 }

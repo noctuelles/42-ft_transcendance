@@ -326,10 +326,10 @@ export default class Channel {
 			createdBy: username,
 			channel: this.id,
 		});
-		await prismaService.matchInvitation.delete({
+		await prismaService.matchInvitation.deleteMany({
 			where: { id: id },
 		});
-		await prismaService.messageOnChannel.delete({
+		await prismaService.messageOnChannel.deleteMany({
 			where: { id: messageId },
 		});
 	}
