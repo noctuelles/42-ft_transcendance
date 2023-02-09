@@ -603,6 +603,7 @@ export class Game {
 		const isUser2Winner = user2.id === winner.profile.user.id;
 
 		let promises = [];
+		this._setPlayersStatus('ONLINE');
 		promises.push(
 			this._prismaService.match.create({
 				data: {
