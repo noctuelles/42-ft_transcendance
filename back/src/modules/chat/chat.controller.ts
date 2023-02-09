@@ -6,6 +6,9 @@ import {
 	Get,
 	Param,
 	BadRequestException,
+	Post,
+	ForbiddenException,
+	Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
@@ -15,12 +18,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JoinChannelDTO, LeaveChannelDTO } from './Channel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
 import { CreateChannelValidationPipe } from './validation.pipe';
+import { WebsocketsService } from '../websockets/websockets.service';
+import { GameService } from '../game/game.service';
 
 @Controller('chat')
 export class ChatController {
 	constructor(
 		private readonly chatService: ChatService,
 		private readonly prismaService: PrismaService,
+		private readonly websocketsService: WebsocketsService,
+		private readonly gameService: GameService,
 	) {}
 
 	@UseGuards(AuthGuard)
@@ -108,5 +115,92 @@ export class ChatController {
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/invite/play')
+	async inviteToGame(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		if (await this.chatService.hasUserCreatedPlayingInvitation(user.id)) {
+			return {
+				success: false,
+				reason: 'You already created a game invitation',
+			};
+		}
+		channel.invitePlay(user, this.prismaService, this.websocketsService);
+		return {
+			success: true,
+		};
+	}
+
+	@UseGuards(AuthGuard)
+	@Delete('channel/:channelId/invite/play')
+	async deleteInvitation(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		const invitation = await this.chatService.getInvitationInChannel(
+			user.id,
+			channel.id,
+		);
+		if (!invitation) {
+			throw new BadRequestException('Invitation not found');
+		}
+		channel.deleteInvitation(
+			invitation.id,
+			invitation.messageId,
+			user.name,
+			this.prismaService,
+			this.websocketsService,
+		);
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/invite/play/accept/:inviter')
+	async acceptInvitation(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+		@Param('inviter') inviterName: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		const inviter = await this.prismaService.user.findUnique({
+			where: { name: inviterName },
+		});
+		const invitation = await this.chatService.getInvitationInChannel(
+			inviter.id,
+			channel.id,
+		);
+		if (!invitation) {
+			throw new BadRequestException('Invitation not found');
+		}
+		channel.acceptInvitation(
+			invitation,
+			user.id,
+			this.prismaService,
+			this.websocketsService,
+			this.gameService,
+		);
 	}
 }

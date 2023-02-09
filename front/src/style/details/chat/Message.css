@@ -66,3 +66,14 @@
 	content: '\01F464';
 	margin: 5px;
 }
+
+.invitation .main {
+	font-size: 20px;
+}
+
+.invitation .message {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}

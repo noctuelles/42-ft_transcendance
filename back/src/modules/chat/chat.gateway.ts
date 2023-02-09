@@ -12,6 +12,7 @@ export class ChatGateway {
 	@SubscribeMessage('chat')
 	async handleMessage(socket: any, data: any) {
 		data.username = socket.user.name;
+		data['isInvitation'] = false;
 		if (
 			!this.chatService.isIMessage(data) ||
 			!(
