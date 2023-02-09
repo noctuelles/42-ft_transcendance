@@ -92,8 +92,8 @@ export class ChatService {
 			socket,
 			'channels',
 			channels.map((channel) => {
-				let { muted, banned, ...frontChannel } = channel;
-				return frontChannel;
+				let { muted, banned, ...frontChannels } = channel;
+				return frontChannels;
 			}),
 		);
 	}

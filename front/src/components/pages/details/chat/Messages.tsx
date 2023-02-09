@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { MessagesContext } from '@/context/MessagesContext';
+import { ChatContext } from '@/context/ChatContext';
 import { UserContext } from '@/context/UserContext';
 import { useContext } from 'react';
 import IMessage from './IMessage';
@@ -40,7 +40,7 @@ export default function Messages({
 	);
 
 	function getMessages(selectedChannel: number): IMessage[] {
-		const messages = useContext(MessagesContext)['data'];
+		const messages = useContext(ChatContext)['messages'];
 		const channelMessages = messages.get(selectedChannel);
 		return channelMessages === undefined ? [] : channelMessages;
 	}

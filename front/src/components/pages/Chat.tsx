@@ -7,6 +7,7 @@ import ChannelJoinList from './details/chat/ChannelJoinList';
 import ChannelList from './details/chat/ChannelList';
 import Messages from './details/chat/Messages';
 import UserInput from './details/chat/UserInput';
+import ChannelSideBar from './details/chat/ChannelSideBar';
 
 enum ChatState {
 	DEFAULT = 'DEFAULT',
@@ -91,7 +92,7 @@ export default function Chat() {
 				<UserInput selectedChannel={selectedChannel} />
 			</div>
 			<div className="chat-page-right-side">
-				<h3>Channel name</h3>
+				<ChannelSideBar selectedChannel={selectedChannel} />
 			</div>
 		</div>
 	);
