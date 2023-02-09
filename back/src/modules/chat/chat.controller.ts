@@ -6,6 +6,8 @@ import {
 	Get,
 	Param,
 	BadRequestException,
+	Post,
+	ForbiddenException,
 } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
@@ -15,12 +17,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JoinChannelDTO, LeaveChannelDTO } from './Channel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
 import { CreateChannelValidationPipe } from './validation.pipe';
+import { WebsocketsService } from '../websockets/websockets.service';
 
 @Controller('chat')
 export class ChatController {
 	constructor(
 		private readonly chatService: ChatService,
 		private readonly prismaService: PrismaService,
+		private readonly websocketsService: WebsocketsService,
 	) {}
 
 	@UseGuards(AuthGuard)
@@ -108,5 +112,30 @@ export class ChatController {
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/invite/play')
+	async inviteToGame(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		if (await this.chatService.hasUserCreatedPlayingInvitation(user.id)) {
+			return {
+				success: false,
+				reason: 'You already created a game invitation',
+			};
+		}
+		channel.invitePlay(user, this.prismaService, this.websocketsService);
+		return {
+			success: true,
+		};
 	}
 }

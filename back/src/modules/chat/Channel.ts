@@ -1,8 +1,9 @@
-import { Prisma } from '@prisma/client';
+import { MathInvitationStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannelVisibility } from '@prisma/client';
 import { UserOnChannelRole } from '@prisma/client';
 import { UserOnChannelStatus } from '@prisma/client';
+import { WebsocketsService } from '../websockets/websockets.service';
 
 export enum ChannelType {
 	PUBLIC,
@@ -19,6 +20,8 @@ export interface IMessage {
 	channel: number;
 	username: string;
 	message: string;
+	isInvitation: boolean;
+	invitationStatus?: MathInvitationStatus;
 }
 
 type ChannelWithUser = Prisma.UserChannelGetPayload<{
@@ -248,14 +251,46 @@ export default class Channel {
 			orderBy: { postedAt: 'asc' },
 			include: {
 				author: true,
+				matchInvitation: true,
 			},
 		});
 		return messages.map((message) => {
-			return {
+			let res = {
 				username: message.author.name,
 				channel: message.channelId,
 				message: message.content,
+				isInvitation: message.matchInvitation ? true : false,
 			};
+			if (res.isInvitation) {
+				res['invitationStatus'] = message.matchInvitation.status;
+			}
+			return res;
+		});
+	}
+
+	async invitePlay(
+		user,
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+	) {
+		websocketsService.sendToAllUsers(this.membersId, 'chat', {
+			username: user.name,
+			channel: this.id,
+			message: '',
+			isInvitation: true,
+			invitationStatus: MathInvitationStatus.PENDING,
+		});
+		await prismaService.messageOnChannel.create({
+			data: {
+				authorId: user.id,
+				channelId: this.id,
+				content: '',
+				matchInvitation: {
+					create: {
+						createdById: user.id,
+					},
+				},
+			},
 		});
 	}
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
-import Channel from './Channel';
+import Channel, { IMessage } from './Channel';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannel, UserChannelVisibility } from '@prisma/client';
 import { UserOnChannel } from '@prisma/client';
@@ -9,17 +9,13 @@ export class Message {
 	channel: number;
 	username: string;
 	message: string;
+	isInvitation: boolean;
 	constructor(obj: IMessage) {
 		this.channel = obj.channel;
 		this.username = obj.username;
 		this.message = obj.message;
+		this.isInvitation = obj.isInvitation;
 	}
-}
-
-export interface IMessage {
-	channel: number;
-	username: string;
-	message: string;
 }
 
 @Injectable()
@@ -166,5 +162,13 @@ export class ChatService {
 				if (a.joined == b.joined) return b.members - a.members;
 				return a.joined ? 1 : -1;
 			});
+	}
+
+	async hasUserCreatedPlayingInvitation(userId: number) {
+		return (await this.prismaService.matchInvitation.findFirst({
+			where: { createdById: userId },
+		}))
+			? true
+			: false;
 	}
 }
