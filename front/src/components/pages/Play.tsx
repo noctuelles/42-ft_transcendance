@@ -8,7 +8,7 @@ import Game from '../play/Game';
 import GameResult from '../play/GameResult';
 import { IGameResult } from '../play/GameInterfaces';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
-import { useLocation } from 'react-router';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { UserContext } from '@/context/UserContext';
 
 export enum GameState {
@@ -40,6 +40,7 @@ const Play = () => {
 	const location = useLocation();
 	const fetched = useRef(false);
 	const userContext = useContext(UserContext);
+	const navigate = useNavigate();
 
 	function isGameAbortedEvent(data: any): boolean {
 		return data.event === 'game-aborted';
@@ -78,13 +79,19 @@ const Play = () => {
 						Authorization: 'Bearer ' + token,
 					},
 				})
-					.then((res) => res.json())
+					.then((res) => {
+						if (res.ok) return res.json();
+						else throw new Error('No game found');
+					})
 					.then((data) => {
 						setPlayers([
 							{ infos: data.player1, score: 0 },
 							{ infos: data.player2, score: 0 },
 						]);
 						setGameState(GameState.PREGAME);
+					})
+					.catch((err) => {
+						navigate('/play');
 					});
 			}
 
