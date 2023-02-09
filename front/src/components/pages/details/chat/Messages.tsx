@@ -31,6 +31,8 @@ export default function Messages({
 					from={x.username}
 					content={x.message}
 					self={myUserName == x.username}
+					isInvitation={x.isInvitation}
+					invitationStatus={x.invitationStatus}
 				/>
 			))}
 		</ol>
