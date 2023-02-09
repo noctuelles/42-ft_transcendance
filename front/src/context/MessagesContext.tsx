@@ -22,14 +22,35 @@ export default function MessagesContextProvider(props: any) {
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
-			if (!data || !isChatMessage(data)) {
+			if (!data) {
 				return;
 			}
-			const newMessage = parseMessage(data);
-			registerMessage(newMessage);
+			if (isChatMessage(data)) {
+				const newMessage = parseMessage(data);
+				registerMessage(newMessage);
+			}
+			if (isChatDeleteMessage(data)) {
+				const obj = JSON.parse(data).data;
+				if (obj.type == 'invitation') {
+					const channelId = obj.channel;
+					const username = obj.createdBy;
+					if (messages.current.has(channelId)) {
+						messages.current.set(
+							channelId,
+							messages.current
+								.get(channelId)!
+								.filter(
+									(m) =>
+										m.username !== username ||
+										!m.isInvitation,
+								),
+						);
+					}
+				}
+			}
 		},
 		filter: ({ data }: { data: string }) => {
-			return isChatMessage(data);
+			return isChatMessage(data) || isChatDeleteMessage(data);
 		},
 	});
 	return (
@@ -78,6 +99,15 @@ export default function MessagesContextProvider(props: any) {
 			return false;
 		}
 		return message?.['event'] == 'chat';
+	}
+
+	function isChatDeleteMessage(rawMessage: string): boolean {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'chat-delete';
 	}
 
 	function parseMessage(rawMessage: string): IMessage {

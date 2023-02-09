@@ -1,7 +1,9 @@
 import Button from '@/components/global/Button';
-import Loader from '@/components/global/Loader';
 import '@/style/details/chat/Message.css';
 import { InvitationStatus } from './IMessage';
+import { back_url } from '@/config.json';
+import { useContext } from 'react';
+import { UserContext } from '@/context/UserContext';
 
 interface IProps {
 	from: string;
@@ -9,6 +11,7 @@ interface IProps {
 	self: boolean;
 	isInvitation: boolean;
 	invitationStatus?: InvitationStatus;
+	selectedChannel: number;
 }
 
 const Message = ({
@@ -17,7 +20,22 @@ const Message = ({
 	self,
 	isInvitation,
 	invitationStatus,
+	selectedChannel,
 }: IProps) => {
+	const userContext = useContext(UserContext);
+
+	async function cancelInvitation() {
+		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + selectedChannel + '/invite/play', {
+			method: 'DELETE',
+			headers: {
+				Authorization: 'Bearer ' + token,
+			},
+		});
+	}
+
+	async function joinInvitation() {}
+
 	return (
 		<li
 			className={`${self ? 'self' : 'other'} ${
@@ -33,7 +51,12 @@ const Message = ({
 				<p className="secondary">
 					{invitationStatus &&
 						invitationStatus === InvitationStatus.PENDING && (
-							<Button color={self ? '#ffb800' : '#17c0e9'}>
+							<Button
+								onClick={
+									self ? cancelInvitation : joinInvitation
+								}
+								color={self ? '#ffb800' : '#17c0e9'}
+							>
 								{self ? 'Cancel' : 'Join'}
 							</Button>
 						)}

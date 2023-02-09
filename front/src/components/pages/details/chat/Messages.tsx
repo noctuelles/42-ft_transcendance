@@ -33,6 +33,7 @@ export default function Messages({
 					self={myUserName == x.username}
 					isInvitation={x.isInvitation}
 					invitationStatus={x.invitationStatus}
+					selectedChannel={selectedChannel}
 				/>
 			))}
 		</ol>
