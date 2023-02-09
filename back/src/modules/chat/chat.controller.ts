@@ -20,7 +20,6 @@ import {
 	JoinChannelDTO,
 	LeaveChannelDTO,
 } from './Channel.dto';
-import { ValidationPipe, UsePipes } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
 
@@ -34,7 +33,6 @@ export class ChatController {
 	) {}
 
 	@UseGuards(AuthGuard)
-	@UsePipes(ValidationPipe)
 	@Patch('channel/join')
 	async joinChannel(
 		@CurrentUser() user: User,
@@ -55,7 +53,6 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
-	@UsePipes(ValidationPipe)
 	@Patch('channel/leave')
 	async leaveChannel(
 		@CurrentUser() user: User,
@@ -126,6 +123,7 @@ export class ChatController {
 		return await this.chatService.createChannel(user, createChannelDTO);
 	}
 
+	@UseGuards(AuthGuard)
 	@Post('channel/:channelId/invite/play')
 	async inviteToGame(
 		@CurrentUser() user: User,

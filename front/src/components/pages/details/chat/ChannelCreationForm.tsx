@@ -11,7 +11,7 @@ type ChannelRadioType = 'Public' | 'Private' | 'Password Protected';
 
 interface IValues {
 	channelName: string;
-	channelPassword: string;
+	channelPassword?: string;
 	channelType: ChannelRadioType;
 }
 
@@ -56,6 +56,9 @@ export default function ChannelCreationForm({
 		}: { setFieldError: (field: string, errorMsg: string) => void },
 	) {
 		const token = await userContext.getAccessToken();
+
+		if (values.channelType !== 'Password Protected')
+			delete values.channelPassword;
 
 		const reqInit: RequestInit = {
 			method: 'POST',

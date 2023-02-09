@@ -5,6 +5,7 @@ import { UserOnChannelRole } from '@prisma/client';
 import { UserOnChannelStatus } from '@prisma/client';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
+import * as argon from 'argon2';
 
 export enum ChannelType {
 	PUBLIC,

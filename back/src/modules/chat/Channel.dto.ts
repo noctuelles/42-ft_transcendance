@@ -20,33 +20,13 @@ export class LeaveChannelDTO {
 }
 
 export class CreateChannelDTO {
-	protected readonly generateGroups? = () => {
-		const groups = [];
-
-		if (Object.values(EChannelType).includes(this.channelType))
-			groups.push(this.channelType);
-
-		return groups;
-	};
-
-	@Length(10, 25, {
-		groups: [
-			EChannelType.PUBLIC,
-			EChannelType.PRIVATE,
-			EChannelType.PWD_PROTECTED,
-		],
-	})
+	@Length(10, 25)
 	channelName: string;
 
-	@IsEnum(EChannelType, {
-		groups: [
-			EChannelType.PUBLIC,
-			EChannelType.PRIVATE,
-			EChannelType.PWD_PROTECTED,
-		],
-	})
+	@IsEnum(EChannelType)
 	channelType: EChannelType;
 
-	@Length(10, 25, { groups: [EChannelType.PWD_PROTECTED] })
-	channelPassword: string;
+	@IsOptional()
+	@Length(10, 25)
+	channelPassword: string | undefined;
 }

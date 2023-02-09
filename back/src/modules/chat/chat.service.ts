@@ -185,6 +185,8 @@ export class ChatService {
 		else if (channelDTO.channelType === EChannelType.PRIVATE)
 			visibility = UserChannelVisibility.PRIVATE;
 		else {
+			if (channelDTO.channelPassword === undefined)
+				throw new BadRequestException('Password requiered');
 			hashedPwd = await argon.hash(channelDTO.channelPassword);
 			visibility = UserChannelVisibility.PWD_PROTECTED;
 		}
