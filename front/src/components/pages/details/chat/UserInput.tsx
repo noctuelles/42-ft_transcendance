@@ -38,7 +38,7 @@ export default function UserInput({
 	});
 
 	return (
-		<form onSubmit={formik.handleSubmit}>
+		<form onSubmit={formik.handleSubmit} className="chat-user-input">
 			<input
 				className="textarea"
 				type="text"
@@ -49,6 +49,7 @@ export default function UserInput({
 				value={formik.values.inputValue}
 				maxLength={255}
 			/>
+			<button>Invite to play</button>
 		</form>
 	);
 }
