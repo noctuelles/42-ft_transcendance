@@ -3,6 +3,9 @@ import '@/style/details/chat/ChannelCreationForm.css';
 import * as Yup from 'yup';
 import Button from '@/components/global/Button';
 import TextField from '@/components/global/TextField';
+import { back_url as BACK_URL } from '@/config.json';
+import { useContext } from 'react';
+import { UserContext } from '@/context/UserContext';
 
 type ChannelRadioType = 'Public' | 'Private' | 'Password Protected';
 
@@ -39,25 +42,42 @@ export default function ChannelCreationForm({
 				.matches(/^[A-Za-z0-9_@./#&+-]*$/i, 'Invalid password'),
 		}),
 	});
-
 	const values: IValues = {
 		channelName: '',
 		channelPassword: '',
 		channelType: 'Public',
 	};
+	const userContext = useContext(UserContext);
 
-	async function handleSubmit(values: IValues) {
-		//TODO: Hash the password before sending it to the API.
+	async function handleSubmit(
+		values: IValues,
+		{
+			setFieldError,
+		}: { setFieldError: (field: string, errorMsg: string) => void },
+	) {
+		const token = await userContext.getAccessToken();
+
 		const reqInit: RequestInit = {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + token,
 			},
-			body: JSON.stringify(values, null, 2),
+			body: JSON.stringify(values),
 		};
 
-		fetch('', reqInit);
-		alert(JSON.stringify(values, null, 2));
+		fetch(BACK_URL + '/chat/channels/create', reqInit)
+			.then((response) => {
+				if (!response.ok)
+					return response.text().then((text) => {
+						throw new Error(text);
+					});
+				if (response.ok) closeModal();
+			})
+			.catch((err) => {
+				const errObj = JSON.parse(err.message);
+				setFieldError('channelName', errObj.message);
+			});
 	}
 
 	return (

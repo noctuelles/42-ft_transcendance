@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import {
-	ValidationArguments,
 	ValidatorConstraint,
 	ValidatorConstraintInterface,
+	ValidationOptions,
+	registerDecorator,
 } from 'class-validator';
 import { CreateUserDTO } from 'src/modules/auth/DTO/CreateUserDTO';
-import { CurrentUser } from '../auth/guards/currentUser.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { achievmentsList } from './achievments.interface';
 import { AchievementsService } from './achievments.service';
@@ -427,11 +427,14 @@ export class UsersService {
 @ValidatorConstraint({ name: 'UserExists', async: true })
 @Injectable()
 export class UserExistsRule implements ValidatorConstraintInterface {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) {
+		console.log('UserExistRule constructed');
+	}
 
 	async validate(value: string): Promise<boolean> {
+		console.log('UserExistRule validation');
 		if (!value) return false;
-		return this.prisma.user
+		return await this.prisma.user
 			.findUnique({
 				where: {
 					name: value,
@@ -446,4 +449,16 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 	defaultMessage(): string {
 		return "User doesn't exist";
 	}
+}
+
+export function IsValidUser(validationOptions?: ValidationOptions) {
+	return function (object: Object, propertyName: string) {
+		registerDecorator({
+			target: object.constructor,
+			propertyName: propertyName,
+			options: validationOptions,
+			constraints: [],
+			validator: UserExistsRule,
+		});
+	};
 }

@@ -1,12 +1,6 @@
-import {
-	IsEnum,
-	IsNotEmpty,
-	IsOptional,
-	Length,
-	Matches,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, Length } from 'class-validator';
 
-enum EChannelType {
+export enum EChannelType {
 	PUBLIC = 'Public',
 	PRIVATE = 'Private',
 	PWD_PROTECTED = 'Password Protected',
@@ -26,14 +20,33 @@ export class LeaveChannelDTO {
 }
 
 export class CreateChannelDTO {
-	@Length(10, 25)
-	@Matches('^[a-zA-Z]+(?: [a-zA-Z]+)*$')
+	protected readonly generateGroups? = () => {
+		const groups = [];
+
+		if (Object.values(EChannelType).includes(this.channelType))
+			groups.push(this.channelType);
+
+		return groups;
+	};
+
+	@Length(10, 25, {
+		groups: [
+			EChannelType.PUBLIC,
+			EChannelType.PRIVATE,
+			EChannelType.PWD_PROTECTED,
+		],
+	})
 	channelName: string;
 
-	@IsEnum(EChannelType)
-	channelType: string;
+	@IsEnum(EChannelType, {
+		groups: [
+			EChannelType.PUBLIC,
+			EChannelType.PRIVATE,
+			EChannelType.PWD_PROTECTED,
+		],
+	})
+	channelType: EChannelType;
 
-	@Length(10, 25, { groups: ['pwd-prot'] })
-	@Matches('[A-Za-z0-9_@./#&+-]*$', null, { groups: ['pwd-prot'] })
-	channelPassword: string | undefined;
+	@Length(10, 25, { groups: [EChannelType.PWD_PROTECTED] })
+	channelPassword: string;
 }

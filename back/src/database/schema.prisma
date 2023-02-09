@@ -85,7 +85,7 @@ model UserChannel {
 
     visibility   UserChannelVisibility   @default(PUBLIC)
     password     String?
-    name         String?
+    name         String                  @unique
     participants UserOnChannel[]
     invitations  UserChannelInvitation[]
     messages     MessageOnChannel[]

@@ -1,9 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
 import Channel from './Channel';
+import {
+	ValidatorConstraint,
+	ValidatorConstraintInterface,
+	ValidationOptions,
+	registerDecorator,
+} from 'class-validator';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserChannel, UserChannelVisibility } from '@prisma/client';
-import { UserOnChannel } from '@prisma/client';
+import { User, UserChannelVisibility, UserOnChannelRole } from '@prisma/client';
+import { CreateChannelDTO, EChannelType } from './Channel.dto';
+import * as argon from 'argon2';
 
 export class Message {
 	channel: number;
@@ -166,5 +173,48 @@ export class ChatService {
 				if (a.joined == b.joined) return b.members - a.members;
 				return a.joined ? 1 : -1;
 			});
+	}
+
+	async createChannel(user: User, channelDTO: CreateChannelDTO) {
+		let visibility: UserChannelVisibility;
+		let hashedPwd = '';
+
+		await this.prismaService.userChannel
+			.findUnique({
+				where: {
+					name: channelDTO.channelName,
+				},
+			})
+			.then((channel) => {
+				if (channel)
+					throw new BadRequestException('Channel already exist !');
+			});
+
+		if (channelDTO.channelType === EChannelType.PUBLIC)
+			visibility = UserChannelVisibility.PUBLIC;
+		else if (channelDTO.channelType === EChannelType.PRIVATE)
+			visibility = UserChannelVisibility.PRIVATE;
+		else {
+			hashedPwd = await argon.hash(channelDTO.channelPassword);
+			visibility = UserChannelVisibility.PWD_PROTECTED;
+		}
+
+		await this.prismaService.userChannel.create({
+			data: {
+				name: channelDTO.channelName,
+				visibility: visibility,
+				password: UserChannelVisibility.PWD_PROTECTED
+					? hashedPwd
+					: null,
+				participants: {
+					create: {
+						userId: user.id,
+						role: UserOnChannelRole.OPERATOR,
+					},
+				},
+			},
+		});
+		this.sendChannelListWhereUserIs(user.id);
+		return undefined;
 	}
 }

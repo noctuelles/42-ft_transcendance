@@ -6,7 +6,6 @@ import {
 	UseGuards,
 	Body,
 	Patch,
-	BadRequestException,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CurrentUser } from '../auth/guards/currentUser.decorator';

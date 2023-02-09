@@ -6,15 +6,19 @@ import {
 	Get,
 	Param,
 	BadRequestException,
+	Post,
 } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
 import { User, UserChannelVisibility } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { JoinChannelDTO, LeaveChannelDTO } from './Channel.dto';
+import {
+	CreateChannelDTO,
+	JoinChannelDTO,
+	LeaveChannelDTO,
+} from './Channel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
-import { CreateChannelValidationPipe } from './validation.pipe';
 
 @Controller('chat')
 export class ChatController {
@@ -39,11 +43,7 @@ export class ChatController {
 		} else {
 			return {
 				sucess: false,
-				reason: channel?.getJoinError(
-					this.prismaService,
-					user.id,
-					password,
-				),
+				reason: channel?.getJoinError(this.prismaService, user.id),
 			};
 		}
 	}
@@ -108,5 +108,15 @@ export class ChatController {
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channels/create')
+	async createChannel(
+		@CurrentUser() user: User,
+		@Body()
+		createChannelDTO: CreateChannelDTO,
+	) {
+		return await this.chatService.createChannel(user, createChannelDTO);
 	}
 }
