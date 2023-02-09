@@ -293,4 +293,24 @@ export default class Channel {
 			},
 		});
 	}
+
+	async deleteInvitation(
+		id: number,
+		messageId: number,
+		username: string,
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+	) {
+		websocketsService.sendToAllUsers(this.membersId, 'chat-delete', {
+			type: 'invitation',
+			createdBy: username,
+			channel: this.id,
+		});
+		await prismaService.matchInvitation.delete({
+			where: { id: id },
+		});
+		await prismaService.messageOnChannel.delete({
+			where: { id: messageId },
+		});
+	}
 }

@@ -8,6 +8,7 @@ import {
 	BadRequestException,
 	Post,
 	ForbiddenException,
+	Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
@@ -137,5 +138,34 @@ export class ChatController {
 		return {
 			success: true,
 		};
+	}
+
+	@UseGuards(AuthGuard)
+	@Delete('channel/:channelId/invite/play')
+	async deleteInvitation(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		const invitation = await this.chatService.getInvitationInChannel(
+			user.id,
+			channel.id,
+		);
+		if (!invitation) {
+			throw new BadRequestException('Invitation not found');
+		}
+		channel.deleteInvitation(
+			invitation.id,
+			invitation.messageId,
+			user.name,
+			this.prismaService,
+			this.websocketsService,
+		);
 	}
 }

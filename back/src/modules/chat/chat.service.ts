@@ -171,4 +171,18 @@ export class ChatService {
 			? true
 			: false;
 	}
+
+	async getInvitationInChannel(userId: number, channelId: number) {
+		const invite = await this.prismaService.matchInvitation.findFirst({
+			where: { createdById: userId },
+			include: {
+				message: {
+					include: {
+						channel: true,
+					},
+				},
+			},
+		});
+		return invite.message.channel.id == channelId ? invite : null;
+	}
 }
