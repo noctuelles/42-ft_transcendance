@@ -91,7 +91,7 @@ const Play = () => {
 						setGameState(GameState.PREGAME);
 					})
 					.catch((err) => {
-						navigate('/play');
+						navigate('/play', { replace: true });
 					});
 			}
 
