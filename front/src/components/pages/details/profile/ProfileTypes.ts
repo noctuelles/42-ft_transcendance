@@ -7,7 +7,7 @@ export interface UserMatchData {
 	eloAtBeg: number;
 	eloEarned: number;
 	winner: boolean;
-	bounce: number;
+	bounces: number;
 	user: {
 		name: string;
 		profile: {

@@ -68,7 +68,7 @@ const Profile = () => {
 					matches={profile.wonMatches + profile.lostMatches}
 					win={profile.wonMatches}
 					lost={profile.lostMatches}
-					bounces={getTotalNbrBounces(profile.matches)}
+					bounces={getTotalNbrBounces(profile.name, profile.matches)}
 				/>
 			</div>
 			<AchievementTable profile={profile} />
@@ -76,13 +76,17 @@ const Profile = () => {
 	);
 };
 
-function getTotalNbrBounces(matches: ProfileMatchData[]): number {
+function getTotalNbrBounces(
+	username: string,
+	matches: ProfileMatchData[],
+): number {
 	let totalNbrBounces = 0;
 
-	matches?.forEach(
-		(match: ProfileMatchData) =>
-			match.userOne.bounce + match.userTwo.bounce,
-	);
+	matches.forEach((match: ProfileMatchData) => {
+		match.userOne.user.name === username
+			? (totalNbrBounces += match.userOne.bounces)
+			: (totalNbrBounces += match.userTwo.bounces);
+	});
 	return totalNbrBounces;
 }
 
