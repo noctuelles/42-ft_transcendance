@@ -255,18 +255,22 @@ export default class Channel {
 				matchInvitation: true,
 			},
 		});
-		return messages.map((message) => {
-			let res = {
-				username: message.author.name,
-				channel: message.channelId,
-				message: message.content,
-				isInvitation: message.matchInvitation ? true : false,
-			};
-			if (res.isInvitation) {
-				res['invitationStatus'] = message.matchInvitation.status;
-			}
-			return res;
-		});
+		return messages
+			.map((message) => {
+				let res = {
+					username: message.author.name,
+					channel: message.channelId,
+					message: message.content,
+					isInvitation: message.matchInvitation ? true : false,
+				};
+				if (res.isInvitation) {
+					res['invitationStatus'] = message.matchInvitation.status;
+				}
+				return res;
+			})
+			.filter((m) => {
+				return m.isInvitation || m.message !== '';
+			});
 	}
 
 	async invitePlay(
