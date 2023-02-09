@@ -122,6 +122,17 @@ export class Game {
 		}
 	}
 
+	getPlayerByName(name: string): IPlayer | null {
+		if (!this._player1Profile || !this._player2Profile) return null;
+		if (this._player1Profile.user.name === name) {
+			return this._gameState.player1;
+		} else if (this._player2Profile.user.name === name) {
+			return this._gameState.player2;
+		} else {
+			return null;
+		}
+	}
+
 	getSpectator(userId: number): IPlayer | null {
 		return this._spectatorSockets.find((s) => s.user.id === userId);
 	}
