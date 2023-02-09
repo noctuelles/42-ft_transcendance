@@ -1,4 +1,4 @@
-import { AchievementType } from '@prisma/client';
+import { AchievementType, MathInvitationStatus } from '@prisma/client';
 import { time } from 'console';
 import { PrismaService } from '../prisma/prisma.service';
 import { AchievementsService } from '../users/achievments.service';
@@ -44,6 +44,8 @@ export class Game {
 
 	private onEnd: () => void;
 
+	private invitation?;
+
 	constructor(
 		player1Profile: IProfile,
 		player2Profile: IProfile,
@@ -51,6 +53,7 @@ export class Game {
 		prismaService: PrismaService,
 		achievementsService: AchievementsService,
 		type: GameType,
+		invitation?,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
@@ -64,6 +67,7 @@ export class Game {
 			type,
 		);
 		this._resetBall(this._gameState.ball);
+		this.invitation = invitation;
 	}
 
 	async start(onEnd: () => void) {
@@ -78,7 +82,33 @@ export class Game {
 		this._status = GameStatus.PLAYING;
 		this._setPlayersStatus('PLAYING');
 		this._gameStartTime = new Date();
+		if (this.invitation) {
+			this._websocketsService.sendToAllUsers(
+				this.invitation.message.channel.participants.map(
+					(p) => p.userId,
+				),
+				'chat-edit',
+				{
+					type: 'invitation',
+					createdBy: this.invitation.createdBy.name,
+					channel: this.invitation.message.channelId,
+					result: MathInvitationStatus.PLAYING,
+				},
+			);
+			await this._prismaService.matchInvitation.update({
+				where: {
+					id: this.invitation.id,
+				},
+				data: {
+					status: MathInvitationStatus.PLAYING,
+				},
+			});
+		}
 		this._game();
+	}
+
+	getPlayers() {
+		return [this._player1Profile.user, this._player2Profile.user];
 	}
 
 	getPlayer(userId: number): IPlayer | null {

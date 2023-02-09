@@ -103,4 +103,33 @@ export class GameService {
 			(game: Game) => game.getSpectator(userId) != null,
 		);
 	}
+
+	async createFriendGame(sockets, invitation) {
+		sockets[0].user.profile = (
+			await this.prismaService.user.findUnique({
+				where: { id: sockets[0].user.id },
+				include: { profile: true },
+			})
+		)['profile'];
+		sockets[1].user.profile = (
+			await this.prismaService.user.findUnique({
+				where: { id: sockets[1].user.id },
+				include: { profile: true },
+			})
+		)['profile'];
+		const game = new Game(
+			{ socket: sockets[0], user: sockets[0].user },
+			{ socket: sockets[1], user: sockets[1].user },
+			this.websocketsService,
+			this.prismaService,
+			this.achievementsService,
+			GameType.FUN,
+			invitation,
+		);
+		this.games.push(game);
+		this.websocketsService.sendToAll(sockets, 'chat-game', {});
+		game.start(() => {
+			this.games.splice(this.games.indexOf(game), 1);
+		});
+	}
 }

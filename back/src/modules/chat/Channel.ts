@@ -1,9 +1,10 @@
-import { MathInvitationStatus, Prisma } from '@prisma/client';
+import { MatchInvitation, MathInvitationStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannelVisibility } from '@prisma/client';
 import { UserOnChannelRole } from '@prisma/client';
 import { UserOnChannelStatus } from '@prisma/client';
 import { WebsocketsService } from '../websockets/websockets.service';
+import { GameService } from '../game/game.service';
 
 export enum ChannelType {
 	PUBLIC,
@@ -280,7 +281,7 @@ export default class Channel {
 			isInvitation: true,
 			invitationStatus: MathInvitationStatus.PENDING,
 		});
-		await prismaService.messageOnChannel.create({
+		const msg = await prismaService.messageOnChannel.create({
 			data: {
 				authorId: user.id,
 				channelId: this.id,
@@ -291,7 +292,22 @@ export default class Channel {
 					},
 				},
 			},
+			include: {
+				matchInvitation: true,
+			},
 		});
+		websocketsService.registerOnClose(
+			websocketsService.getSocketsFromUsersId([user.id])[0],
+			() => {
+				this.deleteInvitation(
+					msg.matchInvitation.id,
+					msg.id,
+					user.name,
+					prismaService,
+					websocketsService,
+				);
+			},
+		);
 	}
 
 	async deleteInvitation(
@@ -311,6 +327,32 @@ export default class Channel {
 		});
 		await prismaService.messageOnChannel.delete({
 			where: { id: messageId },
+		});
+	}
+
+	async acceptInvitation(
+		invitation,
+		userId: number,
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		gameService: GameService,
+	) {
+		websocketsService.sendToAllUsers(this.membersId, 'chat-edit', {
+			type: 'invitation',
+			createdBy: invitation.createdBy.name,
+			channel: this.id,
+			result: MathInvitationStatus.ACCEPTED,
+		});
+		gameService.createFriendGame(
+			websocketsService.getSocketsFromUsersId([
+				userId,
+				invitation.createdById,
+			]),
+			invitation,
+		);
+		await prismaService.matchInvitation.update({
+			where: { id: invitation.id },
+			data: { status: MathInvitationStatus.ACCEPTED },
 		});
 	}
 }

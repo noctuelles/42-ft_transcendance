@@ -19,6 +19,7 @@ import { JoinChannelDTO, LeaveChannelDTO } from './Channel.dto';
 import { ValidationPipe, UsePipes } from '@nestjs/common';
 import { CreateChannelValidationPipe } from './validation.pipe';
 import { WebsocketsService } from '../websockets/websockets.service';
+import { GameService } from '../game/game.service';
 
 @Controller('chat')
 export class ChatController {
@@ -26,6 +27,7 @@ export class ChatController {
 		private readonly chatService: ChatService,
 		private readonly prismaService: PrismaService,
 		private readonly websocketsService: WebsocketsService,
+		private readonly gameService: GameService,
 	) {}
 
 	@UseGuards(AuthGuard)
@@ -166,6 +168,39 @@ export class ChatController {
 			user.name,
 			this.prismaService,
 			this.websocketsService,
+		);
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/invite/play/accept/:inviter')
+	async acceptInvitation(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+		@Param('inviter') inviterName: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		const inviter = await this.prismaService.user.findUnique({
+			where: { name: inviterName },
+		});
+		const invitation = await this.chatService.getInvitationInChannel(
+			inviter.id,
+			channel.id,
+		);
+		if (!invitation) {
+			throw new BadRequestException('Invitation not found');
+		}
+		channel.acceptInvitation(
+			invitation,
+			user.id,
+			this.prismaService,
+			this.websocketsService,
+			this.gameService,
 		);
 	}
 }

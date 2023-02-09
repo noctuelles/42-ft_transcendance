@@ -178,9 +178,14 @@ export class ChatService {
 			include: {
 				message: {
 					include: {
-						channel: true,
+						channel: {
+							include: {
+								participants: true,
+							},
+						},
 					},
 				},
+				createdBy: true,
 			},
 		});
 		return invite.message.channel.id == channelId ? invite : null;

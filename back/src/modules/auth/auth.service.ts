@@ -28,6 +28,7 @@ export class AuthService {
 		private readonly prismaService: PrismaService,
 		private readonly jwtService: JwtService,
 		private readonly twoFAService: TwoFAService,
+		@Inject(forwardRef(() => GameService))
 		private readonly gameService: GameService,
 	) {}
 
