@@ -1,9 +1,12 @@
 import Button from '@/components/global/Button';
 import '@/style/details/chat/Message.css';
 import { InvitationStatus } from './IMessage';
-import { back_url } from '@/config.json';
+import { back_url, ws_url as WS_URL } from '@/config.json';
 import { useContext } from 'react';
 import { UserContext } from '@/context/UserContext';
+import useWebSocket from 'react-use-websocket';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import { useNavigate } from 'react-router';
 
 interface IProps {
 	from: string;
@@ -23,6 +26,8 @@ const Message = ({
 	selectedChannel,
 }: IProps) => {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
+	const navigate = useNavigate();
 
 	async function cancelInvitation() {
 		const token = await userContext.getAccessToken();
@@ -51,6 +56,41 @@ const Message = ({
 		);
 	}
 
+	function isSpectateMatchEvent(data: any): boolean {
+		return data.event === 'spectate-match';
+	}
+
+	const { sendMessage } = useWebSocket(WS_URL, {
+		share: true,
+		onMessage: (event) => {
+			const data = JSON.parse(event.data);
+			if (isSpectateMatchEvent(data)) {
+				if (data.data.status == 'error') {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: data.data.error,
+					});
+				} else if (data.data.status == 'success') {
+					navigate(`/play?spectate`);
+				}
+			}
+		},
+		filter: ({ data }) => {
+			return isSpectateMatchEvent(JSON.parse(data));
+		},
+	});
+
+	async function spectateGame() {
+		sendMessage(
+			JSON.stringify({
+				event: 'spectate-match-name',
+				data: {
+					name: from,
+				},
+			}),
+		);
+	}
+
 	return (
 		<li
 			className={`${self ? 'self' : 'other'} ${
@@ -74,8 +114,14 @@ const Message = ({
 					)}
 					{invitationStatus === InvitationStatus.ACCEPTED &&
 						'Match starting...'}
-					{invitationStatus === InvitationStatus.PLAYING &&
-						'Match playing...'}
+					{invitationStatus === InvitationStatus.PLAYING && (
+						<Button
+							color={self ? '#ffb800' : '#17c0e9'}
+							onClick={spectateGame}
+						>
+							Spectate
+						</Button>
+					)}
 				</p>
 			</div>
 		</li>
