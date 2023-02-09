@@ -4,6 +4,7 @@ import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useRef } from 'react';
 import { UserContext } from './UserContext';
+import { useNavigate } from 'react-router';
 
 export const MessagesContext = React.createContext<{
 	data: Map<number, IMessage[]>;
@@ -19,6 +20,8 @@ export default function MessagesContextProvider(props: any) {
 	const userContext = useContext(UserContext);
 	const messages = useRef(new Map<number, IMessage[]>());
 	const fetching = useRef(false);
+	const navigate = useNavigate();
+
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
@@ -48,9 +51,38 @@ export default function MessagesContextProvider(props: any) {
 					}
 				}
 			}
+			if (isChatEditMessage(data)) {
+				const obj = JSON.parse(data).data;
+				if (obj.type == 'invitation') {
+					const channelId = obj.channel;
+					const username = obj.createdBy;
+					if (messages.current.has(channelId)) {
+						messages.current.set(
+							channelId,
+							messages.current.get(channelId)!.map((m) => {
+								if (m.username === username && m.isInvitation) {
+									return {
+										...m,
+										invitationStatus: obj.result,
+									};
+								}
+								return m;
+							}),
+						);
+					}
+				}
+			}
+			if (isChatGameMessage(data)) {
+				navigate('/play?invite');
+			}
 		},
 		filter: ({ data }: { data: string }) => {
-			return isChatMessage(data) || isChatDeleteMessage(data);
+			return (
+				isChatMessage(data) ||
+				isChatDeleteMessage(data) ||
+				isChatEditMessage(data) ||
+				isChatGameMessage(data)
+			);
 		},
 	});
 	return (
@@ -108,6 +140,23 @@ export default function MessagesContextProvider(props: any) {
 			return false;
 		}
 		return message?.['event'] == 'chat-delete';
+	}
+	function isChatEditMessage(rawMessage: string): boolean {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'chat-edit';
+	}
+
+	function isChatGameMessage(rawMessage: string): boolean {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'chat-game';
 	}
 
 	function parseMessage(rawMessage: string): IMessage {

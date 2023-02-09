@@ -1,7 +1,7 @@
 import '@/style/play/Play.css';
 import { useContext, useEffect, useRef, useState } from 'react';
 import Matchmaking from '../play/Matchmaking';
-import { ws_url as WS_URL } from '@/config.json';
+import { ws_url as WS_URL, back_url } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
 import PreGame from '../play/PreGame';
 import Game from '../play/Game';
@@ -9,6 +9,7 @@ import GameResult from '../play/GameResult';
 import { IGameResult } from '../play/GameInterfaces';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { useLocation } from 'react-router';
+import { UserContext } from '@/context/UserContext';
 
 export enum GameState {
 	NO_GAME = 'no-game',
@@ -37,6 +38,8 @@ const Play = () => {
 	const [result, setResult] = useState<IGameResult | null>(null);
 	const infoBoxContext = useContext(InfoBoxContext);
 	const location = useLocation();
+	const fetched = useRef(false);
+	const userContext = useContext(UserContext);
 
 	function isGameAbortedEvent(data: any): boolean {
 		return data.event === 'game-aborted';
@@ -67,6 +70,30 @@ const Play = () => {
 		const spec = location.search.includes('spectate');
 		setGameState(spec ? GameState.SPECTATE : GameState.LOBBY);
 		if (!spec) {
+			async function fetchCurrentGame() {
+				const token = await userContext.getAccessToken();
+				fetch(back_url + '/game/invited', {
+					method: 'GET',
+					headers: {
+						Authorization: 'Bearer ' + token,
+					},
+				})
+					.then((res) => res.json())
+					.then((data) => {
+						setPlayers([
+							{ infos: data.player1, score: 0 },
+							{ infos: data.player2, score: 0 },
+						]);
+						setGameState(GameState.PREGAME);
+					});
+			}
+
+			const invite = location.search.includes('invite');
+			if (invite && !fetched.current) {
+				fetched.current = true;
+				fetchCurrentGame();
+			}
+
 			return () => {
 				if (
 					stateRef.current == GameState.PREGAME ||

@@ -34,7 +34,22 @@ const Message = ({
 		});
 	}
 
-	async function joinInvitation() {}
+	async function joinInvitation() {
+		const token = await userContext.getAccessToken();
+		fetch(
+			back_url +
+				'/chat/channel/' +
+				selectedChannel +
+				'/invite/play/accept/' +
+				from,
+			{
+				method: 'POST',
+				headers: {
+					Authorization: 'Bearer ' + token,
+				},
+			},
+		);
+	}
 
 	return (
 		<li
@@ -49,17 +64,18 @@ const Message = ({
 					{isInvitation ? 'Invited channel to play !' : content}
 				</p>
 				<p className="secondary">
-					{invitationStatus &&
-						invitationStatus === InvitationStatus.PENDING && (
-							<Button
-								onClick={
-									self ? cancelInvitation : joinInvitation
-								}
-								color={self ? '#ffb800' : '#17c0e9'}
-							>
-								{self ? 'Cancel' : 'Join'}
-							</Button>
-						)}
+					{invitationStatus === InvitationStatus.PENDING && (
+						<Button
+							onClick={self ? cancelInvitation : joinInvitation}
+							color={self ? '#ffb800' : '#17c0e9'}
+						>
+							{self ? 'Cancel' : 'Join'}
+						</Button>
+					)}
+					{invitationStatus === InvitationStatus.ACCEPTED &&
+						'Match starting...'}
+					{invitationStatus === InvitationStatus.PLAYING &&
+						'Match playing...'}
 				</p>
 			</div>
 		</li>
