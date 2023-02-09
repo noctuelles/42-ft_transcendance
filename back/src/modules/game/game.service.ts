@@ -17,6 +17,40 @@ export class GameService {
 		private readonly achievementsService: AchievementsService,
 	) {}
 
+	private async _deleteUserInvitations(userId: number) {
+		const invitation = await this.prismaService.matchInvitation.findUnique({
+			where: { createdById: userId },
+			include: {
+				createdBy: true,
+				message: {
+					include: {
+						channel: {
+							include: {
+								participants: true,
+							},
+						},
+					},
+				},
+			},
+		});
+		if (!invitation) return;
+		await this.prismaService.messageOnChannel.delete({
+			where: { id: invitation.message.id },
+		});
+		await this.prismaService.matchInvitation.delete({
+			where: { id: invitation.id },
+		});
+		this.websocketsService.sendToAllUsers(
+			invitation.message.channel.participants.map((p) => p.userId),
+			'chat-delete',
+			{
+				type: 'invitation',
+				createdBy: invitation.createdBy.name,
+				channel: invitation.message.channel.id,
+			},
+		);
+	}
+
 	private _treatQueue(queue, type: GameType) {
 		if (queue.length >= 2) {
 			const player1 = queue.shift();
@@ -34,6 +68,8 @@ export class GameService {
 			};
 			this.websocketsService.send(player1, 'matchmaking', msg);
 			this.websocketsService.send(player2, 'matchmaking', msg);
+			this._deleteUserInvitations(player1.user.id);
+			this._deleteUserInvitations(player2.user.id);
 			const game = new Game(
 				{ socket: player1, user: player1.user },
 				{ socket: player2, user: player2.user },
@@ -86,6 +122,12 @@ export class GameService {
 		return this.games.find((game: Game) => game.getPlayer(userId) != null);
 	}
 
+	getGameWherePlayerIsByName(username: string) {
+		return this.games.find(
+			(game: Game) => game.getPlayerByName(username) != null,
+		);
+	}
+
 	leaveGame(socket) {
 		const game = this.getGameWherePlayerIs(socket.user.id);
 		if (!game) return;
@@ -102,5 +144,34 @@ export class GameService {
 		return this.games.find(
 			(game: Game) => game.getSpectator(userId) != null,
 		);
+	}
+
+	async createFriendGame(sockets, invitation) {
+		sockets[0].user.profile = (
+			await this.prismaService.user.findUnique({
+				where: { id: sockets[0].user.id },
+				include: { profile: true },
+			})
+		)['profile'];
+		sockets[1].user.profile = (
+			await this.prismaService.user.findUnique({
+				where: { id: sockets[1].user.id },
+				include: { profile: true },
+			})
+		)['profile'];
+		const game = new Game(
+			{ socket: sockets[0], user: sockets[0].user },
+			{ socket: sockets[1], user: sockets[1].user },
+			this.websocketsService,
+			this.prismaService,
+			this.achievementsService,
+			GameType.FUN,
+			invitation,
+		);
+		this.games.push(game);
+		this.websocketsService.sendToAll(sockets, 'chat-game', {});
+		game.start(() => {
+			this.games.splice(this.games.indexOf(game), 1);
+		});
 	}
 }

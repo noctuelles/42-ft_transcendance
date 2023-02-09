@@ -1,9 +1,12 @@
 :root {
 	--chat-textinput-size: 50px;
+	--chat-page-radius: 60px;
 }
 
 .chat-page {
 	/* Center the chat page */
+	border-radius: var(--chat-page-radius);
+	border: 5px solid var(--yellow-primary-color);
 	margin: auto;
 	border-radius: 40px;
 	height: 70%;
@@ -11,13 +14,15 @@
 	width: 70%;
 	background-color: lightgray;
 	display: flex;
-	border: 1px solid black;
+
+	-webkit-box-shadow: 5px 4px 15px 3px rgba(0, 0, 0, 0.5);
+	box-shadow: 5px 4px 15px 3px rgba(0, 0, 0, 0.5);
 }
 
 .chat-page-left-side {
 	min-width: 20%;
 	text-align: center;
-	border-right: 1px solid black;
+	border-right: 2px solid black;
 	padding: 0.5rem;
 }
 
@@ -32,7 +37,7 @@
 .chat-page-right-side {
 	min-width: 20%;
 	text-align: center;
-	border-left: 1px solid black;
+	border-left: 2px solid black;
 }
 
 .chat-container {
@@ -55,7 +60,7 @@ input.textarea {
 	position: relative;
 	left: 0px;
 	right: 0px;
-	width: 100%;
+	width: 85%;
 	height: var(--chat-textinput-size);
 	bottom: var(--chat-textinput-size);
 	background: #fafafa;
@@ -78,4 +83,29 @@ input.textarea {
 	bottom: 0;
 	background: rgba(0, 0, 0, 0.5);
 	z-index: 999;
+}
+
+.chat-user-input {
+	display: flex;
+	flex-direction: row;
+}
+
+.chat-user-input button {
+	width: 15%;
+	transform: translateY(-100%);
+	border-top: solid 2px transparent;
+	border-left: solid 2px transparent;
+	border-bottom: solid 1px transparent;
+	border-right: solid 1px transparent;
+	background-color: var(--yellow-primary-color);
+	cursor: pointer;
+	font-size: 15px;
+	font-weight: 800;
+}
+
+.chat-user-input button:hover {
+	border-top: solid 2px black;
+	border-left: solid 2px black;
+	border-bottom: solid 1px black;
+	border-right: solid 1px black;
 }

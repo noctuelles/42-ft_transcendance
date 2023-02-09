@@ -1,9 +1,10 @@
-import { Prisma } from '@prisma/client';
+import { MatchInvitation, MathInvitationStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannelVisibility } from '@prisma/client';
 import { UserOnChannelRole } from '@prisma/client';
 import { UserOnChannelStatus } from '@prisma/client';
-import * as argon from 'argon2';
+import { WebsocketsService } from '../websockets/websockets.service';
+import { GameService } from '../game/game.service';
 
 export enum ChannelType {
 	PUBLIC,
@@ -20,6 +21,8 @@ export interface IMessage {
 	channel: number;
 	username: string;
 	message: string;
+	isInvitation: boolean;
+	invitationStatus?: MathInvitationStatus;
 }
 
 type ChannelWithUser = Prisma.UserChannelGetPayload<{
@@ -243,14 +246,111 @@ export default class Channel {
 			orderBy: { postedAt: 'asc' },
 			include: {
 				author: true,
+				matchInvitation: true,
 			},
 		});
-		return messages.map((message) => {
-			return {
-				username: message.author.name,
-				channel: message.channelId,
-				message: message.content,
-			};
+		return messages
+			.map((message) => {
+				let res = {
+					username: message.author.name,
+					channel: message.channelId,
+					message: message.content,
+					isInvitation: message.matchInvitation ? true : false,
+				};
+				if (res.isInvitation) {
+					res['invitationStatus'] = message.matchInvitation.status;
+				}
+				return res;
+			})
+			.filter((m) => {
+				return m.isInvitation || m.message !== '';
+			});
+	}
+
+	async invitePlay(
+		user,
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+	) {
+		websocketsService.sendToAllUsers(this.membersId, 'chat', {
+			username: user.name,
+			channel: this.id,
+			message: '',
+			isInvitation: true,
+			invitationStatus: MathInvitationStatus.PENDING,
+		});
+		const msg = await prismaService.messageOnChannel.create({
+			data: {
+				authorId: user.id,
+				channelId: this.id,
+				content: '',
+				matchInvitation: {
+					create: {
+						createdById: user.id,
+					},
+				},
+			},
+			include: {
+				matchInvitation: true,
+			},
+		});
+		websocketsService.registerOnClose(
+			websocketsService.getSocketsFromUsersId([user.id])[0],
+			() => {
+				this.deleteInvitation(
+					msg.matchInvitation.id,
+					msg.id,
+					user.name,
+					prismaService,
+					websocketsService,
+				);
+			},
+		);
+	}
+
+	async deleteInvitation(
+		id: number,
+		messageId: number,
+		username: string,
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+	) {
+		websocketsService.sendToAllUsers(this.membersId, 'chat-delete', {
+			type: 'invitation',
+			createdBy: username,
+			channel: this.id,
+		});
+		await prismaService.matchInvitation.deleteMany({
+			where: { id: id },
+		});
+		await prismaService.messageOnChannel.deleteMany({
+			where: { id: messageId },
+		});
+	}
+
+	async acceptInvitation(
+		invitation,
+		userId: number,
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		gameService: GameService,
+	) {
+		websocketsService.sendToAllUsers(this.membersId, 'chat-edit', {
+			type: 'invitation',
+			createdBy: invitation.createdBy.name,
+			channel: this.id,
+			result: MathInvitationStatus.ACCEPTED,
+		});
+		gameService.createFriendGame(
+			websocketsService.getSocketsFromUsersId([
+				userId,
+				invitation.createdById,
+			]),
+			invitation,
+		);
+		await prismaService.matchInvitation.update({
+			where: { id: invitation.id },
+			data: { status: MathInvitationStatus.ACCEPTED },
 		});
 	}
 }

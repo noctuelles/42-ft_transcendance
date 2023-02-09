@@ -1,12 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { WebsocketsService } from '../websockets/websockets.service';
-import Channel from './Channel';
-import {
-	ValidatorConstraint,
-	ValidatorConstraintInterface,
-	ValidationOptions,
-	registerDecorator,
-} from 'class-validator';
+import Channel, { IMessage } from './Channel';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserChannelVisibility, UserOnChannelRole } from '@prisma/client';
 import { CreateChannelDTO, EChannelType } from './Channel.dto';
@@ -16,17 +10,13 @@ export class Message {
 	channel: number;
 	username: string;
 	message: string;
+	isInvitation: boolean;
 	constructor(obj: IMessage) {
 		this.channel = obj.channel;
 		this.username = obj.username;
 		this.message = obj.message;
+		this.isInvitation = obj.isInvitation;
 	}
-}
-
-export interface IMessage {
-	channel: number;
-	username: string;
-	message: string;
 }
 
 @Injectable()
@@ -216,5 +206,32 @@ export class ChatService {
 		});
 		this.sendChannelListWhereUserIs(user.id);
 		return undefined;
+	}
+
+	async hasUserCreatedPlayingInvitation(userId: number) {
+		return (await this.prismaService.matchInvitation.findFirst({
+			where: { createdById: userId },
+		}))
+			? true
+			: false;
+	}
+
+	async getInvitationInChannel(userId: number, channelId: number) {
+		const invite = await this.prismaService.matchInvitation.findFirst({
+			where: { createdById: userId },
+			include: {
+				message: {
+					include: {
+						channel: {
+							include: {
+								participants: true,
+							},
+						},
+					},
+				},
+				createdBy: true,
+			},
+		});
+		return invite.message.channel.id == channelId ? invite : null;
 	}
 }

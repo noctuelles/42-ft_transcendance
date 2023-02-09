@@ -1,4 +1,4 @@
-import { AchievementType } from '@prisma/client';
+import { AchievementType, MathInvitationStatus } from '@prisma/client';
 import { time } from 'console';
 import { PrismaService } from '../prisma/prisma.service';
 import { AchievementsService } from '../users/achievments.service';
@@ -44,6 +44,8 @@ export class Game {
 
 	private onEnd: () => void;
 
+	private invitation?;
+
 	constructor(
 		player1Profile: IProfile,
 		player2Profile: IProfile,
@@ -51,6 +53,7 @@ export class Game {
 		prismaService: PrismaService,
 		achievementsService: AchievementsService,
 		type: GameType,
+		invitation?,
 	) {
 		this._player1Profile = player1Profile;
 		this._player2Profile = player2Profile;
@@ -64,6 +67,7 @@ export class Game {
 			type,
 		);
 		this._resetBall(this._gameState.ball);
+		this.invitation = invitation;
 	}
 
 	async start(onEnd: () => void) {
@@ -78,7 +82,33 @@ export class Game {
 		this._status = GameStatus.PLAYING;
 		this._setPlayersStatus('PLAYING');
 		this._gameStartTime = new Date();
+		if (this.invitation) {
+			this._websocketsService.sendToAllUsers(
+				this.invitation.message.channel.participants.map(
+					(p) => p.userId,
+				),
+				'chat-edit',
+				{
+					type: 'invitation',
+					createdBy: this.invitation.createdBy.name,
+					channel: this.invitation.message.channelId,
+					result: MathInvitationStatus.PLAYING,
+				},
+			);
+			await this._prismaService.matchInvitation.update({
+				where: {
+					id: this.invitation.id,
+				},
+				data: {
+					status: MathInvitationStatus.PLAYING,
+				},
+			});
+		}
 		this._game();
+	}
+
+	getPlayers() {
+		return [this._player1Profile.user, this._player2Profile.user];
 	}
 
 	getPlayer(userId: number): IPlayer | null {
@@ -86,6 +116,17 @@ export class Game {
 		if (this._player1Profile.user.id === userId) {
 			return this._gameState.player1;
 		} else if (this._player2Profile.user.id === userId) {
+			return this._gameState.player2;
+		} else {
+			return null;
+		}
+	}
+
+	getPlayerByName(name: string): IPlayer | null {
+		if (!this._player1Profile || !this._player2Profile) return null;
+		if (this._player1Profile.user.name === name) {
+			return this._gameState.player1;
+		} else if (this._player2Profile.user.name === name) {
 			return this._gameState.player2;
 		} else {
 			return null;
@@ -562,6 +603,7 @@ export class Game {
 		const isUser2Winner = user2.id === winner.profile.user.id;
 
 		let promises = [];
+		this._setPlayersStatus('ONLINE');
 		promises.push(
 			this._prismaService.match.create({
 				data: {
@@ -741,6 +783,31 @@ export class Game {
 				1,
 			);
 		}
+
+		if (this.invitation) {
+			this._websocketsService.sendToAllUsers(
+				this.invitation.message.channel.participants.map(
+					(p) => p.userId,
+				),
+				'chat-delete',
+				{
+					type: 'invitation',
+					createdBy: this.invitation.createdBy.name,
+					channel: this.invitation.message.channel.id,
+				},
+			);
+			promises.push(
+				this._prismaService.matchInvitation.deleteMany({
+					where: { id: this.invitation.id },
+				}),
+			);
+			promises.push(
+				this._prismaService.messageOnChannel.deleteMany({
+					where: { id: this.invitation.message.id },
+				}),
+			);
+		}
+
 		await Promise.all(promises);
 	}
 }

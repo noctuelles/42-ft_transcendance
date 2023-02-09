@@ -1,7 +1,10 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { ws_url as WS_URL } from '@/config.json';
+import { ws_url as WS_URL, back_url } from '@/config.json';
 import useWebSocket from 'react-use-websocket';
+import { useContext } from 'react';
+import { UserContext } from '@/context/UserContext';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IMessage {
 	username: string;
@@ -17,6 +20,8 @@ export default function UserInput({
 	const { sendMessage } = useWebSocket(WS_URL, {
 		share: true,
 	});
+	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 
 	const formik = useFormik({
 		initialValues: {
@@ -37,8 +42,30 @@ export default function UserInput({
 		},
 	});
 
+	async function sendInvite() {
+		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + selectedChannel + '/invite/play', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Bearer ' + token,
+			},
+		})
+			.then((res) => {
+				if (res.ok) return res.json();
+				else throw new Error('Error while inviting to play');
+			})
+			.then((data) => {
+				if (!data.success) {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: data.reason,
+					});
+				}
+			});
+	}
+
 	return (
-		<form onSubmit={formik.handleSubmit}>
+		<form onSubmit={formik.handleSubmit} className="chat-user-input">
 			<input
 				className="textarea"
 				type="text"
@@ -49,6 +76,9 @@ export default function UserInput({
 				value={formik.values.inputValue}
 				maxLength={255}
 			/>
+			<button type="button" onClick={sendInvite}>
+				Invite to play
+			</button>
 		</form>
 	);
 }

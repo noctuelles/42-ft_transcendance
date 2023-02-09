@@ -50,6 +50,23 @@ export class GameGateway {
 		game.addSpectator(socket);
 	}
 
+	@SubscribeMessage('spectate-match-name')
+	async spectateMatchName(socket: any, payload: any) {
+		if (!payload || !payload.name) return;
+		const game = this.gameService.getGameWherePlayerIsByName(payload.name);
+		if (!game) {
+			this.websocketsService.send(socket, 'spectate-match', {
+				status: 'error',
+				error: 'Game not found',
+			});
+			return;
+		}
+		this.websocketsService.send(socket, 'spectate-match', {
+			status: 'success',
+		});
+		game.addSpectator(socket);
+	}
+
 	@SubscribeMessage('spectate-leave')
 	async spectateLeave(socket: any, payload: any) {
 		const game = this.gameService.getGameWhereSpectatorIs(socket.user.id);
