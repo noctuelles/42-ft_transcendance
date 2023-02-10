@@ -1,38 +1,42 @@
 import React, { useContext } from 'react';
-import IMessage from '@/components/chat/IMessage';
+import { UserContext } from './UserContext';
+import IMessage from '@/components/pages/details/chat/IMessage';
+import IChannel from '@/components/pages/details/chat/IChannel';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useRef } from 'react';
-import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router';
 
-export const MessagesContext = React.createContext<{
-	data: Map<number, IMessage[]>;
+export const ChatContext = React.createContext<{
+	messages: Map<number, IMessage[]>;
+	channels: IChannel[];
 	fetchMessages: (channelId: number) => Promise<void>;
 }>(
 	{} as {
-		data: Map<number, IMessage[]>;
+		messages: Map<number, IMessage[]>;
+		channels: IChannel[];
 		fetchMessages: (channelId: number) => Promise<void>;
 	},
 );
 
-export default function MessagesContextProvider(props: any) {
+export default function ChatContextProvider(props: any) {
 	const userContext = useContext(UserContext);
 	const messages = useRef(new Map<number, IMessage[]>());
+	const channels = useRef<IChannel[]>([]);
 	const fetching = useRef(false);
 	const navigate = useNavigate();
-
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
-			if (!data) {
+			if (!data || (!isChatMessage(data) && !isChannelsMessage(data))) {
 				return;
 			}
 			if (isChatMessage(data)) {
 				const newMessage = parseMessage(data);
 				registerMessage(newMessage);
-			}
-			if (isChatDeleteMessage(data)) {
+			} else if (isChannelsMessage(data)) {
+				channels.current = parseChannel(data);
+			} else if (isChatDeleteMessage(data)) {
 				const obj = JSON.parse(data).data;
 				if (obj.type == 'invitation') {
 					const channelId = obj.channel;
@@ -50,8 +54,7 @@ export default function MessagesContextProvider(props: any) {
 						);
 					}
 				}
-			}
-			if (isChatEditMessage(data)) {
+			} else if (isChatEditMessage(data)) {
 				const obj = JSON.parse(data).data;
 				if (obj.type == 'invitation') {
 					const channelId = obj.channel;
@@ -71,14 +74,14 @@ export default function MessagesContextProvider(props: any) {
 						);
 					}
 				}
-			}
-			if (isChatGameMessage(data)) {
+			} else if (isChatGameMessage(data)) {
 				navigate('/play?invite');
 			}
 		},
 		filter: ({ data }: { data: string }) => {
 			return (
 				isChatMessage(data) ||
+				isChannelsMessage(data) ||
 				isChatDeleteMessage(data) ||
 				isChatEditMessage(data) ||
 				isChatGameMessage(data)
@@ -86,11 +89,15 @@ export default function MessagesContextProvider(props: any) {
 		},
 	});
 	return (
-		<MessagesContext.Provider
-			value={{ data: messages.current, fetchMessages }}
+		<ChatContext.Provider
+			value={{
+				messages: messages.current,
+				channels: channels.current,
+				fetchMessages: fetchMessages,
+			}}
 		>
 			{props.children}
-		</MessagesContext.Provider>
+		</ChatContext.Provider>
 	);
 
 	async function registerMessage(newMessage: IMessage) {
@@ -133,6 +140,20 @@ export default function MessagesContextProvider(props: any) {
 		return message?.['event'] == 'chat';
 	}
 
+	function parseMessage(rawMessage: string): IMessage {
+		const jsonMessage = JSON.parse(rawMessage);
+		return jsonMessage['data'];
+	}
+
+	function isChannelsMessage(rawMessage: string) {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'channels';
+	}
+
 	function isChatDeleteMessage(rawMessage: string): boolean {
 		try {
 			var message = JSON.parse(rawMessage);
@@ -159,7 +180,7 @@ export default function MessagesContextProvider(props: any) {
 		return message?.['event'] == 'chat-game';
 	}
 
-	function parseMessage(rawMessage: string): IMessage {
+	function parseChannel(rawMessage: string): IChannel[] {
 		const jsonMessage = JSON.parse(rawMessage);
 		return jsonMessage['data'];
 	}

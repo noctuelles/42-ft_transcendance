@@ -1,8 +1,8 @@
 import {
-	MatchInvitation,
 	MathInvitationStatus,
-	Prisma,
+	UserChannel,
 	UserOnChannel,
+	UserStatus,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannelVisibility } from '@prisma/client';
@@ -31,21 +31,30 @@ export interface IMessage {
 	invitationStatus?: MathInvitationStatus;
 }
 
-type ChannelWithUser = Prisma.UserChannelGetPayload<{
-	include: Prisma.UserChannelInclude;
-}>;
+interface reducedUser {
+	name: string;
+	status: UserStatus;
+	profile: { picture: string };
+}
+
+type ChannelWithUser = UserChannel & {
+	participants: (UserOnChannel & {
+		user: reducedUser;
+	})[];
+};
 
 export default class Channel {
 	id: number;
 	name: string;
 	type: UserChannelVisibility;
 	ownerId: number;
+	members: reducedUser[];
 	membersId: number[];
 	adminsId: number[];
 	muted: IPunishment[];
 	banned: IPunishment[];
 	hashedPwd: string;
-	members: UserOnChannel[];
+	completeMembers: UserOnChannel[];
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -54,7 +63,7 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
-		this.members = userChannel.participants;
+		this.completeMembers = userChannel.participants;
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;
@@ -64,6 +73,9 @@ export default class Channel {
 		})[0]?.userId;
 		this.membersId = userChannel.participants.map((user) => {
 			return user.userId;
+		}); // TODO: Remove this
+		this.members = userChannel.participants.map((participant) => {
+			return participant.user;
 		});
 		this.adminsId = userChannel.participants
 			.filter((user) => {

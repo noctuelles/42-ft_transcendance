@@ -1,4 +1,4 @@
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import '@/style/details/chat/ChannelCreationForm.css';
 import * as Yup from 'yup';
 import Button from '@/components/global/Button';

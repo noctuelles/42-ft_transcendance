@@ -42,6 +42,7 @@ export class ChatController {
 		const channel = await this.chatService.getChannel(channelId);
 		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
+			// TODO: Send to all users in channel
 			this.chatService.sendChannelListWhereUserIs(user.id);
 			return {
 				success: true,
@@ -50,6 +51,10 @@ export class ChatController {
 					members: channel.membersId.length,
 				},
 			};
+			//			this.chatService.sendChannelListToAllUsers([
+			//				...channel.membersId,
+			//				user.id,
+			//			]);
 		} else {
 			return {
 				sucess: false,
