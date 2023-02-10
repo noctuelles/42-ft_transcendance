@@ -210,6 +210,44 @@ export class ChatService {
 		return undefined;
 	}
 
+	async changeChannelPwd(
+		userId: number,
+		channelId: number,
+		password: string,
+	) {
+		const currentChannel = await this.prismaService.userChannel.findUnique({
+			where: {
+				id: channelId,
+			},
+			select: {
+				password: true,
+				participants: {
+					where: {
+						userId: userId,
+						role: UserOnChannelRole.OPERATOR,
+					},
+				},
+			},
+		});
+		if (!currentChannel) throw new BadRequestException('No such channel');
+		if (currentChannel.participants.length === 0)
+			throw new BadRequestException('Invalid user permission');
+		if (await argon.verify(currentChannel.password, password))
+			throw new BadRequestException('Password is the same as before');
+		return await this.prismaService.userChannel.update({
+			where: {
+				id: channelId,
+			},
+			data: {
+				password: await argon.hash(password),
+			},
+			select: {
+				id: true,
+				name: true,
+			},
+		});
+	}
+
 	async hasUserCreatedPlayingInvitation(userId: number) {
 		return (await this.prismaService.matchInvitation.findFirst({
 			where: { createdById: userId },

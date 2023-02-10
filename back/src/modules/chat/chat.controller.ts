@@ -9,6 +9,8 @@ import {
 	Post,
 	ForbiddenException,
 	Delete,
+	ParseIntPipe,
+	HttpCode,
 } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
@@ -16,6 +18,7 @@ import { User, UserChannelVisibility } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+	ChangeChannelPwdDTO,
 	CreateChannelDTO,
 	JoinChannelDTO,
 	LeaveChannelDTO,
@@ -124,15 +127,26 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
+	@Patch('channels/:channelId/chpwd')
+	async changeChannelPwd(
+		@CurrentUser() user: User,
+		@Param('channelId', ParseIntPipe) channelId: number,
+		@Body() changeChannelPwd: ChangeChannelPwdDTO,
+	) {
+		return this.chatService.changeChannelPwd(
+			user.id,
+			channelId,
+			changeChannelPwd.channelPassword,
+		);
+	}
+
+	@UseGuards(AuthGuard)
 	@Post('channel/:channelId/invite/play')
 	async inviteToGame(
 		@CurrentUser() user: User,
-		@Param('channelId') channelId: string,
+		@Param('channelId', ParseIntPipe) channelId: number,
 	) {
-		if (isNaN(parseInt(channelId))) {
-			throw new BadRequestException('Channel ID must be a number');
-		}
-		const channel = await this.chatService.getChannel(parseInt(channelId));
+		const channel = await this.chatService.getChannel(channelId);
 		if (!channel?.containsUser(user.id)) {
 			throw new ForbiddenException('User is not in this channel');
 		}
