@@ -41,7 +41,7 @@ export default function ChatContextProvider(props: any) {
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
-			if (!data || (!isChatMessage(data) && !isChannelsMessage(data))) {
+			if (!data) {
 				return;
 			}
 			if (isChatMessage(data)) {
