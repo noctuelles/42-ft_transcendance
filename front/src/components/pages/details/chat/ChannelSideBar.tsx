@@ -14,11 +14,9 @@ export default function ChannelSideBar({
 		<div>
 			<h3>{selectedChannel}</h3>
 			<ul className="channel-sidebar-user">
-				{getChannelInfo(selectedChannel)?.members.map(
-					(member: IUser) => {
-						return <UserOnChannel user={member} />;
-					},
-				)}
+				{getChannelInfo(selectedChannel)?.members.map((member: IUser) => {
+					return <UserOnChannel key={member.name} user={member} />;
+				})}
 			</ul>
 		</div>
 	);
