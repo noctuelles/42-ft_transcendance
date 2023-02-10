@@ -24,14 +24,8 @@ model User {
     authIdentifier AuthIdentifier[]
     friends        User[]           @relation("UserFriends")
     friendsOf      User[]           @relation("UserFriends")
-
-    // Here i define an explicit many-to-many relations.
-    // Three models defines this kind of relation :
-    //    User and UserChannel has a many-to-many relations (an User can be in multiple channel and a Channel can have multiple User)
-    //    UserOnChannel, that's the link or pivot table.
-    // This pivot table defines additional fields that describes the User / UserChannel relationship,
-    // such as the nickname, the status of the User on a particural Channel etc...
-    // See https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations
+    blocked        User[]           @relation("UserBlocked")
+    blockedBy      User[]           @relation("UserBlocked")
 
     onChannels         UserOnChannel[]
     matches            UserOnMatch[]

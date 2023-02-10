@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CurrentUser } from '../auth/guards/currentUser.decorator';
-import { FriendDto } from './friend.dto';
+import { UserDto } from './friend.dto';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
 
@@ -42,10 +42,7 @@ export class UsersController {
 
 	@Post('friends/add')
 	@UseGuards(AuthGuard)
-	async addFriend(
-		@CurrentUser() user: User,
-		@Body() addFriendDto: FriendDto,
-	) {
+	async addFriend(@CurrentUser() user: User, @Body() addFriendDto: UserDto) {
 		return await this.usersService.addFriend(user, addFriendDto.username);
 	}
 
@@ -53,11 +50,23 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	async removeFriend(
 		@CurrentUser() user: User,
-		@Body() removeFriendDto: FriendDto,
+		@Body() removeFriendDto: UserDto,
 	) {
 		return await this.usersService.removeFriend(
 			user,
 			removeFriendDto.username,
 		);
+	}
+
+	@Post('blocked/add')
+	@UseGuards(AuthGuard)
+	async addBlocked(@CurrentUser() user: User, @Body() userDto: UserDto) {
+		return await this.usersService.addBlocked(user, userDto.username);
+	}
+
+	@Patch('blocked/remove')
+	@UseGuards(AuthGuard)
+	async removeBlocked(@CurrentUser() user: User, @Body() userDto: UserDto) {
+		return await this.usersService.removeBlocked(user, userDto.username);
 	}
 }

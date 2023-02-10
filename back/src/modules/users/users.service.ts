@@ -162,7 +162,6 @@ export class UsersService {
 		return friends;
 	}
 
-	//TODO: AuthGuard.
 	/* Fetch a profile of a specified username zer*/
 	async fetchProfileData(username: string) {
 		const opt = {
@@ -333,20 +332,36 @@ export class UsersService {
 
 	async addFriend(currentUser: User, username: string) {
 		if (username === currentUser.name)
-			throw new ForbiddenException('Are you lonely ?');
-		await this.prismaService.user
-			.findUnique({
-				where: {
-					id: currentUser.id,
+			throw new ForbiddenException('Invalid username');
+		const currentUserData = await this.prismaService.user.findUnique({
+			where: {
+				id: currentUser.id,
+			},
+			include: {
+				friends: {
+					where: {
+						name: username,
+					},
 				},
-				include: {
-					friends: true,
+				blocked: {
+					where: {
+						name: username,
+					},
 				},
-			})
-			.then((obj) => {
-				if (obj.friends.find((user) => user.name === username))
-					throw new ForbiddenException('Duplicate friend');
-			});
+				blockedBy: {
+					where: {
+						name: username,
+					},
+				},
+			},
+		});
+
+		if (currentUserData.friends.length !== 0)
+			throw new ForbiddenException('Duplicate friend');
+		if (currentUserData.blocked.length !== 0)
+			throw new ForbiddenException('Blocked user');
+		if (currentUserData.blockedBy.length !== 0)
+			throw new ForbiddenException('User blocked you');
 
 		const { friends } = await this.prismaService.user.update({
 			where: {
@@ -424,6 +439,64 @@ export class UsersService {
 			},
 		});
 		return friends;
+	}
+
+	async addBlocked(currentUser: User, blockedUsername: string) {
+		const currentUserData = await this.prismaService.user.findUnique({
+			where: {
+				id: currentUser.id,
+			},
+			include: {
+				blocked: {
+					where: {
+						name: blockedUsername,
+					},
+				},
+			},
+		});
+		if (currentUserData.blocked.length !== 0)
+			throw new ForbiddenException('Already blocked');
+		return await this.prismaService.user.update({
+			where: {
+				id: currentUser.id,
+			},
+			data: {
+				blocked: {
+					connect: {
+						name: blockedUsername,
+					},
+				},
+			},
+		});
+	}
+
+	async removeBlocked(currentUser: User, blockedUsername: string) {
+		const currentUserData = await this.prismaService.user.findUnique({
+			where: {
+				id: currentUser.id,
+			},
+			include: {
+				blocked: {
+					where: {
+						name: blockedUsername,
+					},
+				},
+			},
+		});
+		if (currentUserData.blocked.length === 0)
+			throw new ForbiddenException("User isn't blocked");
+		return await this.prismaService.user.update({
+			where: {
+				id: currentUser.id,
+			},
+			data: {
+				blocked: {
+					disconnect: {
+						name: blockedUsername,
+					},
+				},
+			},
+		});
 	}
 }
 
