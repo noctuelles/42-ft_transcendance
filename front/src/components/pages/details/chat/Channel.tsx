@@ -1,28 +1,40 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
 import Button from '@/components/global/Button';
 import '@/style/details/chat/Channel.css';
 import IChannel from './IChannel';
 import { back_url } from '@/config.json';
+import { ChatContext } from '@/context/ChatContext';
 
 interface IProps {
 	channel: IChannel;
 	isSelectedChannel: boolean;
 	setSelectedChannel: any;
-	hasJoined: boolean;
 }
 
 const Channel = ({
 	channel,
 	isSelectedChannel,
 	setSelectedChannel,
-	hasJoined,
 }: IProps) => {
 	const userContext = useContext(UserContext);
+	const chatContext = useContext(ChatContext);
 
 	async function selectChannel() {
 		setSelectedChannel(channel.id);
-		channel.unreaded = 0;
+		setSelectedChannel(channel.id);
+		chatContext.setChannels((prev: IChannel[]) => {
+			return prev.map((ch: IChannel) => {
+				if (ch.id === channel.id) {
+					return {
+						...ch,
+						unreaded: 0,
+					};
+				}
+				return ch;
+			});
+		});
+
 		const token = await userContext.getAccessToken();
 		fetch(back_url + '/chat/channel/' + channel.id + '/read', {
 			method: 'POST',

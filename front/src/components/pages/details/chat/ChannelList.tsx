@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react';
+import { useEffect, useContext, useRef } from 'react';
 import '@/style/details/chat/ChannelList.css';
 import Channel from './Channel';
 import IChannel from './IChannel';
@@ -15,12 +15,32 @@ export default function ChannelList({
 	selectedChannel: number;
 }) {
 	const userContext = useContext(UserContext);
-	const channels = getChannels();
+	const chatContext = useContext(ChatContext);
+	const { sendMessage } = useWebSocket(WS_URL, { share: true });
+	const fetched = useRef(false);
+
+	useEffect(() => {
+		if (!fetched.current) {
+			fetched.current = true;
+			const jsonMessage = { event: 'channels', data: {} };
+			sendMessage(JSON.stringify(jsonMessage));
+		}
+	}, []);
 
 	useEffect(() => {
 		async function selectChannel(c: IChannel) {
 			setSelectedChannel(c.id);
-			c.unreaded = 0;
+			chatContext.setChannels((prev: IChannel[]) => {
+				return prev.map((ch: IChannel) => {
+					if (ch.id === c.id) {
+						return {
+							...ch,
+							unreaded: 0,
+						};
+					}
+					return ch;
+				});
+			});
 			const token = await userContext.getAccessToken();
 			fetch(back_url + '/chat/channel/' + c.id + '/read', {
 				method: 'POST',
@@ -29,51 +49,24 @@ export default function ChannelList({
 				},
 			});
 		}
-		if (selectedChannel === 0 && channels.length > 0) {
-			selectChannel(channels[0]);
+		if (selectedChannel === 0 && chatContext.channels.length > 0) {
+			selectChannel(chatContext.channels[0]);
 		}
-	}, [channels.length]);
+	}, [chatContext.channels.length]);
 
 	return (
 		<ul className="channel-list">
-			{channels
-				.sort((channel1, channel2) => {
-					return (
-						(!isUserInChannel(userContext.user.id, channel1) &&
-							isUserInChannel(userContext.user.id, channel2) &&
-							1) ||
-						0
-					);
-				})
-				.map((channel) => {
-					var isSelectedChannel = selectedChannel == channel.id;
-					return (
-						<Channel
-							key={channel.id}
-							channel={channel}
-							isSelectedChannel={isSelectedChannel}
-							setSelectedChannel={setSelectedChannel}
-							hasJoined={isUserInChannel(
-								userContext.user.id,
-								channel,
-							)}
-						/>
-					);
-				})}
+			{chatContext.channels.map((channel) => {
+				var isSelectedChannel = selectedChannel == channel.id;
+				return (
+					<Channel
+						key={channel.id}
+						channel={channel}
+						isSelectedChannel={isSelectedChannel}
+						setSelectedChannel={setSelectedChannel}
+					/>
+				);
+			})}
 		</ul>
 	);
-
-	function isUserInChannel(userId: number, channel: IChannel) {
-		return channel.membersId.includes(userId);
-	}
-}
-
-function getChannels(): IChannel[] {
-	const chatContext = useContext(ChatContext);
-	const { sendMessage } = useWebSocket(WS_URL, { share: true });
-	useEffect(() => {
-		const jsonMessage = { event: 'channels', data: {} };
-		sendMessage(JSON.stringify(jsonMessage));
-	}, []);
-	return [...chatContext.channels.values()];
 }

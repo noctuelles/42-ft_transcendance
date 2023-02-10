@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { UserContext } from './UserContext';
 import IMessage from '@/components/pages/details/chat/IMessage';
 import IChannel from '@/components/pages/details/chat/IChannel';
@@ -10,11 +10,13 @@ import { useNavigate } from 'react-router';
 export const ChatContext = React.createContext<{
 	messages: Map<number, IMessage[]>;
 	channels: IChannel[];
+	setChannels: React.Dispatch<React.SetStateAction<IChannel[]>>;
 	fetchMessages: (channelId: number) => Promise<void>;
 }>(
 	{} as {
 		messages: Map<number, IMessage[]>;
 		channels: IChannel[];
+		setChannels: React.Dispatch<React.SetStateAction<IChannel[]>>;
 		fetchMessages: (channelId: number) => Promise<void>;
 	},
 );
@@ -22,9 +24,10 @@ export const ChatContext = React.createContext<{
 export default function ChatContextProvider(props: any) {
 	const userContext = useContext(UserContext);
 	const messages = useRef(new Map<number, IMessage[]>());
-	const channels = useRef<IChannel[]>([]);
+	const [channels, setChannels] = useState<IChannel[]>([]);
 	const fetching = useRef(false);
 	const navigate = useNavigate();
+
 	useWebSocket(WS_URL, {
 		share: true,
 		onMessage: ({ data }: { data?: string }) => {
@@ -35,7 +38,7 @@ export default function ChatContextProvider(props: any) {
 				const newMessage = parseMessage(data);
 				registerMessage(newMessage);
 			} else if (isChannelsMessage(data)) {
-				channels.current = parseChannel(data);
+				setChannels(parseChannel(data));
 			} else if (isChatDeleteMessage(data)) {
 				const obj = JSON.parse(data).data;
 				if (obj.type == 'invitation') {
@@ -92,7 +95,8 @@ export default function ChatContextProvider(props: any) {
 		<ChatContext.Provider
 			value={{
 				messages: messages.current,
-				channels: channels.current,
+				channels: channels,
+				setChannels: setChannels,
 				fetchMessages: fetchMessages,
 			}}
 		>
