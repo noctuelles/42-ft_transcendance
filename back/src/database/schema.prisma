@@ -86,13 +86,12 @@ model UserChannel {
 
     createdAt DateTime @default(now())
 
-    visibility       UserChannelVisibility   @default(PUBLIC)
-    password         String?
-    name             String                  @unique
-    participants     UserOnChannel[]
-    invitations      UserChannelInvitation[]
-    messages         MessageOnChannel[]
-    isPrivateMessage Boolean                 @default(false)
+    visibility   UserChannelVisibility   @default(PUBLIC)
+    password     String?
+    name         String                  @unique
+    participants UserOnChannel[]
+    invitations  UserChannelInvitation[]
+    messages     MessageOnChannel[]
 }
 
 model UserProfile {
@@ -219,4 +218,5 @@ enum UserChannelVisibility {
     PUBLIC
     PRIVATE
     PWD_PROTECTED
+    PRIVATE_MESSAGE
 }

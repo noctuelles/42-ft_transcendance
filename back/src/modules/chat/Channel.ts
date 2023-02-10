@@ -120,8 +120,16 @@ export default class Channel {
 		if (this.containsUser(userId)) {
 			return false;
 		}
+		const lastMessage = (await prismaService.messageOnChannel.findFirst({
+			where: { channelId: this.id },
+			orderBy: { postedAt: 'desc' },
+		})) || { id: -1 };
 		await prismaService.userOnChannel.create({
-			data: { userId: userId, channelId: this.id },
+			data: {
+				userId: userId,
+				channelId: this.id,
+				lastReadedMessage: lastMessage.id,
+			},
 		});
 		this.membersId.push(userId);
 		return true;
