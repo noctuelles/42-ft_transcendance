@@ -4,7 +4,7 @@ import Channel from './Channel';
 import IChannel from './IChannel';
 import { UserContext } from '@/context/UserContext';
 import useWebSocket from 'react-use-websocket';
-import { ws_url as WS_URL } from '@/config.json';
+import { ws_url as WS_URL, back_url } from '@/config.json';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -17,8 +17,19 @@ export default function ChannelList({
 	const channels = getChannels();
 
 	useEffect(() => {
+		async function selectChannel(c: IChannel) {
+			setSelectedChannel(c.id);
+			c.unreaded = 0;
+			const token = await userContext.getAccessToken();
+			fetch(back_url + '/chat/channel/' + c.id + '/read', {
+				method: 'POST',
+				headers: {
+					Authorization: 'Bearer ' + token,
+				},
+			});
+		}
 		if (selectedChannel === 0 && channels.length > 0) {
-			setSelectedChannel(channels[0].id);
+			selectChannel(channels[0]);
 		}
 	}, [channels]);
 

@@ -5,6 +5,7 @@ export default interface IChannel {
 	ownerId: number;
 	membersId: number[];
 	adminsId: number[];
+	unreaded: number;
 }
 
 export enum ChannelType {

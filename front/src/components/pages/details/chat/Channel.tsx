@@ -19,15 +19,31 @@ const Channel = ({
 	hasJoined,
 }: IProps) => {
 	const userContext = useContext(UserContext);
+
+	async function selectChannel() {
+		setSelectedChannel(channel.id);
+		channel.unreaded = 0;
+		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + channel.id + '/read', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Bearer ' + token,
+			},
+		});
+	}
+
 	return (
 		<li
 			className={'channel-list-item'}
 			id={isSelectedChannel ? 'channel-list-item-selected' : undefined}
-			onClick={() => {
-				setSelectedChannel(channel.id);
-			}}
+			onClick={selectChannel}
 		>
-			<span>{channel.name}</span>
+			<span>
+				{channel.unreaded > 0 && (
+					<div className="channel-unread">{channel.unreaded}</div>
+				)}
+				{channel.name}
+			</span>
 		</li>
 	);
 };

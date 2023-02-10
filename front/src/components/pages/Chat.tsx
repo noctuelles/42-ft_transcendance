@@ -7,6 +7,8 @@ import ChannelJoinList from './details/chat/ChannelJoinList';
 import ChannelList from './details/chat/ChannelList';
 import Messages from './details/chat/Messages';
 import UserInput from './details/chat/UserInput';
+import { back_url } from '@/config.json';
+import { UserContext } from '@/context/UserContext';
 
 enum ChatState {
 	DEFAULT = 'DEFAULT',
