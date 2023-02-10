@@ -55,6 +55,7 @@ export class ChatService {
 						include: {
 							user: {
 								select: {
+									id: true,
 									name: true,
 									status: true,
 									profile: { select: { picture: true } },
@@ -88,14 +89,31 @@ export class ChatService {
 		userId: number,
 	): Promise<void> {
 		const channels = await this.getChannelWehreUserIs(userId);
-		this.websocketsService.send(
-			socket,
-			'channels',
-			channels.map((channel) => {
-				let { muted, banned, ...frontChannels } = channel;
-				return frontChannels;
+		const channelsForFront = await Promise.all(
+			channels.map(async (channel) => {
+				let {
+					muted,
+					banned,
+					hashedPwd,
+					completeMembers,
+					...frontChannel
+				} = channel;
+				const unreaded =
+					await this.prismaService.messageOnChannel.count({
+						where: {
+							channelId: channel.id,
+							id: {
+								gt: channel.completeMembers.find(
+									(u) => u.userId === userId,
+								).lastReadedMessage,
+							},
+						},
+					});
+				frontChannel['unreaded'] = unreaded;
+				return frontChannel;
 			}),
 		);
+		this.websocketsService.send(socket, 'channels', channelsForFront);
 	}
 
 	async sendChannelListToSocket(socket: any): Promise<void> {
@@ -297,6 +315,7 @@ export class ChatService {
 				createdBy: true,
 			},
 		});
+		if (!invite) return null;
 		return invite.message.channel.id == channelId ? invite : null;
 	}
 

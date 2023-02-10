@@ -8,6 +8,7 @@ export default interface IChannel {
 	members: IUser[];
 	membersId: number[];
 	adminsId: number[];
+	unreaded: number;
 }
 
 export enum ChannelType {
