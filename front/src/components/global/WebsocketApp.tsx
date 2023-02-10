@@ -1,4 +1,4 @@
-import MessagesContextProvider from '@/context/MessagesContext';
+import ChatContextProvider from '@/context/ChatContext';
 import { Outlet } from 'react-router';
 import NavBar from './NavBar';
 import useWebSocket from 'react-use-websocket';
@@ -59,12 +59,12 @@ function WebsocketApp() {
 		<div className="app">
 			<NavBar />
 			<SideBar />
-			<MessagesContextProvider>
+			<ChatContextProvider>
 				<main>
 					<Outlet />
 				</main>
 				<footer></footer>
-			</MessagesContextProvider>
+			</ChatContextProvider>
 		</div>
 	);
 }

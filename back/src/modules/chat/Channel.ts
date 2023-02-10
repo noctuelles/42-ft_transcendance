@@ -6,6 +6,7 @@ import { UserOnChannelStatus } from '@prisma/client';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
 import * as argon from 'argon2';
+import { UserChannel, UserOnChannel, User, UserStatus } from '@prisma/client';
 
 export enum ChannelType {
 	PUBLIC,
@@ -26,15 +27,24 @@ export interface IMessage {
 	invitationStatus?: MathInvitationStatus;
 }
 
-type ChannelWithUser = Prisma.UserChannelGetPayload<{
-	include: Prisma.UserChannelInclude;
-}>;
+interface reducedUser {
+	name: string;
+	status: UserStatus;
+	profile: { picture: string };
+}
+
+type ChannelWithUser = UserChannel & {
+	participants: (UserOnChannel & {
+		user: reducedUser;
+	})[];
+};
 
 export default class Channel {
 	id: number;
 	name: string;
 	type: UserChannelVisibility;
 	ownerId: number;
+	members: reducedUser[];
 	membersId: number[];
 	adminsId: number[];
 	muted: IPunishment[];
@@ -48,6 +58,12 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
+		console.log('LOG', userChannel);
+		console.log(
+			userChannel.participants.map((participant) => {
+				return participant.user;
+			}),
+		);
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;
@@ -57,6 +73,9 @@ export default class Channel {
 		})[0]?.userId;
 		this.membersId = userChannel.participants.map((user) => {
 			return user.userId;
+		}); // TODO: Remove this
+		this.members = userChannel.participants.map((participant) => {
+			return participant.user;
 		});
 		this.adminsId = userChannel.participants
 			.filter((user) => {

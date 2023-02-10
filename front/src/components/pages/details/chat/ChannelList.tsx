@@ -1,10 +1,11 @@
-import { useRef, useEffect, useContext, useState } from 'react';
+import { useEffect, useContext } from 'react';
 import '@/style/details/chat/ChannelList.css';
 import Channel from './Channel';
 import IChannel from './IChannel';
 import { UserContext } from '@/context/UserContext';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL } from '@/config.json';
+import { ChatContext } from '@/context/ChatContext';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -57,36 +58,11 @@ export default function ChannelList({
 }
 
 function getChannels(): IChannel[] {
-	const channels = useRef<IChannel[]>([]);
-	const { sendMessage } = useWebSocket(WS_URL, {
-		share: true,
-		onMessage: ({ data }: { data?: string }) => {
-			if (!data || !isChannelsMessage(data)) {
-				return;
-			}
-			channels.current = parseChannel(data);
-		},
-		filter: ({ data }: { data: string }) => {
-			return isChannelsMessage(data);
-		},
-	});
+	const chatContext = useContext(ChatContext);
+	const { sendMessage } = useWebSocket(WS_URL, { share: true });
 	useEffect(() => {
 		const jsonMessage = { event: 'channels', data: {} };
 		sendMessage(JSON.stringify(jsonMessage));
 	}, []);
-	return channels.current;
-}
-
-function isChannelsMessage(rawMessage: string) {
-	try {
-		var message = JSON.parse(rawMessage);
-	} catch (error) {
-		return false;
-	}
-	return message?.['event'] == 'channels';
-}
-
-function parseChannel(rawMessage: string): IChannel[] {
-	const jsonMessage = JSON.parse(rawMessage);
-	return jsonMessage['data'];
+	return [...chatContext.channels.values()];
 }
