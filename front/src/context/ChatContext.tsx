@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from './UserContext';
 import IMessage from '@/components/pages/details/chat/IMessage';
 import IChannel from '@/components/pages/details/chat/IChannel';
@@ -7,18 +7,17 @@ import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 
-export const ChatContext = React.createContext<{
+interface IChatContext {
 	messages: Map<number, IMessage[]>;
 	channels: IChannel[];
 	setChannels: React.Dispatch<React.SetStateAction<IChannel[]>>;
 	fetchMessages: (channelId: number) => Promise<void>;
-}>(
-	{} as {
-		messages: Map<number, IMessage[]>;
-		channels: IChannel[];
-		setChannels: React.Dispatch<React.SetStateAction<IChannel[]>>;
-		fetchMessages: (channelId: number) => Promise<void>;
-	},
+	selectedChannel: number;
+	setSelectedChannel: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const ChatContext = React.createContext<IChatContext>(
+	{} as IChatContext,
 );
 
 export default function ChatContextProvider(props: any) {
@@ -27,6 +26,17 @@ export default function ChatContextProvider(props: any) {
 	const [channels, setChannels] = useState<IChannel[]>([]);
 	const fetching = useRef(false);
 	const navigate = useNavigate();
+	const [selectedChannel, setSelectedChannel] = useState(0);
+
+	async function setReaded(channelId: number) {
+		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + channelId + '/read', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Bearer ' + token,
+			},
+		});
+	}
 
 	useWebSocket(WS_URL, {
 		share: true,
@@ -37,6 +47,21 @@ export default function ChatContextProvider(props: any) {
 			if (isChatMessage(data)) {
 				const newMessage = parseMessage(data);
 				registerMessage(newMessage);
+				setChannels((prev: IChannel[]) => {
+					return prev.map((ch: IChannel) => {
+						if (ch.id === newMessage.channel) {
+							if (ch.id !== selectedChannel) {
+								return {
+									...ch,
+									unreaded: ch.unreaded + 1,
+								};
+							} else {
+								setReaded(ch.id);
+							}
+						}
+						return ch;
+					});
+				});
 			} else if (isChannelsMessage(data)) {
 				setChannels(parseChannel(data));
 			} else if (isChatDeleteMessage(data)) {
@@ -98,6 +123,8 @@ export default function ChatContextProvider(props: any) {
 				channels: channels,
 				setChannels: setChannels,
 				fetchMessages: fetchMessages,
+				selectedChannel: selectedChannel,
+				setSelectedChannel: setSelectedChannel,
 			}}
 		>
 			{props.children}

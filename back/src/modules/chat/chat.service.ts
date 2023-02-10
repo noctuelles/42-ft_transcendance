@@ -315,6 +315,7 @@ export class ChatService {
 				createdBy: true,
 			},
 		});
+		if (!invite) return null;
 		return invite.message.channel.id == channelId ? invite : null;
 	}
 
