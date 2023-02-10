@@ -32,6 +32,7 @@ export interface IMessage {
 }
 
 interface reducedUser {
+	id: number;
 	name: string;
 	status: UserStatus;
 	profile: { picture: string };
