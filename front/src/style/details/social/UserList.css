@@ -1,4 +1,4 @@
-.friend-list {
+.user-list {
 	background-color: lightgray;
 	border: 4px solid var(--yellow-primary-color);
 	border-left: 0;
@@ -19,28 +19,28 @@
 	transition: width 0.3s;
 }
 
-.friend-list h2 {
+.user-list h2 {
 	text-align: center;
 }
 
-.friend-list .add-friend-form {
+.user-list .add-user-form {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-.add-friend-form button {
+.add-user-form button {
 	background-color: transparent;
 	border: none;
 	cursor: pointer;
 }
 
-.add-friend-form button svg {
+.add-user-form button svg {
 	width: 30px;
 	height: 30px;
 }
 
-.friend-ul {
+.user-ul {
 	list-style-type: none;
 	padding-left: 10px;
 	padding-right: 10px;

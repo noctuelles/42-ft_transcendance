@@ -3,6 +3,7 @@ import {
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
+	InternalServerErrorException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import {
@@ -160,6 +161,32 @@ export class UsersService {
 		});
 
 		return friends;
+	}
+
+	async fetchBlockedList(userId: number) {
+		const { blocked } = await this.prismaService.user.findUnique({
+			where: {
+				id: userId,
+			},
+			select: {
+				blocked: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
+		console.log(blocked);
+
+		return blocked;
 	}
 
 	/* Fetch a profile of a specified username zer*/
@@ -394,23 +421,37 @@ export class UsersService {
 	}
 
 	async removeFriend(currentUser: User, username: string) {
-		await this.prismaService.user
-			.findUnique({
-				where: {
-					id: currentUser.id,
+		if (username === currentUser.name)
+			throw new InternalServerErrorException();
+		const currentUserData = await this.prismaService.user.findUnique({
+			where: {
+				id: currentUser.id,
+			},
+			include: {
+				friends: {
+					where: {
+						name: username,
+					},
 				},
-				include: {
-					friends: true,
+				blocked: {
+					where: {
+						name: username,
+					},
 				},
-			})
-			.then((obj) => {
-				if (
-					!obj.friends.find((friend) => {
-						return friend.name === username;
-					})
-				)
-					throw new ForbiddenException("Friend doesn't exist");
-			});
+				blockedBy: {
+					where: {
+						name: username,
+					},
+				},
+			},
+		});
+
+		if (currentUserData.friends.length === 0)
+			throw new ForbiddenException("Friend doesn't exist");
+		if (currentUserData.blocked.length !== 0)
+			throw new InternalServerErrorException();
+		if (currentUserData.blockedBy.length !== 0)
+			throw new InternalServerErrorException();
 
 		const { friends } = await this.prismaService.user.update({
 			where: {
@@ -456,7 +497,8 @@ export class UsersService {
 		});
 		if (currentUserData.blocked.length !== 0)
 			throw new ForbiddenException('Already blocked');
-		return await this.prismaService.user.update({
+
+		const { blocked } = await this.prismaService.user.update({
 			where: {
 				id: currentUser.id,
 			},
@@ -467,7 +509,22 @@ export class UsersService {
 					},
 				},
 			},
+			select: {
+				blocked: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
 		});
+		return blocked;
 	}
 
 	async removeBlocked(currentUser: User, blockedUsername: string) {
@@ -485,7 +542,7 @@ export class UsersService {
 		});
 		if (currentUserData.blocked.length === 0)
 			throw new ForbiddenException("User isn't blocked");
-		return await this.prismaService.user.update({
+		const { blocked } = await this.prismaService.user.update({
 			where: {
 				id: currentUser.id,
 			},
@@ -496,16 +553,29 @@ export class UsersService {
 					},
 				},
 			},
+			select: {
+				blocked: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						profile: {
+							select: {
+								picture: true,
+							},
+						},
+					},
+				},
+			},
 		});
+		return blocked;
 	}
 }
 
 @ValidatorConstraint({ name: 'UserExists', async: true })
 @Injectable()
 export class UserExistsRule implements ValidatorConstraintInterface {
-	constructor(private readonly prisma: PrismaService) {
-		console.log('UserExistRule constructed');
-	}
+	constructor(private readonly prisma: PrismaService) {}
 
 	async validate(value: string): Promise<boolean> {
 		console.log('UserExistRule validation');

@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
-import FriendItem from './FriendItem';
-import IFriendData from './Types';
+import UserItem from './UserItem';
 import TextField from '@/components/global/TextField';
-import '@/style/details/social/FriendList.css';
+import '@/style/details/social/UserList.css';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
 import { back_url } from '@/config.json';
@@ -10,15 +9,30 @@ import { UserContext } from '@/context/UserContext';
 import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 import { ws_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import IUserData from './Types';
 
 interface IValues {
 	username: string;
 }
 
-const FriendList = () => {
+export enum UserListType {
+	FRIEND = 0,
+	BLOCKED,
+}
+
+interface IProps {
+	placeholder: string;
+	hint: string;
+	type: UserListType;
+	addEndpoint: string;
+	getEndpoint: string;
+	removeEndpoint: string;
+}
+
+const UserList = (props: IProps) => {
 	const userContext = useContext(UserContext);
 	const infoContext = useContext(InfoBoxContext);
-	const [friends, setFriends] = useState<IFriendData[] | null>(null);
+	const [users, setUsers] = useState<IUserData[] | null>(null);
 	const validation = Yup.object().shape({
 		username: Yup.string().required('Requiered'),
 	});
@@ -26,28 +40,31 @@ const FriendList = () => {
 		username: '',
 	};
 
-	useWebSocket(ws_url, {
-		share: true,
-		onMessage: (event) => {
-			const content = JSON.parse(event.data);
+	if (props.type === UserListType.FRIEND) {
+		useWebSocket(ws_url, {
+			share: true,
+			onMessage: (event) => {
+				const content = JSON.parse(event.data);
 
-			if (content.event === 'user-status') {
-				let updatedList = friends?.map((friend) => {
-					if (friend.id === content.data.id)
-						friend.status = content.data.status;
-					return friend;
-				});
+				if (content.event === 'user-status') {
+					let updatedList = users?.map((user) => {
+						if (user.id === content.data.id)
+							user.status = content.data.status;
+						return user;
+					});
 
-				if (updatedList) setFriends(updatedList);
-			}
-		},
-	});
+					if (updatedList) setUsers(updatedList);
+				}
+			},
+		});
+	}
 
 	useEffect(() => {
 		async function fetchData() {
 			const token = await userContext.getAccessToken();
 
-			fetch(back_url + '/users/friends', {
+			console.log(back_url + props.getEndpoint);
+			fetch(back_url + props.getEndpoint, {
 				method: 'GET',
 				headers: {
 					Authorization: 'Bearer ' + token,
@@ -57,20 +74,24 @@ const FriendList = () => {
 					if (!response.ok) throw new Error();
 					if (response.ok) return response.json();
 				})
-				.then((data: IFriendData[]) => {
-					setFriends(data);
+				.then((data: IUserData[]) => {
+					setUsers(data);
 				})
 				.catch(() => {
 					infoContext.addInfo({
 						type: InfoType.ERROR,
-						message: `Cannot load friend list`,
+						message: `Cannot load ${
+							props.type === UserListType.FRIEND
+								? 'friends'
+								: 'blocked users'
+						} list`,
 					});
 				});
 		}
 		fetchData();
 	}, []);
 
-	async function handleAddFriend(
+	async function handleAddUser(
 		values: IValues,
 		{
 			setFieldError,
@@ -78,7 +99,7 @@ const FriendList = () => {
 	) {
 		const token = await userContext.getAccessToken();
 
-		fetch(back_url + '/users/friends/add', {
+		fetch(back_url + props.addEndpoint, {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json; charset=UTF-8',
@@ -94,7 +115,8 @@ const FriendList = () => {
 				if (response.ok) return response.json();
 			})
 			.then((response) => {
-				setFriends(response);
+				console.log(response);
+				setUsers(response);
 			})
 			.catch((err) => {
 				const errObj = JSON.parse(err.message);
@@ -103,21 +125,25 @@ const FriendList = () => {
 	}
 
 	return (
-		<div className="friend-list">
-			<h2>Add a friend</h2>
+		<div className="user-list">
+			<h2>
+				{props.type === UserListType.FRIEND
+					? 'Add a user'
+					: 'Block a user'}
+			</h2>
 			<Formik
 				validationSchema={validation}
 				initialValues={values}
-				onSubmit={handleAddFriend}
+				onSubmit={handleAddUser}
 			>
-				<Form className="add-friend-form">
+				<Form className="add-user-form">
 					<TextField
 						label="Username"
 						id="username"
 						name="username"
-						helpText="Having friends is cool !"
+						helpText={props.hint}
 						type="text"
-						placeholder="Friend name..."
+						placeholder={props.placeholder}
 					/>
 					<button type="submit">
 						<svg
@@ -129,19 +155,24 @@ const FriendList = () => {
 					</button>
 				</Form>
 			</Formik>
-			{friends ? (
-				<ul className="friend-ul">
-					{friends.length !== 0 ? (
-						friends.map((friend) => (
-							<FriendItem
-								key={friend.id}
-								friend={friend}
-								setFriends={setFriends}
+			{users ? (
+				<ul className="user-ul">
+					{users.length !== 0 ? (
+						users.map((user) => (
+							<UserItem
+								key={user.id}
+								user={user}
+								setUsers={setUsers}
+								removeEndpoint={props.removeEndpoint}
 							/>
 						))
 					) : (
 						<li style={{ textAlign: 'center', fontSize: '1.2rem' }}>
-							You don't have any friends.
+							You don't have any{' '}
+							{props.type === UserListType.FRIEND
+								? 'friends'
+								: 'blocked users'}
+							.
 						</li>
 					)}
 				</ul>
@@ -154,4 +185,4 @@ const FriendList = () => {
 	);
 };
 
-export default FriendList;
+export default UserList;

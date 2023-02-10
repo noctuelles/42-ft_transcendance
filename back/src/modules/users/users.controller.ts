@@ -58,6 +58,12 @@ export class UsersController {
 		);
 	}
 
+	@Get('blocked')
+	@UseGuards(AuthGuard)
+	async getBlocked(@CurrentUser() user: User) {
+		return await this.usersService.fetchBlockedList(user.id);
+	}
+
 	@Post('blocked/add')
 	@UseGuards(AuthGuard)
 	async addBlocked(@CurrentUser() user: User, @Body() userDto: UserDto) {
