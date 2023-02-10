@@ -221,4 +221,20 @@ export class ChatController {
 			this.gameService,
 		);
 	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/read')
+	async readAllMessages(
+		@CurrentUser() user: User,
+		@Param('channelId') channelId: string,
+	) {
+		if (isNaN(parseInt(channelId))) {
+			throw new BadRequestException('Channel ID must be a number');
+		}
+		const channel = await this.chatService.getChannel(parseInt(channelId));
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		channel.readAllMessages(user.id, this.prismaService);
+	}
 }

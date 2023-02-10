@@ -365,4 +365,17 @@ export default class Channel {
 			data: { status: MathInvitationStatus.ACCEPTED },
 		});
 	}
+
+	async readAllMessages(userId: number, prismaService: PrismaService) {
+		const lastMessage = await prismaService.messageOnChannel.findFirst({
+			where: { channelId: this.id },
+			orderBy: { postedAt: 'desc' },
+		});
+		if (lastMessage) {
+			await prismaService.userOnChannel.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: { lastReadedMessage: lastMessage.id },
+			});
+		}
+	}
 }
