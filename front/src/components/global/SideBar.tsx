@@ -1,41 +1,50 @@
 import '@/style/global/SideBar.css';
 import { useState } from 'react';
 import UserList, { UserListType } from '../pages/details/social/UsersList';
-
-const SideBarContent = () => {
-	const [showFriends, setShowFriends] = useState<boolean>(true);
-
-	return (
-		<>
-			{showFriends ? (
-				<UserList
-					type={UserListType.FRIEND}
-					addEndpoint="/users/friends/add"
-					removeEndpoint="/users/friends/remove"
-					getEndpoint="/users/friends"
-					placeholder="Your future friend..."
-					hint="Having friend is an healthy habit !"
-				/>
-			) : (
-				<UserList
-					type={UserListType.BLOCKED}
-					addEndpoint="/users/blocked/add"
-					removeEndpoint="/users/blocked/remove"
-					getEndpoint="/users/blocked"
-					placeholder="User you want to block..."
-					hint="You can't be friend with everybody !"
-				/>
-			)}
-		</>
-	);
-};
+import Button from './Button';
 
 const SideBar = () => {
 	const [isExpand, setIsExpand] = useState<boolean>(false);
+	const [showFriends, setShowFriends] = useState<boolean>(false);
 
 	return (
 		<>
-			{isExpand && <SideBarContent />}
+			{isExpand && (
+				<div className="social-sidebar">
+					<div className="sidebar-top">
+						<Button
+							onClick={() =>
+								showFriends
+									? setShowFriends(false)
+									: setShowFriends(true)
+							}
+						>
+							{!showFriends
+								? 'Switch to blocked user'
+								: 'Switch to friend list'}
+						</Button>
+					</div>
+					{showFriends ? (
+						<UserList
+							type={UserListType.FRIEND}
+							addEndpoint="/users/friends/add"
+							removeEndpoint="/users/friends/remove"
+							getEndpoint="/users/friends"
+							placeholder="Your future friend..."
+							hint="Having friend is an healthy habit !"
+						/>
+					) : (
+						<UserList
+							type={UserListType.BLOCKED}
+							addEndpoint="/users/blocked/add"
+							removeEndpoint="/users/blocked/remove"
+							getEndpoint="/users/blocked"
+							placeholder="User you want to block..."
+							hint="You can't be friend with everybody !"
+						/>
+					)}
+				</div>
+			)}
 			<div className={`side-bar ${isExpand ? 'expanded' : ''}`}>
 				<i>
 					<svg

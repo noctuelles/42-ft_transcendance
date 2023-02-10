@@ -40,24 +40,22 @@ const UserList = (props: IProps) => {
 		username: '',
 	};
 
-	if (props.type === UserListType.FRIEND) {
-		useWebSocket(ws_url, {
-			share: true,
-			onMessage: (event) => {
-				const content = JSON.parse(event.data);
+	useWebSocket(ws_url, {
+		share: true,
+		onMessage: (event) => {
+			const content = JSON.parse(event.data);
 
-				if (content.event === 'user-status') {
-					let updatedList = users?.map((user) => {
-						if (user.id === content.data.id)
-							user.status = content.data.status;
-						return user;
-					});
+			if (content.event === 'user-status') {
+				let updatedList = users?.map((user) => {
+					if (user.id === content.data.id)
+						user.status = content.data.status;
+					return user;
+				});
 
-					if (updatedList) setUsers(updatedList);
-				}
-			},
-		});
-	}
+				if (updatedList) setUsers(updatedList);
+			}
+		},
+	});
 
 	useEffect(() => {
 		async function fetchData() {
@@ -89,7 +87,7 @@ const UserList = (props: IProps) => {
 				});
 		}
 		fetchData();
-	}, []);
+	}, [props.type]);
 
 	async function handleAddUser(
 		values: IValues,
@@ -115,7 +113,6 @@ const UserList = (props: IProps) => {
 				if (response.ok) return response.json();
 			})
 			.then((response) => {
-				console.log(response);
 				setUsers(response);
 			})
 			.catch((err) => {

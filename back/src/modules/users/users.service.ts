@@ -488,6 +488,11 @@ export class UsersService {
 				id: currentUser.id,
 			},
 			include: {
+				friends: {
+					where: {
+						name: blockedUsername,
+					},
+				},
 				blocked: {
 					where: {
 						name: blockedUsername,
@@ -495,6 +500,8 @@ export class UsersService {
 				},
 			},
 		});
+		if (currentUserData.friends.length !== 0)
+			throw new ForbiddenException('Cannot block friend');
 		if (currentUserData.blocked.length !== 0)
 			throw new ForbiddenException('Already blocked');
 
