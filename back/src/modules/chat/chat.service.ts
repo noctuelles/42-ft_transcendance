@@ -92,7 +92,6 @@ export class ChatService {
 						},
 					});
 				frontChannel['unreaded'] = unreaded;
-				console.log(frontChannel);
 				return frontChannel;
 			}),
 		);
