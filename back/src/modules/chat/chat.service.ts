@@ -98,6 +98,24 @@ export class ChatService {
 		);
 	}
 
+	async sendChannelListToSocket(socket: any): Promise<void> {
+		this.sendChannelListToAllSockets([socket]);
+	}
+
+	async sendChannelListToAllSockets(sockets: any[]): Promise<void> {
+		const channels = await this.getChannelList();
+		sockets.map((socket) => {
+			this.websocketsService.send(
+				socket,
+				'channels',
+				channels.map((channel) => {
+					let { muted, banned, ...frontChannels } = channel;
+					return frontChannels;
+				}),
+			);
+		});
+	}
+
 	async getChannelWehreUserIs(userId: number): Promise<Channel[]> {
 		const rawChannelList = await this.prismaService.userChannel.findMany({
 			where: {
@@ -158,6 +176,7 @@ export class ChatService {
 		);
 	}
 
+<<<<<<< HEAD
 	async getChannelsAvailableForUser(
 		user,
 		channelVisibility: UserChannelVisibility,
@@ -280,5 +299,11 @@ export class ChatService {
 			},
 		});
 		return invite.message.channel.id == channelId ? invite : null;
+=======
+	sendChannelListToAllUsers(userIds: number[]) {
+		this.sendChannelListToAllSockets(
+			this.websocketsService.getSocketsFromUsersId(userIds),
+		);
+>>>>>>> 958480a (Update user list when user join channel)
 	}
 }
