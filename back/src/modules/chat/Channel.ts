@@ -104,6 +104,7 @@ export default class Channel {
 		await prismaService.userOnChannel.create({
 			data: { userId: userId, channelId: this.id },
 		});
+		this.membersId.push(userId);
 		return true;
 	}
 
@@ -121,6 +122,9 @@ export default class Channel {
 					delete: { id: { userId: userId, channelId: this.id } },
 				},
 			},
+		});
+		this.membersId = this.membersId.filter((id) => {
+			return id !== userId;
 		});
 		return true;
 	}

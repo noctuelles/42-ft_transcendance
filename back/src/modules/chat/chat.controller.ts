@@ -43,7 +43,13 @@ export class ChatController {
 		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
-			return { success: true };
+			return {
+				success: true,
+				channel: {
+					id: channel.id,
+					members: channel.membersId.length,
+				},
+			};
 		} else {
 			return {
 				sucess: false,
@@ -63,7 +69,13 @@ export class ChatController {
 		if (channel?.containsUser(user.id)) {
 			await channel.removeUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
-			return { success: true };
+			return {
+				success: true,
+				channel: {
+					id: channel.id,
+					members: channel.membersId.length,
+				},
+			};
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
