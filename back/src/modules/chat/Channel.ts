@@ -1,4 +1,9 @@
-import { MatchInvitation, MathInvitationStatus, Prisma } from '@prisma/client';
+import {
+	MatchInvitation,
+	MathInvitationStatus,
+	Prisma,
+	UserOnChannel,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannelVisibility } from '@prisma/client';
 import { UserOnChannelRole } from '@prisma/client';
@@ -40,6 +45,7 @@ export default class Channel {
 	muted: IPunishment[];
 	banned: IPunishment[];
 	hashedPwd: string;
+	members: UserOnChannel[];
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -48,6 +54,7 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
+		this.members = userChannel.participants;
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;

@@ -50,7 +50,8 @@ model UserOnChannel {
     status    UserOnChannelStatus @default(CLEAN)
     statusEnd DateTime?
 
-    messages MessageOnChannel[]
+    messages          MessageOnChannel[]
+    lastReadedMessage Int                @default(-1)
 
     @@id([userId, channelId], name: "id")
 }
@@ -85,12 +86,13 @@ model UserChannel {
 
     createdAt DateTime @default(now())
 
-    visibility   UserChannelVisibility   @default(PUBLIC)
-    password     String?
-    name         String                  @unique
-    participants UserOnChannel[]
-    invitations  UserChannelInvitation[]
-    messages     MessageOnChannel[]
+    visibility       UserChannelVisibility   @default(PUBLIC)
+    password         String?
+    name             String                  @unique
+    participants     UserOnChannel[]
+    invitations      UserChannelInvitation[]
+    messages         MessageOnChannel[]
+    isPrivateMessage Boolean                 @default(false)
 }
 
 model UserProfile {
