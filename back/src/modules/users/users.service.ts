@@ -97,6 +97,9 @@ export class UsersService {
 				() => {},
 			);
 		}
+		if (await this.isUserWithName(user.name)) {
+			throw new BadRequestException('Username already taken');
+		}
 		const createdUser = await this.prismaService.user.create({
 			data: {
 				login: user.login,

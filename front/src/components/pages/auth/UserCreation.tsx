@@ -16,6 +16,15 @@ function UserCreation() {
 
 	useEffect(() => {
 		ImageLoad({ button: btnRef, image: imgRef });
+		fetch(back_url + `/auth/name/${userContext.auth.creatingUser.name}`)
+			.then((res) => {
+				if (res.ok) return res.json();
+				//TODO error message
+			})
+			.then((data) => {
+				if (data.valid) setError('');
+				else setError(data.reason);
+			});
 	});
 
 	function updateName(e: any) {
