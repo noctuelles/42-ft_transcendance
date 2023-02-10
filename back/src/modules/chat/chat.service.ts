@@ -324,4 +324,44 @@ export class ChatService {
 			this.websocketsService.getSocketsFromUsersId(userIds),
 		);
 	}
+
+	async getMpChannel(name1: string, name2: string) {
+		return await this.prismaService.userChannel.findFirst({
+			where: {
+				visibility: UserChannelVisibility.PRIVATE_MESSAGE,
+				AND: [
+					{
+						participants: {
+							some: {
+								user: {
+									name: name1,
+								},
+							},
+						},
+					},
+					{
+						participants: {
+							some: {
+								user: {
+									name: name2,
+								},
+							},
+						},
+					},
+				],
+			},
+			include: {
+				participants: {
+					include: {
+						user: true,
+					},
+				},
+			},
+		});
+	}
+
+	async joinMp(user, otherName) {
+		const channel = await this.getMpChannel(user.name, otherName);
+		console.log(channel ? channel : 'no channel');
+	}
 }

@@ -23,6 +23,7 @@ import {
 } from './Channel.dto';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('chat')
 export class ChatController {
@@ -31,6 +32,7 @@ export class ChatController {
 		private readonly prismaService: PrismaService,
 		private readonly websocketsService: WebsocketsService,
 		private readonly gameService: GameService,
+		private readonly usersService: UsersService,
 	) {}
 
 	@UseGuards(AuthGuard)
@@ -136,6 +138,23 @@ export class ChatController {
 		createChannelDTO: CreateChannelDTO,
 	) {
 		return await this.chatService.createChannel(user, createChannelDTO);
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channels/mp/:otherName')
+	async joinMp(
+		@CurrentUser() user: User,
+		@Param('otherName') otherName: string,
+	) {
+		if (!(await this.usersService.isUserWithName(otherName))) {
+			throw new BadRequestException('User does not exist');
+		}
+		if (otherName === user.name) {
+			throw new BadRequestException(
+				'You cannot create a mp with yourself',
+			);
+		}
+		return await this.chatService.joinMp(user, otherName);
 	}
 
 	@UseGuards(AuthGuard)

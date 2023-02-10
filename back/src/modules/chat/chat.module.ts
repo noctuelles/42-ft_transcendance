@@ -7,9 +7,16 @@ import { AuthModule } from '../auth/auth.module';
 import { ChatController } from './chat.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { GameModule } from '../game/game.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-	imports: [WebsocketsModule, AuthModule, PrismaModule, GameModule],
+	imports: [
+		WebsocketsModule,
+		AuthModule,
+		PrismaModule,
+		GameModule,
+		UsersModule,
+	],
 	providers: [ChatGateway, ChannelsGateway, ChatService],
 	controllers: [ChatController],
 })
