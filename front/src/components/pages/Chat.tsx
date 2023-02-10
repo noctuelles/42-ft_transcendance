@@ -1,4 +1,4 @@
-import { MessagesContext } from '@/context/MessagesContext';
+import { ChatContext } from '@/context/ChatContext';
 import '@/style/Chat.css';
 import { useContext, useEffect, useState } from 'react';
 import Button from '../global/Button';
@@ -18,7 +18,7 @@ enum ChatState {
 export default function Chat() {
 	const [selectedChannel, setSelectedChannel] = useState<number>(0);
 	const [chatState, setChatState] = useState(ChatState.DEFAULT);
-	const messagesContext = useContext(MessagesContext);
+	const chatContext = useContext(ChatContext);
 
 	function handleNewChannelClick() {
 		setChatState(ChatState.CREATING_CHANNEL);
@@ -36,8 +36,8 @@ export default function Chat() {
 	}
 
 	async function selectChannel(channelId: number) {
-		if (!messagesContext.data.has(channelId)) {
-			await messagesContext.fetchMessages(channelId);
+		if (!chatContext.messages.has(channelId)) {
+			await chatContext.fetchMessages(channelId);
 		}
 		setSelectedChannel(channelId);
 	}

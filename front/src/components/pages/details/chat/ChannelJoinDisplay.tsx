@@ -6,7 +6,7 @@ import Loader from '@/components/global/Loader';
 import usersGroupIcon from '@/assets/users-group.svg';
 import Button from '@/components/global/Button';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
-import { MessagesContext } from '@/context/MessagesContext';
+import { ChatContext } from '@/context/ChatContext';
 
 interface IJoinnableChannel {
 	id: number;
@@ -29,7 +29,7 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 	const fetching = useRef(false);
 	const userContext = useContext(UserContext);
 	const infoBoxContext = useContext(InfoBoxContext);
-	const messagesContext = useContext(MessagesContext);
+	const chatContext = useContext(ChatContext);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -95,7 +95,7 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 						newChannels[index].joined = true;
 						return newChannels;
 					});
-					messagesContext.data.delete(channelId);
+					chatContext.messages.delete(channelId);
 				} else {
 					infoBoxContext.addInfo({
 						type: InfoType.ERROR,

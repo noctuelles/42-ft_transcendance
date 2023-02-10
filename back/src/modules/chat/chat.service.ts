@@ -176,7 +176,6 @@ export class ChatService {
 		);
 	}
 
-<<<<<<< HEAD
 	async getChannelsAvailableForUser(
 		user,
 		channelVisibility: UserChannelVisibility,
@@ -299,11 +298,11 @@ export class ChatService {
 			},
 		});
 		return invite.message.channel.id == channelId ? invite : null;
-=======
+	}
+
 	sendChannelListToAllUsers(userIds: number[]) {
 		this.sendChannelListToAllSockets(
 			this.websocketsService.getSocketsFromUsersId(userIds),
 		);
->>>>>>> 958480a (Update user list when user join channel)
 	}
 }
