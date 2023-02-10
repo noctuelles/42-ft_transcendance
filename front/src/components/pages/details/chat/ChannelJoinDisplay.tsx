@@ -90,9 +90,10 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 					setChannels((prev) => {
 						const newChannels = [...prev];
 						const index = newChannels.findIndex(
-							(c) => c.id == channelId,
+							(c) => c.id == data.channel.id,
 						);
 						newChannels[index].joined = true;
+						newChannels[index].members = data.channel.members;
 						return newChannels;
 					});
 					messagesContext.data.delete(channelId);
@@ -123,9 +124,10 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 					setChannels((prev) => {
 						const newChannels = [...prev];
 						const index = newChannels.findIndex(
-							(c) => c.id == channelId,
+							(c) => c.id == data.channel.id,
 						);
 						newChannels[index].joined = false;
+						newChannels[index].members = data.channel.members;
 						if (props.joinType == ChannelJoinType.INVITED)
 							newChannels.splice(index, 1);
 						return newChannels;
