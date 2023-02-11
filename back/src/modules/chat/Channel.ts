@@ -73,7 +73,7 @@ export default class Channel {
 		})[0]?.userId;
 		this.membersId = userChannel.participants.map((user) => {
 			return user.userId;
-		}); // TODO: Remove this
+		});
 		this.members = userChannel.participants.map((participant) => {
 			return participant.user;
 		});

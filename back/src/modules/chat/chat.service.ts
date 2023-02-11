@@ -196,6 +196,12 @@ export class ChatService {
 		}
 	}
 
+	sendChannelListToUserIds(userIds: number[]) {
+		userIds.map((userId) => {
+			this.sendChannelListWhereUserIs(userId);
+		});
+	}
+
 	async getChannelsAvailableForUser(
 		user,
 		channelVisibility: UserChannelVisibility,
