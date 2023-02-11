@@ -8,6 +8,8 @@ import { useWebSocket } from 'react-use-websocket/dist/lib/use-websocket';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import MpButton from './MpButtons';
+import { UserContext } from '@/context/UserContext';
 
 interface ProfileHeaderProps {
 	userId: number;
@@ -23,6 +25,7 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
 	const [status, setStatus] = useState(props.status);
 	const navigate = useNavigate();
 	const infoBoxContext = useContext(InfoBoxContext);
+	const userContext = useContext(UserContext);
 
 	function isStatusChangedEvent(data: any): boolean {
 		return data.event === 'user-status';
@@ -89,6 +92,9 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
 						>
 							Spectate
 						</button>
+					)}
+					{props.username !== userContext.user.name && (
+						<MpButton withUserName={props.username} />
 					)}
 				</div>
 				<ProfileHeaderSearchBar onSearchClick={props.onSearchClick} />

@@ -188,10 +188,12 @@ export class ChatService {
 	}
 
 	sendChannelListWhereUserIs(userId: number) {
-		this.sendChannelListWhereUserIsToSocket(
-			this.websocketsService.getSocketsFromUsersId([userId])[0],
-			userId,
-		);
+		if (this.websocketsService.getSocketsFromUsersId([userId]).length > 0) {
+			this.sendChannelListWhereUserIsToSocket(
+				this.websocketsService.getSocketsFromUsersId([userId])[0],
+				userId,
+			);
+		}
 	}
 
 	async getChannelsAvailableForUser(
