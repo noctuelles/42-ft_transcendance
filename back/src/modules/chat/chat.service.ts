@@ -188,10 +188,12 @@ export class ChatService {
 	}
 
 	sendChannelListWhereUserIs(userId: number) {
-		this.sendChannelListWhereUserIsToSocket(
-			this.websocketsService.getSocketsFromUsersId([userId])[0],
-			userId,
-		);
+		if (this.websocketsService.getSocketsFromUsersId([userId]).length > 0) {
+			this.sendChannelListWhereUserIsToSocket(
+				this.websocketsService.getSocketsFromUsersId([userId])[0],
+				userId,
+			);
+		}
 	}
 
 	async getChannelsAvailableForUser(
@@ -361,5 +363,72 @@ export class ChatService {
 		this.sendChannelListToAllSockets(
 			this.websocketsService.getSocketsFromUsersId(userIds),
 		);
+	}
+
+	async getMpChannel(name1: string, name2: string): Promise<Channel | null> {
+		const chan = await this.prismaService.userChannel.findFirst({
+			where: {
+				visibility: UserChannelVisibility.PRIVATE_MESSAGE,
+				AND: [
+					{
+						participants: {
+							some: {
+								user: {
+									name: name1,
+								},
+							},
+						},
+					},
+					{
+						participants: {
+							some: {
+								user: {
+									name: name2,
+								},
+							},
+						},
+					},
+				],
+			},
+		});
+		if (!chan) return null;
+		return await this.getChannel(chan.id);
+	}
+
+	async createMpChannel(name1: string, name2: string): Promise<Channel> {
+		const chan = await this.prismaService.userChannel.create({
+			data: {
+				name: `${name1} - ${name2}`,
+				visibility: UserChannelVisibility.PRIVATE_MESSAGE,
+				participants: {
+					create: [
+						{
+							user: {
+								connect: {
+									name: name1,
+								},
+							},
+						},
+						{
+							user: {
+								connect: {
+									name: name2,
+								},
+							},
+						},
+					],
+				},
+			},
+		});
+		return await this.getChannel(chan.id);
+	}
+
+	async joinMp(user, otherName) {
+		let channel = await this.getMpChannel(user.name, otherName);
+		if (!channel)
+			channel = await this.createMpChannel(user.name, otherName);
+		channel.completeMembers.forEach((member) => {
+			this.sendChannelListWhereUserIs(member.userId);
+		});
 	}
 }

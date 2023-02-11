@@ -1,10 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
-import Button from '@/components/global/Button';
 import '@/style/details/chat/Channel.css';
-import IChannel from './IChannel';
-import { back_url } from '@/config.json';
-import { ChatContext } from '@/context/ChatContext';
+import { useContext } from 'react';
+import IChannel, { ChannelType } from './IChannel';
 
 interface IProps {
 	channel: IChannel;
@@ -17,6 +14,7 @@ const Channel = ({
 	isSelectedChannel,
 	setSelectedChannel,
 }: IProps) => {
+	const userContext = useContext(UserContext);
 	return (
 		<li
 			className={'channel-list-item'}
@@ -29,7 +27,12 @@ const Channel = ({
 				{channel.unreaded > 0 && (
 					<div className="channel-unread">{channel.unreaded}</div>
 				)}
-				{channel.name}
+				{channel.type === ChannelType.PRIVATE_MESSAGE
+					? channel.name
+							.split(' - ')
+							.find((name) => name !== userContext.user.name) +
+					  ' (PM)'
+					: channel.name}
 			</span>
 		</li>
 	);

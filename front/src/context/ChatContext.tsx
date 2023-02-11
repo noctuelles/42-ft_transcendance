@@ -144,6 +144,15 @@ export default function ChatContextProvider(props: any) {
 			...(messages.current.get(newMessage.channel) || []),
 			newMessage,
 		]);
+		if (newMessage.channel === selectedChannel) {
+			const token = await userContext.getAccessToken();
+			fetch(back_url + '/chat/channel/' + newMessage.channel + '/read', {
+				method: 'POST',
+				headers: {
+					Authorization: 'Bearer ' + token,
+				},
+			});
+		}
 	}
 
 	async function fetchMessages(channelId: number) {

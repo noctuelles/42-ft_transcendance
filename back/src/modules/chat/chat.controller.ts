@@ -24,6 +24,7 @@ import {
 } from './Channel.dto';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('chat')
 export class ChatController {
@@ -32,6 +33,7 @@ export class ChatController {
 		private readonly prismaService: PrismaService,
 		private readonly websocketsService: WebsocketsService,
 		private readonly gameService: GameService,
+		private readonly usersService: UsersService,
 	) {}
 
 	@UseGuards(AuthGuard)
@@ -74,6 +76,9 @@ export class ChatController {
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
+			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
+				throw new ForbiddenException("You can't leave a pm channel");
+			}
 			await channel.removeUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
 			return {
@@ -140,6 +145,22 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
+	@Post('channels/mp/:otherName')
+	async joinMp(
+		@CurrentUser() user: User,
+		@Param('otherName') otherName: string,
+	) {
+		if (!(await this.usersService.isUserWithName(otherName))) {
+			throw new BadRequestException('User does not exist');
+		}
+		if (otherName === user.name) {
+			throw new BadRequestException(
+				'You cannot create a mp with yourself',
+			);
+		}
+		return await this.chatService.joinMp(user, otherName);
+	}
+
 	@Patch('channels/:channelId/chpwd')
 	async changeChannelPwd(
 		@CurrentUser() user: User,
