@@ -87,7 +87,7 @@ export default function UserOnChannel({
 		},
 	});
 	return (
-		<li className="user-on-channel"
+		<li
 			onClick={() => {
 				if (
 					myUserRole !== UserRole.USER &&
@@ -96,11 +96,13 @@ export default function UserOnChannel({
 					setPanelOpened(!isPanelOpened);
 			}}
 		>
+			<div className="user-on-channel">
 			<img alt="profile picture" src={user.profile.picture} />
 			<Link className="profile-link" to={`/profile/${user.name}`}>
 				{user.name}
 			</Link>
 			<StatusDot status={user.status}></StatusDot>
+			</div>
 			{isPanelOpened && (
 				<form
 					onSubmit={formik.handleSubmit}
