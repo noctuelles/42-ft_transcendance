@@ -325,8 +325,8 @@ export class ChatService {
 		);
 	}
 
-	async getMpChannel(name1: string, name2: string) {
-		return await this.prismaService.userChannel.findFirst({
+	async getMpChannel(name1: string, name2: string): Promise<Channel | null> {
+		const chan = await this.prismaService.userChannel.findFirst({
 			where: {
 				visibility: UserChannelVisibility.PRIVATE_MESSAGE,
 				AND: [
@@ -350,18 +350,45 @@ export class ChatService {
 					},
 				],
 			},
-			include: {
+		});
+		if (!chan) return null;
+		return await this.getChannel(chan.id);
+	}
+
+	async createMpChannel(name1: string, name2: string): Promise<Channel> {
+		const chan = await this.prismaService.userChannel.create({
+			data: {
+				name: `${name1} - ${name2}`,
+				visibility: UserChannelVisibility.PRIVATE_MESSAGE,
 				participants: {
-					include: {
-						user: true,
-					},
+					create: [
+						{
+							user: {
+								connect: {
+									name: name1,
+								},
+							},
+						},
+						{
+							user: {
+								connect: {
+									name: name2,
+								},
+							},
+						},
+					],
 				},
 			},
 		});
+		return await this.getChannel(chan.id);
 	}
 
 	async joinMp(user, otherName) {
-		const channel = await this.getMpChannel(user.name, otherName);
-		console.log(channel ? channel : 'no channel');
+		let channel = await this.getMpChannel(user.name, otherName);
+		if (!channel)
+			channel = await this.createMpChannel(user.name, otherName);
+		channel.completeMembers.forEach((member) => {
+			this.sendChannelListWhereUserIs(member.userId);
+		});
 	}
 }
