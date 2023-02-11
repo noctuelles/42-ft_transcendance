@@ -1,11 +1,7 @@
+import { EUserStatus } from '../social/Types';
+
 export default interface IUser {
 	name: string;
-	status: UserStatus;
+	status: EUserStatus;
 	profile: { picture: string };
-}
-
-export enum UserStatus {
-	OFFLINE,
-	ONLINE,
-	PLAYING,
 }

@@ -17,6 +17,7 @@ import { User, UserChannelVisibility } from '@prisma/client';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+	ChangeChannelPwdDTO,
 	CreateChannelDTO,
 	JoinChannelDTO,
 	LeaveChannelDTO,
@@ -158,6 +159,19 @@ export class ChatController {
 			);
 		}
 		return await this.chatService.joinMp(user, otherName);
+	}
+
+	@Patch('channels/:channelId/chpwd')
+	async changeChannelPwd(
+		@CurrentUser() user: User,
+		@Param('channelId', ParseIntPipe) channelId: number,
+		@Body() changeChannelPwd: ChangeChannelPwdDTO,
+	) {
+		return this.chatService.changeChannelPwd(
+			user.id,
+			channelId,
+			changeChannelPwd.channelPassword,
+		);
 	}
 
 	@UseGuards(AuthGuard)
