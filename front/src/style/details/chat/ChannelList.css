@@ -1,4 +1,6 @@
 .channel-list {
+	flex: 1;
+	overflow: auto;
 	text-align: left;
 	list-style-type: none;
 	padding-inline-start: 0;

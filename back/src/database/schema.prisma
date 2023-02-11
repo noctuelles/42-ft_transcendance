@@ -44,7 +44,8 @@ model UserOnChannel {
     status    UserOnChannelStatus @default(CLEAN)
     statusEnd DateTime?
 
-    messages MessageOnChannel[]
+    messages          MessageOnChannel[]
+    lastReadedMessage Int                @default(-1)
 
     @@id([userId, channelId], name: "id")
 }
@@ -211,4 +212,5 @@ enum UserChannelVisibility {
     PUBLIC
     PRIVATE
     PWD_PROTECTED
+    PRIVATE_MESSAGE
 }

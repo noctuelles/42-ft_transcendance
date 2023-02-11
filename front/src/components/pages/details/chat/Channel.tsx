@@ -1,22 +1,18 @@
-import { useContext } from 'react';
 import { UserContext } from '@/context/UserContext';
-import Button from '@/components/global/Button';
 import '@/style/details/chat/Channel.css';
-import IChannel from './IChannel';
-import { back_url } from '@/config.json';
+import { useContext } from 'react';
+import IChannel, { ChannelType } from './IChannel';
 
 interface IProps {
 	channel: IChannel;
 	isSelectedChannel: boolean;
 	setSelectedChannel: any;
-	hasJoined: boolean;
 }
 
 const Channel = ({
 	channel,
 	isSelectedChannel,
 	setSelectedChannel,
-	hasJoined,
 }: IProps) => {
 	const userContext = useContext(UserContext);
 	return (
@@ -27,7 +23,17 @@ const Channel = ({
 				setSelectedChannel(channel.id);
 			}}
 		>
-			<span>{channel.name}</span>
+			<span>
+				{channel.unreaded > 0 && (
+					<div className="channel-unread">{channel.unreaded}</div>
+				)}
+				{channel.type === ChannelType.PRIVATE_MESSAGE
+					? channel.name
+							.split(' - ')
+							.find((name) => name !== userContext.user.name) +
+					  ' (PM)'
+					: channel.name}
+			</span>
 		</li>
 	);
 };

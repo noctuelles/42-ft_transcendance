@@ -1,10 +1,12 @@
-import { useRef, useEffect, useContext, useState } from 'react';
+import { useEffect, useContext, useRef } from 'react';
 import '@/style/details/chat/ChannelList.css';
 import Channel from './Channel';
 import IChannel from './IChannel';
 import { UserContext } from '@/context/UserContext';
 import useWebSocket from 'react-use-websocket';
-import { ws_url as WS_URL } from '@/config.json';
+import { ws_url as WS_URL, back_url } from '@/config.json';
+import { ChatContext } from '@/context/ChatContext';
+import IMessage from './IMessage';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -14,79 +16,80 @@ export default function ChannelList({
 	selectedChannel: number;
 }) {
 	const userContext = useContext(UserContext);
-	const channels = getChannels();
+	const chatContext = useContext(ChatContext);
+	const { sendMessage } = useWebSocket(WS_URL, { share: true });
+	const fetched = useRef(false);
+	const selected = useRef(false);
 
 	useEffect(() => {
-		if (selectedChannel === 0 && channels.length > 0) {
-			setSelectedChannel(channels[0].id);
+		if (!fetched.current) {
+			fetched.current = true;
+			const jsonMessage = { event: 'channels', data: {} };
+			sendMessage(JSON.stringify(jsonMessage));
 		}
-	}, [channels]);
+	}, []);
+
+	async function selectChannel(channeId: number) {
+		setSelectedChannel(channeId);
+		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + channeId + '/read', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Bearer ' + token,
+			},
+		}).then((res) => {
+			if (res.ok) {
+				chatContext.setChannels((prev: IChannel[]) => {
+					return prev.map((ch: IChannel) => {
+						if (ch.id === channeId) {
+							return {
+								...ch,
+								unreaded: 0,
+							};
+						}
+						return ch;
+					});
+				});
+			}
+		});
+	}
+
+	useEffect(() => {
+		if (location.search.includes('mp') && !selected.current) {
+			const channelId = chatContext.channels.find(
+				(ch) =>
+					ch.name
+						.split(' - ')
+						.find((name) => name !== userContext.user.name) ===
+					new URLSearchParams(location.search).get('mp'),
+			)?.id;
+			if (channelId) {
+				selected.current = true;
+				selectChannel(channelId);
+			}
+		}
+		if (
+			selectedChannel === 0 &&
+			chatContext.channels.length > 0 &&
+			!selected.current
+		) {
+			selected.current = true;
+			selectChannel(chatContext.channels[0].id);
+		}
+	}, [chatContext.channels.length]);
 
 	return (
 		<ul className="channel-list">
-			{channels
-				.sort((channel1, channel2) => {
-					return (
-						(!isUserInChannel(userContext.user.id, channel1) &&
-							isUserInChannel(userContext.user.id, channel2) &&
-							1) ||
-						0
-					);
-				})
-				.map((channel) => {
-					var isSelectedChannel = selectedChannel == channel.id;
-					return (
-						<Channel
-							key={channel.id}
-							channel={channel}
-							isSelectedChannel={isSelectedChannel}
-							setSelectedChannel={setSelectedChannel}
-							hasJoined={isUserInChannel(
-								userContext.user.id,
-								channel,
-							)}
-						/>
-					);
-				})}
+			{chatContext.channels.map((channel) => {
+				return (
+					<Channel
+						key={channel.id}
+						channel={channel}
+						isSelectedChannel={selectedChannel == channel.id}
+						setSelectedChannel={selectChannel}
+					/>
+				);
+			})}
 		</ul>
 	);
-
-	function isUserInChannel(userId: number, channel: IChannel) {
-		return channel.membersId.includes(userId);
-	}
-}
-
-function getChannels(): IChannel[] {
-	const channels = useRef<IChannel[]>([]);
-	const { sendMessage } = useWebSocket(WS_URL, {
-		share: true,
-		onMessage: ({ data }: { data?: string }) => {
-			if (!data || !isChannelsMessage(data)) {
-				return;
-			}
-			channels.current = parseChannel(data);
-		},
-		filter: ({ data }: { data: string }) => {
-			return isChannelsMessage(data);
-		},
-	});
-	useEffect(() => {
-		const jsonMessage = { event: 'channels', data: {} };
-		sendMessage(JSON.stringify(jsonMessage));
-	}, []);
-	return channels.current;
-}
-
-function isChannelsMessage(rawMessage: string) {
-	try {
-		var message = JSON.parse(rawMessage);
-	} catch (error) {
-		return false;
-	}
-	return message?.['event'] == 'channels';
-}
-
-function parseChannel(rawMessage: string): IChannel[] {
-	const jsonMessage = JSON.parse(rawMessage);
-	return jsonMessage['data'];
 }

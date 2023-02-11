@@ -51,15 +51,15 @@
 }
 
 .info-item-success {
-	background-color: rgba(0, 255, 0, 0.6);
+	background-color: rgba(0, 255, 0, 0.9);
 }
 
 .info-item-warning {
-	background-color: rgba(208, 155, 9, 0.6);
+	background-color: rgba(208, 155, 9, 0.9);
 }
 
 .info-item-error {
-	background-color: rgba(255, 0, 0, 0.6);
+	background-color: rgba(255, 0, 0, 0.9);
 }
 
 .info-item-clickable {

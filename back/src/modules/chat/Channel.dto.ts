@@ -30,3 +30,8 @@ export class CreateChannelDTO {
 	@Length(10, 25)
 	channelPassword: string | undefined;
 }
+
+export class ChangeChannelPwdDTO {
+	@Length(10, 25)
+	channelPassword: string;
+}

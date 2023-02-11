@@ -6,7 +6,7 @@ import Loader from '@/components/global/Loader';
 import usersGroupIcon from '@/assets/users-group.svg';
 import Button from '@/components/global/Button';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
-import { MessagesContext } from '@/context/MessagesContext';
+import { ChatContext } from '@/context/ChatContext';
 
 interface IJoinnableChannel {
 	id: number;
@@ -29,7 +29,7 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 	const fetching = useRef(false);
 	const userContext = useContext(UserContext);
 	const infoBoxContext = useContext(InfoBoxContext);
-	const messagesContext = useContext(MessagesContext);
+	const chatContext = useContext(ChatContext);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -90,12 +90,13 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 					setChannels((prev) => {
 						const newChannels = [...prev];
 						const index = newChannels.findIndex(
-							(c) => c.id == channelId,
+							(c) => c.id == data.channel.id,
 						);
 						newChannels[index].joined = true;
+						newChannels[index].members = data.channel.members;
 						return newChannels;
 					});
-					messagesContext.data.delete(channelId);
+					chatContext.messages.delete(channelId);
 				} else {
 					infoBoxContext.addInfo({
 						type: InfoType.ERROR,
@@ -123,9 +124,10 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 					setChannels((prev) => {
 						const newChannels = [...prev];
 						const index = newChannels.findIndex(
-							(c) => c.id == channelId,
+							(c) => c.id == data.channel.id,
 						);
 						newChannels[index].joined = false;
+						newChannels[index].members = data.channel.members;
 						if (props.joinType == ChannelJoinType.INVITED)
 							newChannels.splice(index, 1);
 						return newChannels;

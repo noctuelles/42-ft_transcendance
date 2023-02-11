@@ -1,26 +1,42 @@
-import React, { useContext } from 'react';
-import IMessage from '@/components/chat/IMessage';
+import React, { useContext, useEffect, useState } from 'react';
+import { UserContext } from './UserContext';
+import IMessage from '@/components/pages/details/chat/IMessage';
+import IChannel from '@/components/pages/details/chat/IChannel';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useRef } from 'react';
-import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router';
 
-export const MessagesContext = React.createContext<{
-	data: Map<number, IMessage[]>;
+interface IChatContext {
+	messages: Map<number, IMessage[]>;
+	channels: IChannel[];
+	setChannels: React.Dispatch<React.SetStateAction<IChannel[]>>;
 	fetchMessages: (channelId: number) => Promise<void>;
-}>(
-	{} as {
-		data: Map<number, IMessage[]>;
-		fetchMessages: (channelId: number) => Promise<void>;
-	},
+	selectedChannel: number;
+	setSelectedChannel: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const ChatContext = React.createContext<IChatContext>(
+	{} as IChatContext,
 );
 
-export default function MessagesContextProvider(props: any) {
+export default function ChatContextProvider(props: any) {
 	const userContext = useContext(UserContext);
 	const messages = useRef(new Map<number, IMessage[]>());
+	const [channels, setChannels] = useState<IChannel[]>([]);
 	const fetching = useRef(false);
 	const navigate = useNavigate();
+	const [selectedChannel, setSelectedChannel] = useState(0);
+
+	async function setReaded(channelId: number) {
+		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + channelId + '/read', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Bearer ' + token,
+			},
+		});
+	}
 
 	useWebSocket(WS_URL, {
 		share: true,
@@ -31,8 +47,24 @@ export default function MessagesContextProvider(props: any) {
 			if (isChatMessage(data)) {
 				const newMessage = parseMessage(data);
 				registerMessage(newMessage);
-			}
-			if (isChatDeleteMessage(data)) {
+				setChannels((prev: IChannel[]) => {
+					return prev.map((ch: IChannel) => {
+						if (ch.id === newMessage.channel) {
+							if (ch.id !== selectedChannel) {
+								return {
+									...ch,
+									unreaded: ch.unreaded + 1,
+								};
+							} else {
+								setReaded(ch.id);
+							}
+						}
+						return ch;
+					});
+				});
+			} else if (isChannelsMessage(data)) {
+				setChannels(parseChannel(data));
+			} else if (isChatDeleteMessage(data)) {
 				const obj = JSON.parse(data).data;
 				if (obj.type == 'invitation') {
 					const channelId = obj.channel;
@@ -50,8 +82,7 @@ export default function MessagesContextProvider(props: any) {
 						);
 					}
 				}
-			}
-			if (isChatEditMessage(data)) {
+			} else if (isChatEditMessage(data)) {
 				const obj = JSON.parse(data).data;
 				if (obj.type == 'invitation') {
 					const channelId = obj.channel;
@@ -71,14 +102,14 @@ export default function MessagesContextProvider(props: any) {
 						);
 					}
 				}
-			}
-			if (isChatGameMessage(data)) {
+			} else if (isChatGameMessage(data)) {
 				navigate('/play?invite');
 			}
 		},
 		filter: ({ data }: { data: string }) => {
 			return (
 				isChatMessage(data) ||
+				isChannelsMessage(data) ||
 				isChatDeleteMessage(data) ||
 				isChatEditMessage(data) ||
 				isChatGameMessage(data)
@@ -86,11 +117,18 @@ export default function MessagesContextProvider(props: any) {
 		},
 	});
 	return (
-		<MessagesContext.Provider
-			value={{ data: messages.current, fetchMessages }}
+		<ChatContext.Provider
+			value={{
+				messages: messages.current,
+				channels: channels,
+				setChannels: setChannels,
+				fetchMessages: fetchMessages,
+				selectedChannel: selectedChannel,
+				setSelectedChannel: setSelectedChannel,
+			}}
 		>
 			{props.children}
-		</MessagesContext.Provider>
+		</ChatContext.Provider>
 	);
 
 	async function registerMessage(newMessage: IMessage) {
@@ -106,6 +144,15 @@ export default function MessagesContextProvider(props: any) {
 			...(messages.current.get(newMessage.channel) || []),
 			newMessage,
 		]);
+		if (newMessage.channel === selectedChannel) {
+			const token = await userContext.getAccessToken();
+			fetch(back_url + '/chat/channel/' + newMessage.channel + '/read', {
+				method: 'POST',
+				headers: {
+					Authorization: 'Bearer ' + token,
+				},
+			});
+		}
 	}
 
 	async function fetchMessages(channelId: number) {
@@ -131,6 +178,20 @@ export default function MessagesContextProvider(props: any) {
 			return false;
 		}
 		return message?.['event'] == 'chat';
+	}
+
+	function parseMessage(rawMessage: string): IMessage {
+		const jsonMessage = JSON.parse(rawMessage);
+		return jsonMessage['data'];
+	}
+
+	function isChannelsMessage(rawMessage: string) {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'channels';
 	}
 
 	function isChatDeleteMessage(rawMessage: string): boolean {
@@ -159,7 +220,7 @@ export default function MessagesContextProvider(props: any) {
 		return message?.['event'] == 'chat-game';
 	}
 
-	function parseMessage(rawMessage: string): IMessage {
+	function parseChannel(rawMessage: string): IChannel[] {
 		const jsonMessage = JSON.parse(rawMessage);
 		return jsonMessage['data'];
 	}
