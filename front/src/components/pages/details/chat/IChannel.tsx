@@ -12,7 +12,8 @@ export default interface IChannel {
 }
 
 export enum ChannelType {
-	PUBLIC,
-	PROTECTED,
-	PRIVATE,
+	PUBLIC = 'PUBLIC',
+	PROTECTED = 'PROTECTED',
+	PRIVATE = 'PRIVATE',
+	PRIVATE_MESSAGE = 'PRIVATE_MESSAGE',
 }
