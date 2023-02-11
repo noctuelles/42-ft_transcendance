@@ -1,24 +1,22 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
 import Button from '@/components/global/Button';
 import '@/style/details/chat/Channel.css';
 import IChannel from './IChannel';
 import { back_url } from '@/config.json';
+import { ChatContext } from '@/context/ChatContext';
 
 interface IProps {
 	channel: IChannel;
 	isSelectedChannel: boolean;
 	setSelectedChannel: any;
-	hasJoined: boolean;
 }
 
 const Channel = ({
 	channel,
 	isSelectedChannel,
 	setSelectedChannel,
-	hasJoined,
 }: IProps) => {
-	const userContext = useContext(UserContext);
 	return (
 		<li
 			className={'channel-list-item'}
@@ -27,7 +25,12 @@ const Channel = ({
 				setSelectedChannel(channel.id);
 			}}
 		>
-			<span>{channel.name}</span>
+			<span>
+				{channel.unreaded > 0 && (
+					<div className="channel-unread">{channel.unreaded}</div>
+				)}
+				{channel.name}
+			</span>
 		</li>
 	);
 };
