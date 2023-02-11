@@ -1,12 +1,15 @@
-import { MessagesContext } from '@/context/MessagesContext';
+import { ChatContext } from '@/context/ChatContext';
 import '@/style/Chat.css';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Button from '../global/Button';
 import ChannelCreationForm from './details/chat/ChannelCreationForm';
 import ChannelJoinList from './details/chat/ChannelJoinList';
 import ChannelList from './details/chat/ChannelList';
 import Messages from './details/chat/Messages';
 import UserInput from './details/chat/UserInput';
+import { back_url } from '@/config.json';
+import { UserContext } from '@/context/UserContext';
+import ChannelSideBar from './details/chat/ChannelSideBar';
 
 enum ChatState {
 	DEFAULT = 'DEFAULT',
@@ -15,9 +18,9 @@ enum ChatState {
 }
 
 export default function Chat() {
-	const [selectedChannel, setSelectedChannel] = useState<number>(0);
 	const [chatState, setChatState] = useState(ChatState.DEFAULT);
-	const messagesContext = useContext(MessagesContext);
+	const chatContext = useContext(ChatContext);
+	const setuped = useRef(false);
 
 	function handleNewChannelClick() {
 		setChatState(ChatState.CREATING_CHANNEL);
@@ -35,21 +38,25 @@ export default function Chat() {
 	}
 
 	async function selectChannel(channelId: number) {
-		if (!messagesContext.data.has(channelId)) {
-			await messagesContext.fetchMessages(channelId);
+		if (!chatContext.messages.has(channelId)) {
+			await chatContext.fetchMessages(channelId);
 		}
-		setSelectedChannel(channelId);
+		chatContext.setSelectedChannel(channelId);
 	}
 
 	useEffect(() => {
-		window.addEventListener('keydown', (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				setChatState(ChatState.DEFAULT);
-			}
-		});
-		return () => {
-			window.removeEventListener('keydown', () => {});
-		};
+		if (setuped.current) {
+			window.addEventListener('keydown', (e: KeyboardEvent) => {
+				if (e.key === 'Escape') {
+					setChatState(ChatState.DEFAULT);
+				}
+			});
+			return () => {
+				chatContext.setSelectedChannel(0);
+				window.removeEventListener('keydown', () => {});
+			};
+		}
+		setuped.current = true;
 	}, []);
 
 	return (
@@ -67,8 +74,8 @@ export default function Chat() {
 					{chatState === ChatState.JOINING_CHANNEL && (
 						<ChannelJoinList
 							closeModal={() => setChatState(ChatState.DEFAULT)}
-							selectedChannel={selectedChannel}
-							setSelectedChannel={setSelectedChannel}
+							selectedChannel={chatContext.selectedChannel}
+							setSelectedChannel={selectChannel}
 						/>
 					)}
 				</div>
@@ -83,15 +90,15 @@ export default function Chat() {
 				<hr />
 				<ChannelList
 					setSelectedChannel={selectChannel}
-					selectedChannel={selectedChannel}
+					selectedChannel={chatContext.selectedChannel}
 				/>
 			</div>
 			<div className="chat-page-center">
-				<Messages selectedChannel={selectedChannel} />
-				<UserInput selectedChannel={selectedChannel} />
+				<Messages selectedChannel={chatContext.selectedChannel} />
+				<UserInput selectedChannel={chatContext.selectedChannel} />
 			</div>
 			<div className="chat-page-right-side">
-				<h3>Channel name</h3>
+				<ChannelSideBar selectedChannel={chatContext.selectedChannel} />
 			</div>
 		</div>
 	);

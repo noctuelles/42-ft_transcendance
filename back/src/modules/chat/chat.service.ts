@@ -50,7 +50,20 @@ export class ChatService {
 		chann.convertFromUserChannel(
 			await this.prismaService.userChannel.findUnique({
 				where: { id: channelId },
-				include: { participants: true },
+				include: {
+					participants: {
+						include: {
+							user: {
+								select: {
+									id: true,
+									name: true,
+									status: true,
+									profile: { select: { picture: true } },
+								},
+							},
+						},
+					},
+				},
 			}),
 		);
 		return chann;
@@ -76,14 +89,49 @@ export class ChatService {
 		userId: number,
 	): Promise<void> {
 		const channels = await this.getChannelWehreUserIs(userId);
-		this.websocketsService.send(
-			socket,
-			'channels',
-			channels.map((channel) => {
-				let { muted, banned, ...frontChannel } = channel;
+		const channelsForFront = await Promise.all(
+			channels.map(async (channel) => {
+				let {
+					muted,
+					banned,
+					hashedPwd,
+					completeMembers,
+					...frontChannel
+				} = channel;
+				const unreaded =
+					await this.prismaService.messageOnChannel.count({
+						where: {
+							channelId: channel.id,
+							id: {
+								gt: channel.completeMembers.find(
+									(u) => u.userId === userId,
+								).lastReadedMessage,
+							},
+						},
+					});
+				frontChannel['unreaded'] = unreaded;
 				return frontChannel;
 			}),
 		);
+		this.websocketsService.send(socket, 'channels', channelsForFront);
+	}
+
+	async sendChannelListToSocket(socket: any): Promise<void> {
+		this.sendChannelListToAllSockets([socket]);
+	}
+
+	async sendChannelListToAllSockets(sockets: any[]): Promise<void> {
+		const channels = await this.getChannelList();
+		sockets.map((socket) => {
+			this.websocketsService.send(
+				socket,
+				'channels',
+				channels.map((channel) => {
+					let { muted, banned, ...frontChannels } = channel;
+					return frontChannels;
+				}),
+			);
+		});
 	}
 
 	async getChannelWehreUserIs(userId: number): Promise<Channel[]> {
@@ -96,7 +144,40 @@ export class ChatService {
 				},
 			},
 			include: {
-				participants: true,
+				participants: {
+					include: {
+						user: {
+							select: {
+								name: true,
+								status: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
+			},
+		});
+		return rawChannelList.map((rawChannel) => {
+			const channel = new Channel(rawChannel.id);
+			channel.convertFromUserChannel(rawChannel);
+			return channel;
+		});
+	}
+
+	async getChannelList(): Promise<Channel[]> {
+		const rawChannelList = await this.prismaService.userChannel.findMany({
+			include: {
+				participants: {
+					include: {
+						user: {
+							select: {
+								name: true,
+								status: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
 			},
 		});
 		return rawChannelList.map((rawChannel) => {
@@ -272,6 +353,13 @@ export class ChatService {
 				createdBy: true,
 			},
 		});
+		if (!invite) return null;
 		return invite.message.channel.id == channelId ? invite : null;
+	}
+
+	sendChannelListToAllUsers(userIds: number[]) {
+		this.sendChannelListToAllSockets(
+			this.websocketsService.getSocketsFromUsersId(userIds),
+		);
 	}
 }

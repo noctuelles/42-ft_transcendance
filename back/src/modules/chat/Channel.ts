@@ -1,4 +1,9 @@
-import { MatchInvitation, MathInvitationStatus, Prisma } from '@prisma/client';
+import {
+	MathInvitationStatus,
+	UserChannel,
+	UserOnChannel,
+	UserStatus,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserChannelVisibility } from '@prisma/client';
 import { UserOnChannelRole } from '@prisma/client';
@@ -26,20 +31,30 @@ export interface IMessage {
 	invitationStatus?: MathInvitationStatus;
 }
 
-type ChannelWithUser = Prisma.UserChannelGetPayload<{
-	include: Prisma.UserChannelInclude;
-}>;
+interface reducedUser {
+	name: string;
+	status: UserStatus;
+	profile: { picture: string };
+}
+
+type ChannelWithUser = UserChannel & {
+	participants: (UserOnChannel & {
+		user: reducedUser;
+	})[];
+};
 
 export default class Channel {
 	id: number;
 	name: string;
 	type: UserChannelVisibility;
 	ownerId: number;
+	members: reducedUser[];
 	membersId: number[];
 	adminsId: number[];
 	muted: IPunishment[];
 	banned: IPunishment[];
 	hashedPwd: string;
+	completeMembers: UserOnChannel[];
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -48,6 +63,7 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
+		this.completeMembers = userChannel.participants;
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;
@@ -57,6 +73,9 @@ export default class Channel {
 		})[0]?.userId;
 		this.membersId = userChannel.participants.map((user) => {
 			return user.userId;
+		}); // TODO: Remove this
+		this.members = userChannel.participants.map((participant) => {
+			return participant.user;
 		});
 		this.adminsId = userChannel.participants
 			.filter((user) => {
@@ -101,9 +120,18 @@ export default class Channel {
 		if (this.containsUser(userId)) {
 			return false;
 		}
+		const lastMessage = (await prismaService.messageOnChannel.findFirst({
+			where: { channelId: this.id },
+			orderBy: { postedAt: 'desc' },
+		})) || { id: -1 };
 		await prismaService.userOnChannel.create({
-			data: { userId: userId, channelId: this.id },
+			data: {
+				userId: userId,
+				channelId: this.id,
+				lastReadedMessage: lastMessage.id,
+			},
 		});
+		this.membersId.push(userId);
 		return true;
 	}
 
@@ -121,6 +149,9 @@ export default class Channel {
 					delete: { id: { userId: userId, channelId: this.id } },
 				},
 			},
+		});
+		this.membersId = this.membersId.filter((id) => {
+			return id !== userId;
 		});
 		return true;
 	}
@@ -353,5 +384,18 @@ export default class Channel {
 			where: { id: invitation.id },
 			data: { status: MathInvitationStatus.ACCEPTED },
 		});
+	}
+
+	async readAllMessages(userId: number, prismaService: PrismaService) {
+		const lastMessage = await prismaService.messageOnChannel.findFirst({
+			where: { channelId: this.id },
+			orderBy: { postedAt: 'desc' },
+		});
+		if (lastMessage) {
+			await prismaService.userOnChannel.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: { lastReadedMessage: lastMessage.id },
+			});
+		}
 	}
 }

@@ -10,7 +10,6 @@ import {
 	ForbiddenException,
 	Delete,
 	ParseIntPipe,
-	HttpCode,
 } from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
@@ -45,8 +44,19 @@ export class ChatController {
 		const channel = await this.chatService.getChannel(channelId);
 		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
+			// TODO: Send to all users in channel
 			this.chatService.sendChannelListWhereUserIs(user.id);
-			return { success: true };
+			return {
+				success: true,
+				channel: {
+					id: channel.id,
+					members: channel.membersId.length,
+				},
+			};
+			//			this.chatService.sendChannelListToAllUsers([
+			//				...channel.membersId,
+			//				user.id,
+			//			]);
 		} else {
 			return {
 				sucess: false,
@@ -66,7 +76,13 @@ export class ChatController {
 		if (channel?.containsUser(user.id)) {
 			await channel.removeUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
-			return { success: true };
+			return {
+				success: true,
+				channel: {
+					id: channel.id,
+					members: channel.membersId.length,
+				},
+			};
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
@@ -103,12 +119,9 @@ export class ChatController {
 	@Get('channel/:channelId/messages')
 	async getChannelMessages(
 		@CurrentUser() user: User,
-		@Param('channelId') channelId: string,
+		@Param('channelId', ParseIntPipe) channelId: number,
 	) {
-		if (isNaN(parseInt(channelId))) {
-			throw new BadRequestException('Channel ID must be a number');
-		}
-		const channel = await this.chatService.getChannel(parseInt(channelId));
+		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
 			return await channel.getMessages(this.prismaService);
 		} else {
@@ -166,12 +179,9 @@ export class ChatController {
 	@Delete('channel/:channelId/invite/play')
 	async deleteInvitation(
 		@CurrentUser() user: User,
-		@Param('channelId') channelId: string,
+		@Param('channelId', ParseIntPipe) channelId: number,
 	) {
-		if (isNaN(parseInt(channelId))) {
-			throw new BadRequestException('Channel ID must be a number');
-		}
-		const channel = await this.chatService.getChannel(parseInt(channelId));
+		const channel = await this.chatService.getChannel(channelId);
 		if (!channel?.containsUser(user.id)) {
 			throw new ForbiddenException('User is not in this channel');
 		}
@@ -195,13 +205,10 @@ export class ChatController {
 	@Post('channel/:channelId/invite/play/accept/:inviter')
 	async acceptInvitation(
 		@CurrentUser() user: User,
-		@Param('channelId') channelId: string,
+		@Param('channelId', ParseIntPipe) channelId: number,
 		@Param('inviter') inviterName: string,
 	) {
-		if (isNaN(parseInt(channelId))) {
-			throw new BadRequestException('Channel ID must be a number');
-		}
-		const channel = await this.chatService.getChannel(parseInt(channelId));
+		const channel = await this.chatService.getChannel(channelId);
 		if (!channel?.containsUser(user.id)) {
 			throw new ForbiddenException('User is not in this channel');
 		}
@@ -222,5 +229,18 @@ export class ChatController {
 			this.websocketsService,
 			this.gameService,
 		);
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/read')
+	async readAllMessages(
+		@CurrentUser() user: User,
+		@Param('channelId', ParseIntPipe) channelId: number,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		channel.readAllMessages(user.id, this.prismaService);
 	}
 }
