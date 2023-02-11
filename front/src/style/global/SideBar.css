@@ -1,7 +1,7 @@
 :root {
 	--side-bar-radius: 25px;
 	--side-bar-height-size: 75%;
-	--side-bar-width-size: 330px;
+	--side-bar-width-size: 350px;
 }
 
 .side-bar {
@@ -31,8 +31,7 @@
 	background-color: lightgray;
 	border: 4px solid var(--yellow-primary-color);
 	border-left: 0;
-	height: 85%;
-	max-height: var(--side-bar-height-size);
+	height: var(--side-bar-height-size);
 	width: var(--side-bar-width-size);
 	position: fixed;
 	top: 50%;
@@ -45,7 +44,6 @@
 
 	-webkit-box-shadow: 13px 5px 15px 1px rgba(0, 0, 0, 0.5);
 	box-shadow: 13px 5px 15px 1px rgba(0, 0, 0, 0.5);
-	transition: width 0.3s;
 }
 
 .social-sidebar .sidebar-top {

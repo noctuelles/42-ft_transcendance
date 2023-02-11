@@ -62,11 +62,13 @@ const UserItem = (props: IProps) => {
 				<Link to={`/profile/${props.user.name}`} style={linkStyle}>
 					{props.user.name}
 				</Link>
-				<MpButton
-					width="80px"
-					fontSize="10px"
-					withUserName={props.friend.name}
-				/>
+				{props.showStatus && (
+					<MpButton
+						width="80px"
+						fontSize="10px"
+						withUserName={props.user.name}
+					/>
+				)}
 			</div>
 			<div className="user-item-center">
 				<button onClick={handleRemoveUser}>

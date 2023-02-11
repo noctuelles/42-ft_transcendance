@@ -19,7 +19,7 @@ const SideBar = () => {
 									: setShowFriends(true)
 							}
 						>
-							{!showFriends
+							{showFriends
 								? 'Switch to blocked user'
 								: 'Switch to friend list'}
 						</Button>

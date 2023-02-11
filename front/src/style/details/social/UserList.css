@@ -1,3 +1,9 @@
+.user-list {
+	display: flex;
+	height: 85%;
+	flex-direction: column;
+}
+
 .user-list h2 {
 	text-align: center;
 }
@@ -20,10 +26,9 @@
 }
 
 .user-ul {
+	overflow-y: auto;
+	overflow-x: hidden;
 	list-style-type: none;
 	padding-left: 10px;
 	padding-right: 10px;
-	overflow-y: auto;
-	overflow-x: hidden;
-	height: 70%;
 }
