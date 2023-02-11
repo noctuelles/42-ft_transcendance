@@ -1,7 +1,9 @@
 import { ChatContext } from '@/context/ChatContext';
+import '@/style/details/chat/ChannelSideBar.css';
 import { useContext } from 'react';
 import UserOnChannel from './UserOnChannel';
 import IChannel from './IChannel';
+import IUser from './IUser';
 
 export default function ChannelSideBar({
 	selectedChannel,
@@ -11,9 +13,13 @@ export default function ChannelSideBar({
 	return (
 		<div>
 			<h3>{selectedChannel}</h3>
-			{getChannelInfo(selectedChannel)?.members.map((member: any) => {
-				return <UserOnChannel user={member} />;
-			})}
+			<ul className="channel-sidebar-user">
+				{getChannelInfo(selectedChannel)?.members.map(
+					(member: IUser) => {
+						return <UserOnChannel user={member} />;
+					},
+				)}
+			</ul>
 		</div>
 	);
 
