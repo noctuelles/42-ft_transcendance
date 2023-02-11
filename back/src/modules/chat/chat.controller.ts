@@ -75,6 +75,9 @@ export class ChatController {
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
+			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
+				throw new ForbiddenException("You can't leave a pm channel");
+			}
 			await channel.removeUser(this.prismaService, user.id);
 			this.chatService.sendChannelListWhereUserIs(user.id);
 			return {
