@@ -4,27 +4,41 @@ import { useContext } from 'react';
 import { back_url } from '@/config.json';
 import { useNavigate } from 'react-router';
 
-function MpButton({ withUserName }: { withUserName: string }) {
+interface IMpButtonProps {
+	withUserName: string;
+	width?: string;
+	height?: string;
+	fontSize?: string;
+}
+
+function MpButton(props: IMpButtonProps) {
 	const userContext = useContext(UserContext);
 	const navigate = useNavigate();
 
 	async function openMp() {
 		const token = await userContext.getAccessToken();
-		fetch(back_url + '/chat/channels/mp/' + withUserName, {
+		fetch(back_url + '/chat/channels/mp/' + props.withUserName, {
 			method: 'POST',
 			headers: {
 				Authorization: 'Bearer ' + token,
 			},
 		}).then((res) => {
 			if (res.ok) {
-				navigate('/chat?mp=' + withUserName);
+				navigate('/chat?mp=' + props.withUserName);
 			}
 		});
 	}
 
 	return (
 		<div className="mp-button">
-			<Button onClick={openMp}>Private message</Button>
+			<Button
+				width={props.width}
+				height={props.height}
+				fontSize={props.fontSize}
+				onClick={openMp}
+			>
+				Private message
+			</Button>
 		</div>
 	);
 }

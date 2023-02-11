@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { back_url as BACK_URL } from '@/config.json';
 import { UserContext } from '@/context/UserContext';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import MpButton from '../profile/MpButtons';
 
 interface IProps {
 	friend: IFriendData;
@@ -58,6 +59,11 @@ const FriendItem = (props: IProps) => {
 				<Link to={`/profile/${props.friend.name}`} style={linkStyle}>
 					{props.friend.name}
 				</Link>
+				<MpButton
+					width="80px"
+					fontSize="10px"
+					withUserName={props.friend.name}
+				/>
 			</div>
 			<div className="friend-item-center">
 				<button onClick={handleRemoveFriend}>
