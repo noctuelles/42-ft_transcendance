@@ -55,6 +55,19 @@ export default function ChannelList({
 	}
 
 	useEffect(() => {
+		if (location.search.includes('mp') && !selected.current) {
+			const channelId = chatContext.channels.find(
+				(ch) =>
+					ch.name
+						.split(' - ')
+						.find((name) => name !== userContext.user.name) ===
+					new URLSearchParams(location.search).get('mp'),
+			)?.id;
+			if (channelId) {
+				selected.current = true;
+				selectChannel(channelId);
+			}
+		}
 		if (
 			selectedChannel === 0 &&
 			chatContext.channels.length > 0 &&

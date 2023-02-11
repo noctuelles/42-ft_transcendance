@@ -17,7 +17,7 @@ function MpButton({ withUserName }: { withUserName: string }) {
 			},
 		}).then((res) => {
 			if (res.ok) {
-				navigate('/chat');
+				navigate('/chat?mp=' + withUserName);
 			}
 		});
 	}
