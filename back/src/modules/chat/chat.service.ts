@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { WebsocketsService } from '../websockets/websockets.service';
-import Channel, { IMessage } from './Channel';
-import { PrismaService } from '../prisma/prisma.service';
 import { User, UserChannelVisibility, UserOnChannelRole } from '@prisma/client';
-import { CreateChannelDTO, EChannelType } from './Channel.dto';
 import * as argon from 'argon2';
+
+import { PrismaService } from '../prisma/prisma.service';
+import { WebsocketsService } from '../websockets/websockets.service';
+
+import Channel, { IMessage } from './Channel';
+import { CreateChannelDTO, EChannelType } from './Channel.dto';
 
 export class Message {
 	channel: number;
@@ -47,25 +49,24 @@ export class ChatService {
 
 	async getChannel(channelId: number): Promise<Channel | undefined> {
 		const chann = new Channel(channelId);
-		chann.convertFromUserChannel(
-			await this.prismaService.userChannel.findUnique({
-				where: { id: channelId },
-				include: {
-					participants: {
-						include: {
-							user: {
-								select: {
-									id: true,
-									name: true,
-									status: true,
-									profile: { select: { picture: true } },
-								},
+		const userChannel = await this.prismaService.userChannel.findUnique({
+			where: { id: channelId },
+			include: {
+				participants: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								status: true,
+								profile: { select: { picture: true } },
 							},
 						},
 					},
 				},
-			}),
-		);
+			},
+		});
+		chann.convertFromUserChannel(userChannel);
 		return chann;
 	}
 

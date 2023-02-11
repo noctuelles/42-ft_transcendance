@@ -26,6 +26,7 @@ export default function UserOnChannel({
 		initialValues: { action: 'Ban', date: '' },
 		onSubmit: async (props, { resetForm }) => {
 			const accessToken: string = await userContext.getAccessToken();
+			props.date = new Date(props.date); // Convert from local to UTC
 			switch (props.action) {
 				case 'Ban':
 					fetch(back_url + '/chat/channel/ban', {

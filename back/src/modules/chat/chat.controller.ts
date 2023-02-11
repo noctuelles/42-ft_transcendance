@@ -21,6 +21,8 @@ import {
 	CreateChannelDTO,
 	JoinChannelDTO,
 	LeaveChannelDTO,
+	ActionInChannelDTO,
+	PromoteDTO,
 } from './Channel.dto';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
@@ -65,6 +67,66 @@ export class ChatController {
 				reason: channel?.getJoinError(this.prismaService, user.id),
 			};
 		}
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/ban')
+	async ban(
+		@CurrentUser() user: User,
+		@Body() { channelId, end, userId }: ActionInChannelDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			return { success: false, reason: 'Channel does not exist' };
+		}
+		if (channel.ownerId !== user.id && !channel.adminsId.includes(user.id))
+			return { success: false, reason: "You can't do that !" };
+		channel.ban(this.prismaService, userId, end);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/mute')
+	async mute(
+		@CurrentUser() user: User,
+		@Body() { channelId, end, userId }: ActionInChannelDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			return { success: false, reason: 'Channel does not exist' };
+		}
+		if (channel.ownerId !== user.id && !channel.adminsId.includes(user.id))
+			return { success: false, reason: "You can't do that !" };
+		channel.mute(this.prismaService, userId, end);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/promote')
+	async promote(
+		@CurrentUser() user: User,
+		@Body() { channelId, userId }: PromoteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			return { success: false, reason: 'Channel does not exist' };
+		}
+		if (channel.ownerId !== user.id)
+			return { success: false, reason: "You can't do that !" };
+		channel.promote(this.prismaService, userId);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/unpromote')
+	async unpromote(
+		@CurrentUser() user: User,
+		@Body() { channelId, userId }: PromoteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			return { success: false, reason: 'Channel does not exist' };
+		}
+		if (channel.ownerId !== user.id)
+			return { success: false, reason: "You can't do that !" };
+		channel.unpromote(this.prismaService, userId);
 	}
 
 	@UseGuards(AuthGuard)
