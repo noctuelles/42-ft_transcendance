@@ -159,6 +159,11 @@ const UserList = (props: IProps) => {
 							<UserItem
 								key={user.id}
 								user={user}
+								showStatus={
+									props.type === UserListType.FRIEND
+										? true
+										: false
+								}
 								setUsers={setUsers}
 								removeEndpoint={props.removeEndpoint}
 							/>
