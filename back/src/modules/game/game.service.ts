@@ -159,6 +159,7 @@ export class GameService {
 				include: { profile: true },
 			})
 		)['profile'];
+		sockets.forEach((socket) => this.registerQuit(socket));
 		const game = new Game(
 			{ socket: sockets[0], user: sockets[0].user },
 			{ socket: sockets[1], user: sockets[1].user },
