@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsString, Validate } from 'class-validator';
-import { IsValidUser, UserExistsRule } from './users.service';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { IsValidUser } from './users.service';
 
-export class FriendDto {
+export class UserDto {
 	@IsNotEmpty()
 	@IsString()
 	@IsValidUser()

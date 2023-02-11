@@ -4,10 +4,10 @@ export enum EUserStatus {
 	PLAYING = 'PLAYING',
 }
 
-export default interface IFriendData {
+export default interface IUserData {
 	id: number;
 	name: string;
-	status: EUserStatus;
+	status?: EUserStatus;
 	profile: {
 		picture: string;
 	};
