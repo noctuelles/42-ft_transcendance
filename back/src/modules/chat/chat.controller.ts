@@ -128,7 +128,11 @@ export class ChatController {
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
-			return await channel.getMessages(this.prismaService);
+			return await channel.getMessages(
+				this.prismaService,
+				this.usersService,
+				user.id,
+			);
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
