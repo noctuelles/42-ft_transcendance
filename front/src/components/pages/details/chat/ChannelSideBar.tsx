@@ -9,6 +9,8 @@ import { UserRole } from './UserRole';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import TextField from '@/components/global/TextField';
+import { back_url } from '@/config.json';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IValues {
 	username: string;
@@ -32,9 +34,35 @@ export default function ChannelSideBar({
 		values: IValues,
 		{
 			setFieldError,
-		}: { setFieldError: (field: string, errorMsg: string) => void },
+			resetForm,
+		}: {
+			setFieldError: (field: string, errorMsg: string) => void;
+			resetForm: () => void;
+		},
 	) {
+		if (!channel) return;
 		const token = await userContext.getAccessToken();
+		fetch(back_url + '/chat/channel/' + channel.id + '/invite', {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json',
+				Authorization: 'Bearer ' + token,
+			},
+			body: JSON.stringify({
+				username: values.username,
+			}),
+		})
+			.then((res) => {
+				if (!res.ok)
+					return res.text().then((text) => {
+						throw new Error(text);
+					});
+				resetForm();
+			})
+			.catch((err) => {
+				const errObj = JSON.parse(err.message);
+				setFieldError('username', errObj.message);
+			});
 	}
 
 	return (

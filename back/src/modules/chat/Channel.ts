@@ -57,7 +57,7 @@ export default class Channel {
 	muted: IPunishment[];
 	banned: IPunishment[];
 	hashedPwd: string;
-	completeMembers: UserOnChannel[];
+	completeMembers;
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -469,6 +469,48 @@ export default class Channel {
 		});
 		await prismaServie.userChannel.delete({
 			where: { id: this.id },
+		});
+	}
+
+	async canInvite(
+		prismaService: PrismaService,
+		inviterId: number,
+		invitedUsername: string,
+	): Promise<string | null> {
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+		});
+		if (!user) {
+			return "The user doesn't exist";
+		}
+		if (
+			await prismaService.userChannelInvitation.findFirst({
+				where: { userId: user.id, channelId: this.id },
+			})
+		) {
+			return 'User already invited';
+		}
+		if (this.isUserBanned(prismaService, user.id)) {
+			return 'User is banned';
+		}
+		if (this.ownerId !== inviterId && !this.adminsId.includes(inviterId)) {
+			return 'You are not allowed to invite';
+		}
+		if (this.completeMembers.find((m) => m.user.name === invitedUsername)) {
+			return 'User is already in the channel';
+		}
+		return null;
+	}
+
+	async invite(prismaService: PrismaService, invitedUsername: string) {
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+		});
+		await prismaService.userChannelInvitation.create({
+			data: {
+				userId: user.id,
+				channelId: this.id,
+			},
 		});
 	}
 }

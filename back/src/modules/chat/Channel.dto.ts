@@ -5,6 +5,8 @@ import {
 	IsNotEmpty,
 	IsOptional,
 	Length,
+	isString,
+	IsString,
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
@@ -60,4 +62,9 @@ export class PromoteDTO {
 	channelId: number;
 	@IsNumber()
 	userId: number;
+}
+
+export class InviteDTO {
+	@IsString()
+	username: string;
 }

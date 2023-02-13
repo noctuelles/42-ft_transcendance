@@ -25,12 +25,14 @@ import {
 	ActionInChannelDTO,
 	ChangeChannelPwdDTO,
 	CreateChannelDTO,
+	InviteDTO,
 	JoinChannelDTO,
 	LeaveChannelDTO,
 	PromoteDTO,
 } from './Channel.dto';
 import { ChatService } from './chat.service';
 import Channel from './Channel';
+import { UserDto } from '../users/friend.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -355,5 +357,27 @@ export class ChatController {
 			throw new ForbiddenException('User is not in this channel');
 		}
 		channel.readAllMessages(user.id, this.prismaService);
+	}
+
+	@UseGuards(AuthGuard)
+	@Post('channel/:channelId/invite')
+	async inviteUser(
+		@CurrentUser() user: User,
+		@Param('channelId', ParseIntPipe) channelId: number,
+		@Body() { username }: InviteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		const error = await channel.canInvite(
+			this.prismaService,
+			user.id,
+			username,
+		);
+		if (error !== null) {
+			throw new BadRequestException(error);
+		}
+		channel.invite(this.prismaService, username);
 	}
 }
