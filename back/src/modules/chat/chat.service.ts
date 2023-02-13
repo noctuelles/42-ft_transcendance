@@ -148,6 +148,7 @@ export class ChatService {
 					include: {
 						user: {
 							select: {
+								id: true,
 								name: true,
 								status: true,
 								profile: { select: { picture: true } },
@@ -171,6 +172,7 @@ export class ChatService {
 					include: {
 						user: {
 							select: {
+								id: true,
 								name: true,
 								status: true,
 								profile: { select: { picture: true } },
@@ -194,6 +196,12 @@ export class ChatService {
 				userId,
 			);
 		}
+	}
+
+	sendChannelListToUserIds(userIds: number[]) {
+		userIds.map((userId) => {
+			this.sendChannelListWhereUserIs(userId);
+		});
 	}
 
 	async getChannelsAvailableForUser(

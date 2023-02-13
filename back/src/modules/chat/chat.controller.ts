@@ -46,8 +46,7 @@ export class ChatController {
 		const channel = await this.chatService.getChannel(channelId);
 		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
-			// TODO: Send to all users in channel
-			this.chatService.sendChannelListWhereUserIs(user.id);
+			this.chatService.sendChannelListToUserIds(channel.membersId);
 			return {
 				success: true,
 				channel: {
@@ -55,10 +54,6 @@ export class ChatController {
 					members: channel.membersId.length,
 				},
 			};
-			//			this.chatService.sendChannelListToAllUsers([
-			//				...channel.membersId,
-			//				user.id,
-			//			]);
 		} else {
 			return {
 				sucess: false,
@@ -80,7 +75,7 @@ export class ChatController {
 				throw new ForbiddenException("You can't leave a pm channel");
 			}
 			await channel.removeUser(this.prismaService, user.id);
-			this.chatService.sendChannelListWhereUserIs(user.id);
+			this.chatService.sendChannelListToUserIds(channel.membersId);
 			return {
 				success: true,
 				channel: {
