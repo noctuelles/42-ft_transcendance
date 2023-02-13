@@ -158,6 +158,22 @@ export class ChatController {
 				'You cannot create a mp with yourself',
 			);
 		}
+		const blocked = await this.usersService.fetchBlockedList(user.id);
+		blocked.forEach((b) => {
+			if (b.name === otherName) {
+				throw new BadRequestException(
+					'You cannot create a mp with a blocked user',
+				);
+			}
+		});
+		const blockedBy = await this.usersService.fetchBlockedByList(user.id);
+		blockedBy.forEach((b) => {
+			if (b.name === otherName) {
+				throw new BadRequestException(
+					'You cannot create a mp with a blocked user',
+				);
+			}
+		});
 		return await this.chatService.joinMp(user, otherName);
 	}
 
