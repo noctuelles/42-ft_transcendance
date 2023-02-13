@@ -1,6 +1,7 @@
 import IChannel from './IChannel';
 import { useContext } from 'react';
 import { UserContext } from '@/context/UserContext';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { back_url } from '@/config.json';
 
 export default function Channel({
@@ -15,6 +16,7 @@ export default function Channel({
 	hasJoined: boolean;
 }) {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	return (
 		<div
 			className={'channel ' + className}
@@ -46,6 +48,13 @@ export default function Channel({
 			body: JSON.stringify({
 				channelId: channelId,
 			}),
+		}).then((res) => {
+			if (!res.ok) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to join channel',
+				});
+			}
 		});
 	}
 }

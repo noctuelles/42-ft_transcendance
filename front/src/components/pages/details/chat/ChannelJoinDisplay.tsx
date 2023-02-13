@@ -44,11 +44,20 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 					},
 				},
 			)
-				.then((res) => res.json())
+				.then((res) => {
+					if (!res.ok) throw new Error('Failed to fetch channels');
+					return res.json();
+				})
 				.then((data) => {
 					setChannels(data);
 					fetching.current = false;
 					setFetched(true);
+				})
+				.catch((err) => {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: err.message,
+					});
 				});
 		}
 		if (!fetching.current) {
@@ -84,7 +93,10 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 			},
 			body: JSON.stringify(body),
 		})
-			.then((res) => res.json())
+			.then((res) => {
+				if (!res.ok) throw new Error('Failed to join channel');
+				return res.json();
+			})
 			.then((data) => {
 				if (data.success) {
 					setChannels((prev) => {
@@ -103,6 +115,12 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 						message: data.reason,
 					});
 				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}
 
@@ -118,7 +136,10 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 				channelId: channelId,
 			}),
 		})
-			.then((res) => res.json())
+			.then((res) => {
+				if (!res.ok) throw new Error('Failed to leave channel');
+				return res.json();
+			})
 			.then((data) => {
 				if (data.success) {
 					setChannels((prev) => {
@@ -135,6 +156,12 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 					if (channelId == props.selectedChannel)
 						props.setSelectedChannel(0);
 				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}
 

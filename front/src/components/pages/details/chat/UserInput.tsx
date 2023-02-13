@@ -61,6 +61,12 @@ export default function UserInput({
 						message: data.reason,
 					});
 				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}
 
