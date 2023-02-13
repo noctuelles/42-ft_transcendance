@@ -138,13 +138,24 @@ export class ChatController {
 			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
 				throw new ForbiddenException("You can't leave a pm channel");
 			}
-			await channel.removeUser(this.prismaService, user.id);
+			let deleted = false;
+			if (channel.ownerId === user.id) {
+				await channel.delete(this.prismaService);
+				deleted = true;
+			} else {
+				await channel.removeUser(this.prismaService, user.id);
+				if (channel.membersId.length <= 0) {
+					await channel.delete(this.prismaService);
+					deleted = true;
+				}
+			}
 			this.chatService.sendChannelListToUserIds([
 				...channel.membersId,
 				user.id,
 			]);
 			return {
 				success: true,
+				deleted,
 				channel: {
 					id: channel.id,
 					members: channel.membersId.length,

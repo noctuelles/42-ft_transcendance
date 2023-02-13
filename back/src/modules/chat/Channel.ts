@@ -1,5 +1,6 @@
 import {
 	MathInvitationStatus,
+	Prisma,
 	UserChannel,
 	UserOnChannel,
 	UserStatus,
@@ -457,5 +458,17 @@ export default class Channel {
 
 	isRegularUser(userId: number) {
 		return this.ownerId !== userId && !this.adminsId.includes(userId);
+	}
+
+	async delete(prismaServie: PrismaService) {
+		await prismaServie.messageOnChannel.deleteMany({
+			where: { channelId: this.id },
+		});
+		await prismaServie.userOnChannel.deleteMany({
+			where: { channelId: this.id },
+		});
+		await prismaServie.userChannel.delete({
+			where: { id: this.id },
+		});
 	}
 }

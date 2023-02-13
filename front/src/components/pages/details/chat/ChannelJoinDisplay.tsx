@@ -149,7 +149,10 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 						);
 						newChannels[index].joined = false;
 						newChannels[index].members = data.channel.members;
-						if (props.joinType == ChannelJoinType.INVITED)
+						if (
+							props.joinType == ChannelJoinType.INVITED ||
+							data.deleted
+						)
 							newChannels.splice(index, 1);
 						return newChannels;
 					});
