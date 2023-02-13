@@ -92,16 +92,17 @@ export default function UserOnChannel({
 				if (
 					myUserRole !== UserRole.USER &&
 					user.id !== userContext.user.id
-				)
+				) {
 					setPanelOpened(!isPanelOpened);
+				}
 			}}
 		>
 			<div className="user-on-channel">
-			<img alt="profile picture" src={user.profile.picture} />
-			<Link className="profile-link" to={`/profile/${user.name}`}>
-				{user.name}
-			</Link>
-			<StatusDot status={user.status}></StatusDot>
+				<img alt="profile picture" src={user.profile.picture} />
+				<Link className="profile-link" to={`/profile/${user.name}`}>
+					{user.name}
+				</Link>
+				<StatusDot status={user.status}></StatusDot>
 			</div>
 			{isPanelOpened && (
 				<form

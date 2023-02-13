@@ -437,4 +437,16 @@ export default class Channel {
 			});
 		}
 	}
+
+	canBan(actionUserId: number, bannedId: number) {
+		return (
+			actionUserId === this.ownerId ||
+			(this.adminsId.includes(actionUserId) &&
+				this.isRegularUser(bannedId))
+		);
+	}
+
+	isRegularUser(userId: number) {
+		return this.ownerId !== userId && !this.adminsId.includes(userId);
+	}
 }

@@ -82,21 +82,9 @@ export class ChatController {
 		if (!channel) {
 			throw new NotFoundException('Channel does not exist');
 		}
-		if (!this.canBan(user.id, userId, channel))
+		if (!channel.canBan(user.id, userId))
 			throw new ForbiddenException("You can't do that !");
 		channel.ban(this.prismaService, userId, end);
-	}
-
-	canBan(actionUserId: number, bannedId: number, channel: Channel) {
-		return (
-			actionUserId === channel.ownerId ||
-			(channel.adminsId.includes(actionUserId) &&
-				this.isRegularUser(bannedId, channel))
-		);
-	}
-
-	isRegularUser(userId: number, channel: Channel) {
-		return channel.ownerId !== userId && !channel.adminsId.includes(userId);
 	}
 
 	@UseGuards(AuthGuard)
@@ -109,7 +97,7 @@ export class ChatController {
 		if (!channel) {
 			throw new NotFoundException('Channel does not exist');
 		}
-		if (!this.canBan(user.id, userId, channel))
+		if (!channel.canBan(user.id, userId))
 			throw new ForbiddenException("You can't do that !");
 		channel.mute(this.prismaService, userId, end);
 	}
