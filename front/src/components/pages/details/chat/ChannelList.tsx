@@ -82,6 +82,8 @@ export default function ChannelList({
 		) {
 			selected.current = true;
 			selectChannel(chatContext.channels[0].id);
+		} else {
+			selected.current = false;
 		}
 	}, [chatContext.channels.length]);
 
