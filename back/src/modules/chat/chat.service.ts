@@ -30,11 +30,18 @@ export class ChatService {
 
 	async sendMessage(message: IMessage, channelId: number): Promise<void> {
 		const channel: Channel = await this.getChannel(channelId);
-		this.websocketsService.sendToAllUsers(
-			channel.membersId,
-			'chat',
-			message,
+		const users = await Promise.all(
+			channel.completeMembers.map(async (member) => {
+				const blocked = await this.usersService.fetchBlockedList(
+					member.userId,
+				);
+				if (blocked.find((b) => b.name === message.username)) {
+					return null;
+				}
+				return member.userId;
+			}),
 		);
+		this.websocketsService.sendToAllUsers(users, 'chat', message);
 		const sender = await this.prismaService.user.findUnique({
 			where: { name: message.username },
 		});
