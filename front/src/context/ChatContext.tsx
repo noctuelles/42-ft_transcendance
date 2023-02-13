@@ -6,6 +6,7 @@ import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router';
+import { InfoBoxContext, InfoType } from './InfoBoxContext';
 
 interface IChatContext {
 	messages: Map<number, IMessage[]>;
@@ -22,6 +23,7 @@ export const ChatContext = React.createContext<IChatContext>(
 
 export default function ChatContextProvider(props: any) {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	const messages = useRef(new Map<number, IMessage[]>());
 	const [channels, setChannels] = useState<IChannel[]>([]);
 	const fetching = useRef(false);
@@ -35,6 +37,13 @@ export default function ChatContextProvider(props: any) {
 			headers: {
 				Authorization: 'Bearer ' + token,
 			},
+		}).then((res) => {
+			if (!res.ok) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to set channel as readed',
+				});
+			}
 		});
 	}
 
@@ -151,6 +160,13 @@ export default function ChatContextProvider(props: any) {
 				headers: {
 					Authorization: 'Bearer ' + token,
 				},
+			}).then((res) => {
+				if (!res.ok) {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: 'Failed to set channel as readed',
+					});
+				}
 			});
 		}
 	}
@@ -163,10 +179,21 @@ export default function ChatContextProvider(props: any) {
 					Authorization: 'Bearer ' + token,
 				},
 			})
-				.then((response) => response.json())
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('Failed to fetch messages');
+					}
+					return response.json();
+				})
 				.then((data) => {
 					messages.current.set(channelId, data);
 					resolve();
+				})
+				.catch((err) => {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: err.message,
+					});
 				});
 		});
 	}

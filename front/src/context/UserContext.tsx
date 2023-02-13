@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import jwtDecode from 'jwt-decode';
 import React, { useState } from 'react';
 import { back_url } from '@/config.json';
+import { InfoBoxContext, InfoType } from './InfoBoxContext';
 
 interface IUserContext {
 	auth: {
@@ -49,6 +50,7 @@ function UserContextProvider(props: any) {
 		profile_picture: '',
 	});
 	const [twoFaStatus, setTwoFaStatus] = useState<boolean | null>(null);
+	const infoBoxContext = React.useContext(InfoBoxContext);
 
 	async function refreshToken(): Promise<string> {
 		const refresh_token = Cookies.get('transcendance_session_cookie');
@@ -155,7 +157,15 @@ function UserContextProvider(props: any) {
 			body: JSON.stringify({
 				refresh_token: cookie,
 			}),
+		}).then((res) => {
+			if (!res.ok) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Error while logging out',
+				});
+			}
 		});
+
 		Cookies.remove('transcendance_session_cookie');
 		setLogged(false);
 		setUser({ id: -1, name: '', profile_picture: '' });

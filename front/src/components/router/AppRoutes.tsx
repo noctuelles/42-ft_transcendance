@@ -19,12 +19,14 @@ import Cookies from 'js-cookie';
 import UserCreation from '../pages/auth/UserCreation';
 import TwoFaLog from '../pages/auth/TwoFaLog';
 import Settings from '../pages/Settings';
+import { InfoBoxContext } from '@/context/InfoBoxContext';
 
 function AppRoutes() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const fetching = useRef(false);
 	const userContext = React.useContext(UserContext);
+	const infoBoxContext = React.useContext(InfoBoxContext);
 
 	React.useEffect(() => {
 		if (!fetching.current) {
@@ -64,7 +66,7 @@ function AppRoutes() {
 					})
 						.then((res) => {
 							if (res.ok) return res.json();
-							//TODO Error message
+							throw new Error('Failed to fetch user data');
 						})
 						.then((data) => {
 							if (data.state == 'connected') {
@@ -97,6 +99,12 @@ function AppRoutes() {
 								);
 								navigate('/2fa', { replace: true });
 							}
+						})
+						.catch((err) => {
+							infoBoxContext.addInfo({
+								type: InfoType.ERROR,
+								message: err.message,
+							});
 						});
 				}
 			}

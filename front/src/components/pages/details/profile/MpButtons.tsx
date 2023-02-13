@@ -40,11 +40,19 @@ function MpButton(props: IMpButtonProps) {
 			headers: {
 				Authorization: 'Bearer ' + token,
 			},
-		}).then((res) => {
-			if (res.ok) {
-				navigate('/chat?mp=' + props.withUserName);
-			}
-		});
+		})
+			.then((res) => {
+				if (res.ok) {
+					navigate('/chat?mp=' + props.withUserName);
+				}
+				throw new Error('Failed to open mp');
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
+			});
 	}
 
 	return (
