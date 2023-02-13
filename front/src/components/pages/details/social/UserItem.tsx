@@ -45,7 +45,6 @@ const UserItem = (props: IProps) => {
 				if (response.ok) return response.json();
 			})
 			.then((response) => {
-				console.log(response);
 				props.setUsers(response);
 			})
 			.catch(() => {
