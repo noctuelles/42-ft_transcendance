@@ -69,6 +69,7 @@ export default function ChannelSideBar({
 		<div>
 			<h3>{channel?.name}</h3>
 			{channel &&
+				channel.type === 'PRIVATE' &&
 				getRole(
 					userContext.user.id,
 					channel.adminsId,

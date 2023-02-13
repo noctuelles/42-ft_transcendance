@@ -477,6 +477,9 @@ export default class Channel {
 		inviterId: number,
 		invitedUsername: string,
 	): Promise<string | null> {
+		if (this.type != UserChannelVisibility.PRIVATE) {
+			return "You can't invite in this channel";
+		}
 		const user = await prismaService.user.findUnique({
 			where: { name: invitedUsername },
 		});
