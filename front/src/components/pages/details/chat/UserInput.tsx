@@ -75,6 +75,7 @@ export default function UserInput({
 				onChange={formik.handleChange}
 				value={formik.values.inputValue}
 				maxLength={255}
+				disabled={selectedChannel === 0}
 			/>
 			<button type="button" onClick={sendInvite}>
 				Invite to play
