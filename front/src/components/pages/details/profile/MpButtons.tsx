@@ -3,6 +3,7 @@ import { UserContext } from '@/context/UserContext';
 import { useContext } from 'react';
 import { back_url } from '@/config.json';
 import { useNavigate } from 'react-router';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IMpButtonProps {
 	withUserName: string;
@@ -13,6 +14,7 @@ interface IMpButtonProps {
 
 function MpButton(props: IMpButtonProps) {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	const navigate = useNavigate();
 
 	async function openMp() {
@@ -22,11 +24,19 @@ function MpButton(props: IMpButtonProps) {
 			headers: {
 				Authorization: 'Bearer ' + token,
 			},
-		}).then((res) => {
-			if (res.ok) {
-				navigate('/chat?mp=' + props.withUserName);
-			}
-		});
+		})
+			.then((res) => {
+				if (res.ok) {
+					navigate('/chat?mp=' + props.withUserName);
+				}
+				throw new Error('Failed to open mp');
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
+			});
 	}
 
 	return (

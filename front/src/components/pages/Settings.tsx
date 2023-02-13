@@ -4,6 +4,7 @@ import { back_url } from '@/config.json';
 import { UserContext } from '@/context/UserContext';
 import TwoFaInput from './auth/TwoFaInput';
 import Loader from '../global/Loader';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 function Settings() {
 	const [finished, setFinished] = useState(false);
@@ -11,6 +12,7 @@ function Settings() {
 	const [error, setError] = useState('|');
 	const [qrcode, setQrcode] = useState('');
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 
 	useEffect(() => {
 		async function fetchStatus() {
@@ -29,6 +31,12 @@ function Settings() {
 				})
 				.then((data) => {
 					userContext.auth.setTwoFaStatus(data.enabled);
+				})
+				.catch((err) => {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: 'Failed to fetch 2FA status',
+					});
 				});
 		}
 		if (userContext.auth.twoFaStatus === null) fetchStatus();
@@ -50,6 +58,12 @@ function Settings() {
 			})
 			.then((_) => {
 				userContext.auth.setTwoFaStatus(false);
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to disable 2FA',
+				});
 			});
 	}
 
@@ -69,6 +83,12 @@ function Settings() {
 			})
 			.then((data) => {
 				setQrcode(data);
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to enable 2FA',
+				});
 			});
 	}
 
@@ -101,6 +121,12 @@ function Settings() {
 					setReset(true);
 					setError("The code you entered doesn't match");
 				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to verify 2FA code',
+				});
 			});
 	}
 

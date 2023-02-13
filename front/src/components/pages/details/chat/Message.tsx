@@ -36,6 +36,13 @@ const Message = ({
 			headers: {
 				Authorization: 'Bearer ' + token,
 			},
+		}).then((res) => {
+			if (!res.ok) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to cancel invitation',
+				});
+			}
 		});
 	}
 
@@ -53,7 +60,14 @@ const Message = ({
 					Authorization: 'Bearer ' + token,
 				},
 			},
-		);
+		).then((res) => {
+			if (!res.ok) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Failed to join invitation',
+				});
+			}
+		});
 	}
 
 	function isSpectateMatchEvent(data: any): boolean {
