@@ -75,7 +75,10 @@ export class ChatController {
 				throw new ForbiddenException("You can't leave a pm channel");
 			}
 			await channel.removeUser(this.prismaService, user.id);
-			this.chatService.sendChannelListToUserIds(channel.membersId);
+			this.chatService.sendChannelListToUserIds([
+				...channel.membersId,
+				user.id,
+			]);
 			return {
 				success: true,
 				channel: {
