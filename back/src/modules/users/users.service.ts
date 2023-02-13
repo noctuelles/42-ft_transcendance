@@ -422,6 +422,18 @@ export class UsersService {
 		return friends;
 	}
 
+	async fetchBlockedByList(userId: number) {
+		return await this.prismaService.user.findMany({
+			where: {
+				blocked: {
+					some: {
+						id: userId,
+					},
+				},
+			},
+		});
+	}
+
 	async removeFriend(currentUser: User, username: string) {
 		if (username === currentUser.name)
 			throw new InternalServerErrorException();
