@@ -183,14 +183,11 @@ export class UsersService {
 				},
 			},
 		});
-
-		console.log(blocked);
-
 		return blocked;
 	}
 
 	/* Fetch a profile of a specified username zer*/
-	async fetchProfileData(username: string) {
+	async fetchProfileData(fetcherId: number, username: string) {
 		const opt = {
 			include: {
 				userOne: {
@@ -278,6 +275,9 @@ export class UsersService {
 					),
 			);
 
+		const blocked = await this.fetchBlockedList(fetcherId);
+		const blockedBy = await this.fetchBlockedList(user.id);
+
 		return {
 			matches: user.matches.map((match) =>
 				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
@@ -285,6 +285,8 @@ export class UsersService {
 			id: user.id,
 			name: user.name,
 			status: user.status,
+			blocked: blocked.find((b) => b.id === user.id) ? true : false,
+			blockedBy: blockedBy.find((b) => b.id === user.id) ? true : false,
 			...user.profile,
 			achievements,
 		};
@@ -585,7 +587,6 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async validate(value: string): Promise<boolean> {
-		console.log('UserExistRule validation');
 		if (!value) return false;
 		return await this.prisma.user
 			.findUnique({

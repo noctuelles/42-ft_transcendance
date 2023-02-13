@@ -3,9 +3,12 @@ import { UserContext } from '@/context/UserContext';
 import { useContext } from 'react';
 import { back_url } from '@/config.json';
 import { useNavigate } from 'react-router';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IMpButtonProps {
 	withUserName: string;
+	blocked: boolean;
+	blockedBy: boolean;
 	width?: string;
 	height?: string;
 	fontSize?: string;
@@ -13,9 +16,21 @@ interface IMpButtonProps {
 
 function MpButton(props: IMpButtonProps) {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	const navigate = useNavigate();
 
 	async function openMp() {
+		if (props.blocked || props.blockedBy) {
+			infoBoxContext.addInfo({
+				type: InfoType.ERROR,
+				message: props.blocked
+					? 'You are blocked by this user'
+					: props.blockedBy
+					? 'You blocked this user'
+					: '',
+			});
+			return;
+		}
 		const token = await userContext.getAccessToken();
 		fetch(back_url + '/chat/channels/mp/' + props.withUserName, {
 			method: 'POST',
@@ -36,6 +51,14 @@ function MpButton(props: IMpButtonProps) {
 				height={props.height}
 				fontSize={props.fontSize}
 				onClick={openMp}
+				disabled={props.blocked || props.blockedBy}
+				tooltip={
+					props.blocked
+						? 'You are blocked by this user'
+						: props.blockedBy
+						? 'You blocked this user'
+						: ''
+				}
 			>
 				Private message
 			</Button>

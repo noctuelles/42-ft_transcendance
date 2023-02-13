@@ -18,8 +18,12 @@ export class UsersController {
 	constructor(private usersService: UsersService) {}
 
 	@Get('profile/:userName')
-	async getUserProfileData(@Param('userName') username: string) {
-		return await this.usersService.fetchProfileData(username);
+	@UseGuards(AuthGuard)
+	async getUserProfileData(
+		@CurrentUser() user,
+		@Param('userName') username: string,
+	) {
+		return await this.usersService.fetchProfileData(user.id, username);
 	}
 
 	@Get('ranking/global')
