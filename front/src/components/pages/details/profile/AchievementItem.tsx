@@ -14,9 +14,12 @@ const AchievementItem = ({ achievement }: AchievementItemProps) => {
 		<div
 			className="achievement-item-container"
 			style={{
-				WebkitFilter: !achievement.unlocked
-					? 'blur(1px) grayscale(60%)'
-					: '',
+				border: achievement.unlocked
+					? 'solid 1.5px #17c0e9'
+					: 'solid 1.5px black',
+				boxShadow: achievement.unlocked
+					? '0 0 10px #17bfe9b8'
+					: '0px 0px 3px 1px rgba(0, 0, 0, 0.71)',
 			}}
 		>
 			<h3>{achievement.name}</h3>
@@ -35,7 +38,9 @@ const AchievementItem = ({ achievement }: AchievementItemProps) => {
 						? `${achievement.objective}/${achievement.objective}`
 						: `${achievement.progress}/${achievement.objective}`
 				}
-				innerBarColor="rgb(255, 153, 0)"
+				innerBarColor={
+					achievement.unlocked ? '#17c0e9' : 'rgb(255, 153, 0)'
+				}
 			/>
 			<div className="achievement-item-bottom">
 				<img
