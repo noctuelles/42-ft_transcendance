@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { back_url } from '@/config.json';
 import { useContext, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { UserRole } from './UserRole';
 
 export default function UserOnChannel({
@@ -21,6 +22,7 @@ export default function UserOnChannel({
 	myUserRole: UserRole;
 }) {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	const [isPanelOpened, setPanelOpened] = useState(false);
 	const formik = useFormik({
 		initialValues: { action: 'Ban', date: '' },
@@ -40,6 +42,13 @@ export default function UserOnChannel({
 							userId: user.id,
 							end: props.date,
 						}),
+					}).then((res) => {
+						if (!res.ok) {
+							infoBoxContext.addInfo({
+								type: InfoType.ERROR,
+								message: "You can't do that !",
+							});
+						}
 					});
 					break;
 				case 'Mute':
@@ -54,6 +63,13 @@ export default function UserOnChannel({
 							userId: user.id,
 							end: props.date,
 						}),
+					}).then((res) => {
+						if (!res.ok) {
+							infoBoxContext.addInfo({
+								type: InfoType.ERROR,
+								message: "You can't do that !",
+							});
+						}
 					});
 					break;
 				case 'Promote':
@@ -67,6 +83,13 @@ export default function UserOnChannel({
 							channelId: selectedChannel,
 							userId: user.id,
 						}),
+					}).then((res) => {
+						if (!res.ok) {
+							infoBoxContext.addInfo({
+								type: InfoType.ERROR,
+								message: "You can't do that !",
+							});
+						}
 					});
 					break;
 				case 'Unpromote':
@@ -80,6 +103,13 @@ export default function UserOnChannel({
 							channelId: selectedChannel,
 							userId: user.id,
 						}),
+					}).then((res) => {
+						if (!res.ok) {
+							infoBoxContext.addInfo({
+								type: InfoType.ERROR,
+								message: "You can't do that !",
+							});
+						}
 					});
 					break;
 			}
