@@ -1,30 +1,36 @@
-import {
-	Controller,
-	Patch,
-	Body,
-	UseGuards,
-	Get,
-	Param,
-	BadRequestException,
-	Post,
-	ForbiddenException,
-	Delete,
-	ParseIntPipe,
-} from '@nestjs/common';
 import { AuthGuard } from '@/modules/auth/guards/auth.guard';
 import { CurrentUser } from '@/modules/auth/guards/currentUser.decorator';
-import { User, UserChannelVisibility } from '@prisma/client';
-import { ChatService } from './chat.service';
-import { PrismaService } from '../prisma/prisma.service';
 import {
+	BadRequestException,
+	Body,
+	Controller,
+	Delete,
+	ForbiddenException,
+	Get,
+	NotFoundException,
+	Param,
+	ParseIntPipe,
+	Patch,
+	Post,
+	UseGuards,
+} from '@nestjs/common';
+import { User, UserChannelVisibility } from '@prisma/client';
+
+import { GameService } from '../game/game.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from '../users/users.service';
+import { WebsocketsService } from '../websockets/websockets.service';
+
+import {
+	ActionInChannelDTO,
 	ChangeChannelPwdDTO,
 	CreateChannelDTO,
 	JoinChannelDTO,
 	LeaveChannelDTO,
+	PromoteDTO,
 } from './Channel.dto';
-import { WebsocketsService } from '../websockets/websockets.service';
-import { GameService } from '../game/game.service';
-import { UsersService } from '../users/users.service';
+import { ChatService } from './chat.service';
+import Channel from './Channel';
 
 @Controller('chat')
 export class ChatController {
@@ -40,8 +46,7 @@ export class ChatController {
 	@Patch('channel/join')
 	async joinChannel(
 		@CurrentUser() user: User,
-		@Body()
-		{ channelId, password }: JoinChannelDTO,
+		@Body() { channelId, password }: JoinChannelDTO,
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
@@ -63,11 +68,70 @@ export class ChatController {
 	}
 
 	@UseGuards(AuthGuard)
+	@Patch('channel/ban')
+	async ban(
+		@CurrentUser() user: User,
+		@Body() { channelId, end, userId }: ActionInChannelDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			throw new NotFoundException('Channel does not exist');
+		}
+		if (!channel.canBan(user.id, userId))
+			throw new ForbiddenException("You can't do that !");
+		channel.ban(this.prismaService, userId, end);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/mute')
+	async mute(
+		@CurrentUser() user: User,
+		@Body() { channelId, end, userId }: ActionInChannelDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			throw new NotFoundException('Channel does not exist');
+		}
+		if (!channel.canBan(user.id, userId))
+			throw new ForbiddenException("You can't do that !");
+		channel.mute(this.prismaService, userId, end);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/promote')
+	async promote(
+		@CurrentUser() user: User,
+		@Body() { channelId, userId }: PromoteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			throw new NotFoundException('Channel does not exist');
+		}
+		if (channel.ownerId !== user.id)
+			throw new ForbiddenException("You can't do that !");
+		channel.promote(this.prismaService, userId);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/unpromote')
+	async unpromote(
+		@CurrentUser() user: User,
+		@Body() { channelId, userId }: PromoteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			throw new NotFoundException('Channel does not exist');
+		}
+		if (channel.ownerId !== user.id)
+			throw new ForbiddenException("You can't do that !");
+		channel.unpromote(this.prismaService, userId);
+	}
+
+	@UseGuards(AuthGuard)
 	@Patch('channel/leave')
 	async leaveChannel(
 		@CurrentUser() user: User,
-		@Body()
-		{ channelId }: LeaveChannelDTO,
+		@Body() { channelId }: LeaveChannelDTO,
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
@@ -151,8 +215,7 @@ export class ChatController {
 	@Post('channels/create')
 	async createChannel(
 		@CurrentUser() user: User,
-		@Body()
-		createChannelDTO: CreateChannelDTO,
+		@Body() createChannelDTO: CreateChannelDTO,
 	) {
 		return await this.chatService.createChannel(user, createChannelDTO);
 	}

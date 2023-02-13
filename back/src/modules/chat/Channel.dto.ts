@@ -1,4 +1,13 @@
-import { IsEnum, IsNotEmpty, IsOptional, Length } from 'class-validator';
+import {
+	IsNumber,
+	IsDate,
+	IsEnum,
+	IsNotEmpty,
+	IsOptional,
+	Length,
+} from 'class-validator';
+
+import { Type } from 'class-transformer';
 
 export enum EChannelType {
 	PUBLIC = 'Public',
@@ -34,4 +43,21 @@ export class CreateChannelDTO {
 export class ChangeChannelPwdDTO {
 	@Length(10, 25)
 	channelPassword: string;
+}
+
+export class ActionInChannelDTO {
+	@IsNumber()
+	channelId: number;
+	@Type(() => Date)
+	@IsDate()
+	end: Date;
+	@IsNumber()
+	userId: number;
+}
+
+export class PromoteDTO {
+	@IsNumber()
+	channelId: number;
+	@IsNumber()
+	userId: number;
 }

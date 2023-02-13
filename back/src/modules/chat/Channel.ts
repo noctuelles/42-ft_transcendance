@@ -34,6 +34,7 @@ export interface IMessage {
 }
 
 interface reducedUser {
+	id: number;
 	name: string;
 	status: UserStatus;
 	profile: { picture: string };
@@ -228,39 +229,77 @@ export default class Channel {
 	}
 
 	ban(prismaService: PrismaService, userId: number, unbanDate: Date): void {
-		prismaService.userOnChannel.update({
-			where: { id: { userId: userId, channelId: this.id } },
-			data: { status: UserOnChannelStatus.BANNED, statusEnd: unbanDate },
-		});
-		this.banned.push({ userId: userId, endDate: unbanDate });
+		prismaService.userOnChannel
+			.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: {
+					status: UserOnChannelStatus.BANNED,
+					statusEnd: unbanDate,
+				},
+			})
+			.then(),
+			this.banned.push({ userId: userId, endDate: unbanDate });
 	}
 
 	pardon(prismaService: PrismaService, userId: number): boolean {
-		prismaService.userOnChannel.update({
-			where: { id: { userId: userId, channelId: this.id } },
-			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
-		});
+		prismaService.userOnChannel
+			.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
+			})
+			.then();
 		return this.removeAllMatches(this.banned, (punishment) => {
 			return punishment.userId === userId;
 		});
 	}
 
 	mute(prismaService: PrismaService, userId: number, unmuteDate: Date): void {
-		prismaService.userOnChannel.update({
-			where: { id: { userId: userId, channelId: this.id } },
-			data: { status: UserOnChannelStatus.MUTED, statusEnd: unmuteDate },
-		});
+		prismaService.userOnChannel
+			.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: {
+					status: UserOnChannelStatus.MUTED,
+					statusEnd: unmuteDate,
+				},
+			})
+			.then();
 		this.muted.push({ userId: userId, endDate: unmuteDate });
 	}
 
 	unmute(prismaService: PrismaService, userId: number): boolean {
-		prismaService.userOnChannel.update({
-			where: { id: { userId: userId, channelId: this.id } },
-			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
-		});
+		prismaService.userOnChannel
+			.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
+			})
+			.then();
 		return this.removeAllMatches(this.muted, (punishment) => {
 			return punishment.userId === userId;
 		});
+	}
+
+	promote(prismaService: PrismaService, userId: number): void {
+		prismaService.userOnChannel
+			.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: {
+					role: UserOnChannelRole.ADMIN,
+				},
+			})
+			.then();
+		this.adminsId.push(userId);
+	}
+
+	unpromote(prismaService: PrismaService, userId: number): void {
+		prismaService.userOnChannel
+			.update({
+				where: { id: { userId: userId, channelId: this.id } },
+				data: {
+					role: UserOnChannelRole.USER,
+				},
+			})
+			.then();
+		this.adminsId.splice(this.adminsId.indexOf(userId), 1);
 	}
 
 	removeAllMatches(array: any[], condition: (elem: any) => boolean): boolean {
@@ -407,6 +446,18 @@ export default class Channel {
 				data: { lastReadedMessage: lastMessage.id },
 			});
 		}
+	}
+
+	canBan(actionUserId: number, bannedId: number) {
+		return (
+			actionUserId === this.ownerId ||
+			(this.adminsId.includes(actionUserId) &&
+				this.isRegularUser(bannedId))
+		);
+	}
+
+	isRegularUser(userId: number) {
+		return this.ownerId !== userId && !this.adminsId.includes(userId);
 	}
 
 	async delete(prismaServie: PrismaService) {
