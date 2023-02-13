@@ -87,7 +87,7 @@ export class ChatController {
 				},
 			};
 		} else {
-			// TODO: Return error to tell why not allowed
+			throw new ForbiddenException('You are not in this channel');
 		}
 	}
 
@@ -132,7 +132,7 @@ export class ChatController {
 				user.id,
 			);
 		} else {
-			// TODO: Return error to tell why not allowed
+			throw new ForbiddenException('You are not in this channel');
 		}
 	}
 
