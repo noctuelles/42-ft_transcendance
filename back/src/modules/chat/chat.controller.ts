@@ -174,7 +174,7 @@ export class ChatController {
 		blockedBy.forEach((b) => {
 			if (b.name === otherName) {
 				throw new BadRequestException(
-					'You cannot create a mp with a blocked user',
+					'You cannot create a mp with a user that blocked you',
 				);
 			}
 		});
