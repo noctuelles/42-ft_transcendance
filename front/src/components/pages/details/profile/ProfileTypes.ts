@@ -52,6 +52,8 @@ export interface ProfileData {
 	name: string;
 	status: UserStatus;
 	xp: number;
+	blocked: boolean;
+	blockedBy: boolean;
 }
 
 /* Other interfaces.. */

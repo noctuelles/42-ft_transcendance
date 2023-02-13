@@ -12,6 +12,7 @@ import { UserOnChannelStatus } from '@prisma/client';
 import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
 import * as argon from 'argon2';
+import { UsersService } from '../users/users.service';
 
 export enum ChannelType {
 	PUBLIC,
@@ -74,7 +75,7 @@ export default class Channel {
 		})[0]?.userId;
 		this.membersId = userChannel.participants.map((user) => {
 			return user.userId;
-		}); // TODO: Remove this
+		});
 		this.members = userChannel.participants.map((participant) => {
 			return participant.user;
 		});
@@ -273,7 +274,11 @@ export default class Channel {
 		return didMatch;
 	}
 
-	async getMessages(prismaService: PrismaService) {
+	async getMessages(
+		prismaService: PrismaService,
+		usersService: UsersService,
+		fetcherId: number,
+	) {
 		const messages = await prismaService.messageOnChannel.findMany({
 			where: { channelId: this.id },
 			orderBy: { postedAt: 'asc' },
@@ -282,8 +287,12 @@ export default class Channel {
 				matchInvitation: true,
 			},
 		});
+		const blocked = await usersService.fetchBlockedList(fetcherId);
 		return messages
 			.map((message) => {
+				if (blocked.map((b) => b.id).includes(message.authorId)) {
+					return null;
+				}
 				let res = {
 					username: message.author.name,
 					channel: message.channelId,
@@ -296,7 +305,7 @@ export default class Channel {
 				return res;
 			})
 			.filter((m) => {
-				return m.isInvitation || m.message !== '';
+				return m != null && (m.isInvitation || m.message !== '');
 			});
 	}
 

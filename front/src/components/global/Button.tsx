@@ -3,8 +3,8 @@ import '@/style/global/Button.css';
 const Button = (props: any) => {
 	return (
 		<button
-			{...props}
-			className="btn"
+			title={props.tooltip}
+			className={`btn btn-${props.disabled ? 'disabled' : 'enabled'}`}
 			type={props.type}
 			onClick={props.onClick}
 			style={{
