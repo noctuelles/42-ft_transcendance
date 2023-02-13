@@ -1,5 +1,6 @@
 import {
 	MathInvitationStatus,
+	Prisma,
 	UserChannel,
 	UserOnChannel,
 	UserStatus,
@@ -397,5 +398,17 @@ export default class Channel {
 				data: { lastReadedMessage: lastMessage.id },
 			});
 		}
+	}
+
+	async delete(prismaServie: PrismaService) {
+		await prismaServie.messageOnChannel.deleteMany({
+			where: { channelId: this.id },
+		});
+		await prismaServie.userOnChannel.deleteMany({
+			where: { channelId: this.id },
+		});
+		await prismaServie.userChannel.delete({
+			where: { id: this.id },
+		});
 	}
 }

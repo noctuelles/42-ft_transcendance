@@ -183,7 +183,7 @@ export default function ChatContextProvider(props: any) {
 					if (!response.ok) {
 						throw new Error('Failed to fetch messages');
 					}
-					return response.json();
+					if (response.arrayBuffer.length > 0) return response.json();
 				})
 				.then((data) => {
 					messages.current.set(channelId, data);
