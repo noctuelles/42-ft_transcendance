@@ -20,14 +20,17 @@ function MpButton(props: IMpButtonProps) {
 	const navigate = useNavigate();
 
 	async function openMp() {
-		if (props.blocked || props.blockedBy) {
+		if (props.blocked) {
 			infoBoxContext.addInfo({
 				type: InfoType.ERROR,
-				message: props.blocked
-					? 'You are blocked by this user'
-					: props.blockedBy
-					? 'You blocked this user'
-					: '',
+				message: 'You blocked this user',
+			});
+			return;
+		}
+		if (props.blockedBy) {
+			infoBoxContext.addInfo({
+				type: InfoType.ERROR,
+				message: 'You are blocked by this user',
 			});
 			return;
 		}
@@ -54,9 +57,9 @@ function MpButton(props: IMpButtonProps) {
 				disabled={props.blocked || props.blockedBy}
 				tooltip={
 					props.blocked
-						? 'You are blocked by this user'
-						: props.blockedBy
 						? 'You blocked this user'
+						: props.blockedBy
+						? 'You are blocked by this user'
 						: ''
 				}
 			>

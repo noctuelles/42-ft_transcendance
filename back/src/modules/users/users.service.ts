@@ -276,7 +276,7 @@ export class UsersService {
 			);
 
 		const blocked = await this.fetchBlockedList(fetcherId);
-		const blockedBy = await this.fetchBlockedList(user.id);
+		const blockedBy = await this.fetchBlockedByList(fetcherId);
 
 		return {
 			matches: user.matches.map((match) =>
@@ -312,7 +312,6 @@ export class UsersService {
 			elo: user.profile.elo,
 		}));
 		return users.sort((a, b) => b.elo - a.elo);
-		return users;
 	}
 
 	async fetchFriendsRanking(user) {
