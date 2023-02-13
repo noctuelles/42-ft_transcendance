@@ -155,12 +155,20 @@ export class UsersService {
 								picture: true,
 							},
 						},
+						blocked: true,
 					},
 				},
 			},
 		});
 
-		return friends;
+		return friends.map((friend) => {
+			return {
+				...friend,
+				blocked: friend.blocked.find((b) => b.id === userId)
+					? true
+					: false,
+			};
+		});
 	}
 
 	async fetchBlockedList(userId: number) {

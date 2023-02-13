@@ -67,6 +67,7 @@ const UserItem = (props: IProps) => {
 						width="80px"
 						fontSize="10px"
 						withUserName={props.user.name}
+						blockedBy={props.user.blocked}
 					/>
 				)}
 			</div>
