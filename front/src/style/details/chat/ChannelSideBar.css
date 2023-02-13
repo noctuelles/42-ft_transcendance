@@ -23,3 +23,7 @@
 	width: 30px;
 	height: 30px;
 }
+
+.invite-user-form .field-feedback {
+	font-size: 10px;
+}
