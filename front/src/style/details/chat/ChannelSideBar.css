@@ -4,3 +4,22 @@
 	padding-left: 0;
 	padding: 7%;
 }
+
+.invite-user-form {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5px;
+}
+
+.invite-user-form button {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.invite-user-form button svg {
+	width: 30px;
+	height: 30px;
+}
