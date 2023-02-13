@@ -1,4 +1,10 @@
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+	IsOptional,
+	IsString,
+	Matches,
+	MaxLength,
+	MinLength,
+} from 'class-validator';
 import { IsFile, MaxFileSize, MemoryStoredFile } from 'nestjs-form-data';
 
 export class CreateUserDTO {
@@ -8,6 +14,7 @@ export class CreateUserDTO {
 	login: string;
 
 	@IsString()
+	@Matches('^[a-zA-Z0-9_]*$')
 	@MinLength(3)
 	@MaxLength(20)
 	name: string;

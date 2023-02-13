@@ -84,6 +84,12 @@ export class AuthController {
 				valid: false,
 				reason: 'The name must be at most 20 characters long',
 			};
+		if (!name.match('^[a-zA-Z0-9_]*$')) {
+			return {
+				valid: false,
+				reason: 'The name must only contain alphanumeric characters and underscores',
+			};
+		}
 		if (await this.usersService.isUserWithName(name)) {
 			return {
 				valid: false,
@@ -136,7 +142,7 @@ export class AuthController {
 	async get2FA(@CurrentUser() user) {
 		return user.otpSecret ? { enabled: true } : { enabled: false };
 	}
-	
+
 	@Post('logout')
 	@UseGuards(AuthGuard)
 	async logout(@Body('refresh_token') refreshToken: string) {
