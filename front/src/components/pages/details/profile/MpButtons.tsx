@@ -28,8 +28,9 @@ function MpButton(props: IMpButtonProps) {
 			.then((res) => {
 				if (res.ok) {
 					navigate('/chat?mp=' + props.withUserName);
+				} else {
+					throw new Error('Failed to open mp');
 				}
-				throw new Error('Failed to open mp');
 			})
 			.catch((err) => {
 				infoBoxContext.addInfo({
