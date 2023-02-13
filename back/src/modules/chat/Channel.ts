@@ -2,6 +2,7 @@ import {
 	MathInvitationStatus,
 	Prisma,
 	UserChannel,
+	UserChannelInvitation,
 	UserOnChannel,
 	UserStatus,
 } from '@prisma/client';
@@ -40,9 +41,18 @@ interface reducedUser {
 	profile: { picture: string };
 }
 
+interface invitedUser {
+	id: number;
+	name: string;
+	profile: { picture: string };
+}
+
 type ChannelWithUser = UserChannel & {
 	participants: (UserOnChannel & {
 		user: reducedUser;
+	})[];
+	invitations: (UserChannelInvitation & {
+		user: invitedUser;
 	})[];
 };
 
@@ -58,6 +68,7 @@ export default class Channel {
 	banned: IPunishment[];
 	hashedPwd: string;
 	completeMembers;
+	invitations;
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -101,6 +112,13 @@ export default class Channel {
 			.map((user) => {
 				return { userId: user.userId, endDate: user.statusEnd };
 			});
+		this.invitations = userChannel.invitations.map((invitation) => {
+			return {
+				userId: invitation.userId,
+				username: invitation.user.name,
+				picture: invitation.user.profile.picture,
+			};
+		});
 	}
 
 	canUserSendMessage(prismaService: PrismaService, userId: number): boolean {

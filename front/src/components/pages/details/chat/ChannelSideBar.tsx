@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import TextField from '@/components/global/TextField';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import ChannelInvitation from './ChannelInvitation';
 
 interface IValues {
 	username: string;
@@ -120,6 +121,29 @@ export default function ChannelSideBar({
 						/>
 					);
 				})}
+				{channel &&
+					channel.type === 'PRIVATE' &&
+					getRole(
+						userContext.user.id,
+						channel.adminsId,
+						channel.ownerId,
+					) !== UserRole.USER && (
+						<>
+							<div className="channel-sidebar-break" />
+							<h4>Invitations</h4>
+							<ul className="channel-sidebar-user">
+								{channel?.invitations.map((invit) => {
+									return (
+										<ChannelInvitation
+											key={invit.userId}
+											invitation={invit}
+											channelId={channel.id}
+										/>
+									);
+								})}
+							</ul>
+						</>
+					)}
 			</ul>
 		</div>
 	);

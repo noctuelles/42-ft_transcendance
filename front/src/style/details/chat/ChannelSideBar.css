@@ -27,3 +27,17 @@
 .invite-user-form .field-feedback {
 	font-size: 10px;
 }
+
+.channel-sidebar-break {
+	height: 1px;
+	width: 100%;
+	background-color: black;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.user-cross {
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}

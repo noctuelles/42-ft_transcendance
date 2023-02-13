@@ -1,5 +1,11 @@
 import IUser from './IUser';
 
+export default interface IChannelInvitation {
+	userId: number;
+	username: string;
+	picture: string;
+}
+
 export default interface IChannel {
 	id: number;
 	name: string;
@@ -9,6 +15,7 @@ export default interface IChannel {
 	membersId: number[];
 	adminsId: number[];
 	unreaded: number;
+	invitations: IChannelInvitation[];
 }
 
 export enum ChannelType {
