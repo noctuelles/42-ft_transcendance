@@ -38,7 +38,7 @@ export default function Chat() {
 	}
 
 	async function selectChannel(channelId: number) {
-		if (!chatContext.messages.has(channelId)) {
+		if (!chatContext.messages.has(channelId) && channelId !== 0) {
 			await chatContext.fetchMessages(channelId);
 		}
 		chatContext.setSelectedChannel(channelId);

@@ -123,7 +123,11 @@ export class ChatController {
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
-			return await channel.getMessages(this.prismaService);
+			return await channel.getMessages(
+				this.prismaService,
+				this.usersService,
+				user.id,
+			);
 		} else {
 			// TODO: Return error to tell why not allowed
 		}
@@ -153,6 +157,22 @@ export class ChatController {
 				'You cannot create a mp with yourself',
 			);
 		}
+		const blocked = await this.usersService.fetchBlockedList(user.id);
+		blocked.forEach((b) => {
+			if (b.name === otherName) {
+				throw new BadRequestException(
+					'You cannot create a mp with a blocked user',
+				);
+			}
+		});
+		const blockedBy = await this.usersService.fetchBlockedByList(user.id);
+		blockedBy.forEach((b) => {
+			if (b.name === otherName) {
+				throw new BadRequestException(
+					'You cannot create a mp with a user that blocked you',
+				);
+			}
+		});
 		return await this.chatService.joinMp(user, otherName);
 	}
 

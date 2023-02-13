@@ -45,7 +45,6 @@ const UserItem = (props: IProps) => {
 				if (response.ok) return response.json();
 			})
 			.then((response) => {
-				console.log(response);
 				props.setUsers(response);
 			})
 			.catch(() => {
@@ -67,6 +66,7 @@ const UserItem = (props: IProps) => {
 						width="80px"
 						fontSize="10px"
 						withUserName={props.user.name}
+						blockedBy={props.user.blocked}
 					/>
 				)}
 			</div>

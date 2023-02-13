@@ -11,4 +11,5 @@ export default interface IUserData {
 	profile: {
 		picture: string;
 	};
+	blocked: boolean;
 }

@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User, UserChannelVisibility, UserOnChannelRole } from '@prisma/client';
 import { CreateChannelDTO, EChannelType } from './Channel.dto';
 import * as argon from 'argon2';
+import { UsersService } from '../users/users.service';
 
 export class Message {
 	channel: number;
@@ -24,15 +25,23 @@ export class ChatService {
 	constructor(
 		private readonly websocketsService: WebsocketsService,
 		private readonly prismaService: PrismaService,
+		private readonly usersService: UsersService,
 	) {}
 
 	async sendMessage(message: IMessage, channelId: number): Promise<void> {
 		const channel: Channel = await this.getChannel(channelId);
-		this.websocketsService.sendToAllUsers(
-			channel.membersId,
-			'chat',
-			message,
+		const users = await Promise.all(
+			channel.completeMembers.map(async (member) => {
+				const blocked = await this.usersService.fetchBlockedList(
+					member.userId,
+				);
+				if (blocked.find((b) => b.name === message.username)) {
+					return null;
+				}
+				return member.userId;
+			}),
 		);
+		this.websocketsService.sendToAllUsers(users, 'chat', message);
 		const sender = await this.prismaService.user.findUnique({
 			where: { name: message.username },
 		});
@@ -88,7 +97,28 @@ export class ChatService {
 		socket: any,
 		userId: number,
 	): Promise<void> {
-		const channels = await this.getChannelWehreUserIs(userId);
+		let channels = await this.getChannelWehreUserIs(userId);
+		const blocked = await this.usersService.fetchBlockedList(userId);
+		const blockedBy = await this.usersService.fetchBlockedByList(userId);
+		channels = channels.filter((channel) => {
+			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
+				let found = false;
+				channel.completeMembers.forEach((member) => {
+					if (
+						blocked.filter((b) => b.id === member.userId).length >
+							0 ||
+						blockedBy.filter((b) => b.id === member.userId).length >
+							0
+					) {
+						found = true;
+					}
+				});
+				if (found) {
+					return false;
+				}
+			}
+			return true;
+		});
 		const channelsForFront = await Promise.all(
 			channels.map(async (channel) => {
 				let {

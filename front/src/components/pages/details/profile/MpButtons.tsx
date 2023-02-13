@@ -7,6 +7,8 @@ import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IMpButtonProps {
 	withUserName: string;
+	blocked: boolean;
+	blockedBy: boolean;
 	width?: string;
 	height?: string;
 	fontSize?: string;
@@ -18,6 +20,20 @@ function MpButton(props: IMpButtonProps) {
 	const navigate = useNavigate();
 
 	async function openMp() {
+		if (props.blocked) {
+			infoBoxContext.addInfo({
+				type: InfoType.ERROR,
+				message: 'You blocked this user',
+			});
+			return;
+		}
+		if (props.blockedBy) {
+			infoBoxContext.addInfo({
+				type: InfoType.ERROR,
+				message: 'You are blocked by this user',
+			});
+			return;
+		}
 		const token = await userContext.getAccessToken();
 		fetch(back_url + '/chat/channels/mp/' + props.withUserName, {
 			method: 'POST',
@@ -47,6 +63,14 @@ function MpButton(props: IMpButtonProps) {
 				height={props.height}
 				fontSize={props.fontSize}
 				onClick={openMp}
+				disabled={props.blocked || props.blockedBy}
+				tooltip={
+					props.blocked
+						? 'You blocked this user'
+						: props.blockedBy
+						? 'You are blocked by this user'
+						: ''
+				}
 			>
 				Private message
 			</Button>
