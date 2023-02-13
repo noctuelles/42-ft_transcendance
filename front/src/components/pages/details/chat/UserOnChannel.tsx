@@ -4,7 +4,8 @@ import '@/style/details/chat/UserOnChannel.css';
 import StatusDot from '../social/StatusDot';
 import { EUserStatus } from '../social/Types';
 import { Link } from 'react-router-dom';
-import { back_url } from '@/config.json';
+import useWebSocket from 'react-use-websocket';
+import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useContext, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
@@ -24,6 +25,21 @@ export default function UserOnChannel({
 	const userContext = useContext(UserContext);
 	const infoBoxContext = useContext(InfoBoxContext);
 	const [isPanelOpened, setPanelOpened] = useState(false);
+
+	useWebSocket(WS_URL, {
+		share: true,
+		onMessage: ({ data }: { data?: string }) => {
+			if (!data) {
+				return;
+			}
+			if (isStatusMessage(data)) {
+				const jsonMessage = JSON.parse(data);
+				if (user.id === jsonMessage.data.id)
+					user.status = jsonMessage.data.status;
+			}
+		},
+	});
+
 	const formik = useFormik({
 		initialValues: { action: 'Ban', date: '' },
 		onSubmit: async (props, { resetForm }) => {
@@ -170,4 +186,13 @@ export default function UserOnChannel({
 			)}
 		</li>
 	);
+
+	function isStatusMessage(rawMessage: string) {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'user-status';
+	}
 }

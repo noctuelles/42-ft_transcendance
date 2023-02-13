@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { back_url } from '@/config.json';
 import Loader from '../global/Loader';
 import { UserContext } from '@/context/UserContext';
+import { InfoBoxContext } from '@/context/InfoBoxContext';
 
 interface IRankingProps {
 	rankingType: RankingType;
@@ -20,6 +21,7 @@ export interface IUserRanking {
 
 function Ranking(props: IRankingProps) {
 	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	const [ranking, setRanking] = useState<IUserRanking[]>([]);
 	const fetching = useRef(false);
 
@@ -40,10 +42,21 @@ function Ranking(props: IRankingProps) {
 					},
 				},
 			)
-				.then((res) => res.json())
+				.then((res) => {
+					if (!res.ok) {
+						throw new Error('Failed to fetch ranking');
+					}
+					return res.json();
+				})
 				.then((data) => {
 					setRanking(data);
 					fetching.current = false;
+				})
+				.catch((err) => {
+					infoBoxContext.addInfo({
+						type: InfoType.ERROR,
+						message: err.message,
+					});
 				});
 		}
 		if (!fetching.current) {

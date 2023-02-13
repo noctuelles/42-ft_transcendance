@@ -51,8 +51,7 @@ export class ChatController {
 		const channel = await this.chatService.getChannel(channelId);
 		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
 			await channel.addUser(this.prismaService, user.id);
-			// TODO: Send to all users in channel
-			this.chatService.sendChannelListWhereUserIs(user.id);
+			this.chatService.sendChannelListToUserIds(channel.membersId);
 			return {
 				success: true,
 				channel: {
@@ -60,10 +59,6 @@ export class ChatController {
 					members: channel.membersId.length,
 				},
 			};
-			//			this.chatService.sendChannelListToAllUsers([
-			//				...channel.membersId,
-			//				user.id,
-			//			]);
 		} else {
 			return {
 				sucess: false,
@@ -144,7 +139,10 @@ export class ChatController {
 				throw new ForbiddenException("You can't leave a pm channel");
 			}
 			await channel.removeUser(this.prismaService, user.id);
-			this.chatService.sendChannelListWhereUserIs(user.id);
+			this.chatService.sendChannelListToUserIds([
+				...channel.membersId,
+				user.id,
+			]);
 			return {
 				success: true,
 				channel: {
@@ -153,7 +151,7 @@ export class ChatController {
 				},
 			};
 		} else {
-			// TODO: Return error to tell why not allowed
+			throw new ForbiddenException('You are not in this channel');
 		}
 	}
 
@@ -192,9 +190,13 @@ export class ChatController {
 	) {
 		const channel = await this.chatService.getChannel(channelId);
 		if (channel?.containsUser(user.id)) {
-			return await channel.getMessages(this.prismaService);
+			return await channel.getMessages(
+				this.prismaService,
+				this.usersService,
+				user.id,
+			);
 		} else {
-			// TODO: Return error to tell why not allowed
+			throw new ForbiddenException('You are not in this channel');
 		}
 	}
 
@@ -221,6 +223,22 @@ export class ChatController {
 				'You cannot create a mp with yourself',
 			);
 		}
+		const blocked = await this.usersService.fetchBlockedList(user.id);
+		blocked.forEach((b) => {
+			if (b.name === otherName) {
+				throw new BadRequestException(
+					'You cannot create a mp with a blocked user',
+				);
+			}
+		});
+		const blockedBy = await this.usersService.fetchBlockedByList(user.id);
+		blockedBy.forEach((b) => {
+			if (b.name === otherName) {
+				throw new BadRequestException(
+					'You cannot create a mp with a user that blocked you',
+				);
+			}
+		});
 		return await this.chatService.joinMp(user, otherName);
 	}
 

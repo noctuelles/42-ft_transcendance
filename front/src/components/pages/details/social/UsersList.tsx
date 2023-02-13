@@ -61,7 +61,6 @@ const UserList = (props: IProps) => {
 		async function fetchData() {
 			const token = await userContext.getAccessToken();
 
-			console.log(back_url + props.getEndpoint);
 			fetch(back_url + props.getEndpoint, {
 				method: 'GET',
 				headers: {

@@ -10,6 +10,11 @@
 	transition: border 0.3s linear;
 }
 
-.btn:hover {
+.btn-enabled .btn:hover {
 	border: 2px solid black;
+}
+
+.btn-disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }

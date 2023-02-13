@@ -18,6 +18,8 @@ interface ProfileHeaderProps {
 	status: UserStatus;
 	total_xp: number;
 	username: string;
+	blocked: boolean;
+	blockedBy: boolean;
 }
 
 const ProfileHeader = (props: ProfileHeaderProps) => {
@@ -94,7 +96,11 @@ const ProfileHeader = (props: ProfileHeaderProps) => {
 						</button>
 					)}
 					{props.username !== userContext.user.name && (
-						<MpButton withUserName={props.username} />
+						<MpButton
+							withUserName={props.username}
+							blocked={props.blocked}
+							blockedBy={props.blockedBy}
+						/>
 					)}
 				</div>
 				<ProfileHeaderSearchBar onSearchClick={props.onSearchClick} />

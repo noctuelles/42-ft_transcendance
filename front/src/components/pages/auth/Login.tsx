@@ -1,18 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { back_url } from '@/config.json';
 import '@/style/auth/Login.css';
 import portal from '@/assets/portal.svg';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 function Login() {
 	const [authUrl, setAuthUrl] = useState('');
+	const infoBoxContext = useContext(InfoBoxContext);
 	useEffect(() => {
 		fetch(back_url + '/auth')
 			.then((res) => {
 				if (res.ok) return res.json();
-				//TODO Error message
+				throw new Error('Failed to get auth url');
 			})
 			.then((data) => {
 				setAuthUrl(data.url);
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}, [setAuthUrl]);
 

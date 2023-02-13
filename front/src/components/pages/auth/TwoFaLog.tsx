@@ -43,7 +43,7 @@ function TwoFaLog() {
 		})
 			.then((res) => {
 				if (!res.ok) {
-					throw new Error('Error');
+					throw new Error('Impossible to verify 2fa code');
 				}
 				return res.json();
 			})
@@ -69,6 +69,12 @@ function TwoFaLog() {
 					setReset(true);
 					setError('Invalid code, please rerty');
 				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}
 

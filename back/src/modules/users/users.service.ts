@@ -155,12 +155,20 @@ export class UsersService {
 								picture: true,
 							},
 						},
+						blocked: true,
 					},
 				},
 			},
 		});
 
-		return friends;
+		return friends.map((friend) => {
+			return {
+				...friend,
+				blocked: friend.blocked.find((b) => b.id === userId)
+					? true
+					: false,
+			};
+		});
 	}
 
 	async fetchBlockedList(userId: number) {
@@ -183,14 +191,11 @@ export class UsersService {
 				},
 			},
 		});
-
-		console.log(blocked);
-
 		return blocked;
 	}
 
 	/* Fetch a profile of a specified username zer*/
-	async fetchProfileData(username: string) {
+	async fetchProfileData(fetcherId: number, username: string) {
 		const opt = {
 			include: {
 				userOne: {
@@ -278,6 +283,9 @@ export class UsersService {
 					),
 			);
 
+		const blocked = await this.fetchBlockedList(fetcherId);
+		const blockedBy = await this.fetchBlockedByList(fetcherId);
+
 		return {
 			matches: user.matches.map((match) =>
 				match.asUserOne ? match?.asUserOne : match?.asUserTwo,
@@ -285,6 +293,8 @@ export class UsersService {
 			id: user.id,
 			name: user.name,
 			status: user.status,
+			blocked: blocked.find((b) => b.id === user.id) ? true : false,
+			blockedBy: blockedBy.find((b) => b.id === user.id) ? true : false,
 			...user.profile,
 			achievements,
 		};
@@ -310,7 +320,6 @@ export class UsersService {
 			elo: user.profile.elo,
 		}));
 		return users.sort((a, b) => b.elo - a.elo);
-		return users;
 	}
 
 	async fetchFriendsRanking(user) {
@@ -418,6 +427,18 @@ export class UsersService {
 		});
 
 		return friends;
+	}
+
+	async fetchBlockedByList(userId: number) {
+		return await this.prismaService.user.findMany({
+			where: {
+				blocked: {
+					some: {
+						id: userId,
+					},
+				},
+			},
+		});
 	}
 
 	async removeFriend(currentUser: User, username: string) {
@@ -585,7 +606,6 @@ export class UserExistsRule implements ValidatorConstraintInterface {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async validate(value: string): Promise<boolean> {
-		console.log('UserExistRule validation');
 		if (!value) return false;
 		return await this.prisma.user
 			.findUnique({

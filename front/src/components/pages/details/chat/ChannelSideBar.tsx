@@ -17,25 +17,27 @@ export default function ChannelSideBar({
 	return (
 		<div>
 			<h3>{channel?.name}</h3>
-			{channel?.members.map((member: IUser) => {
-				return (
-					<UserOnChannel
-						key={member.name}
-						selectedChannel={selectedChannel}
-						user={member}
-						userRole={getRole(
-							member.id,
-							channel.adminsId,
-							channel.ownerId,
-						)}
-						myUserRole={getRole(
-							userContext.user.id,
-							channel.adminsId,
-							channel.ownerId,
-						)}
-					/>
-				);
-			})}
+			<ul className="channel-sidebar-user">
+				{channel?.members.map((member: IUser) => {
+					return (
+						<UserOnChannel
+							key={member.id}
+							selectedChannel={selectedChannel}
+							user={member}
+							userRole={getRole(
+								member.id,
+								channel.adminsId,
+								channel.ownerId,
+							)}
+							myUserRole={getRole(
+								userContext.user.id,
+								channel.adminsId,
+								channel.ownerId,
+							)}
+						/>
+					);
+				})}
+			</ul>
 		</div>
 	);
 

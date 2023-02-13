@@ -6,6 +6,7 @@ import ImageLoad from 'image-preview-react';
 import { back_url } from '@/config.json';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 function UserCreation() {
 	const userContext = useContext(UserContext);
@@ -13,17 +14,24 @@ function UserCreation() {
 	const btnRef = useRef<any>();
 	const [error, setError] = useState('');
 	const navigate = useNavigate();
+	const infoBoxContext = useContext(InfoBoxContext);
 
 	useEffect(() => {
 		ImageLoad({ button: btnRef, image: imgRef });
 		fetch(back_url + `/auth/name/${userContext.auth.creatingUser.name}`)
 			.then((res) => {
 				if (res.ok) return res.json();
-				//TODO error message
+				throw new Error('Impossible to verify username');
 			})
 			.then((data) => {
 				if (data.valid) setError('');
 				else setError(data.reason);
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	});
 
@@ -32,11 +40,17 @@ function UserCreation() {
 		fetch(back_url + `/auth/name/${e.target.value}`)
 			.then((res) => {
 				if (res.ok) return res.json();
-				//TODO error message
+				throw new Error('Impossible to update name');
 			})
 			.then((data) => {
 				if (data.valid) setError('');
 				else setError(data.reason);
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}
 
@@ -55,7 +69,7 @@ function UserCreation() {
 		})
 			.then((res) => {
 				if (res.ok) return res.json();
-				//TODO Error message
+				throw new Error('Impossible to create user');
 			})
 			.then(async (data) => {
 				if (data.state == 'connected') {
@@ -74,6 +88,12 @@ function UserCreation() {
 					await userContext.updateUser();
 					navigate('/');
 				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
 			});
 	}
 

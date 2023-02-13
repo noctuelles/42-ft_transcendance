@@ -7,6 +7,7 @@ import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { ChatContext } from '@/context/ChatContext';
 import IMessage from './IMessage';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 export default function ChannelList({
 	setSelectedChannel,
@@ -17,6 +18,7 @@ export default function ChannelList({
 }) {
 	const userContext = useContext(UserContext);
 	const chatContext = useContext(ChatContext);
+	const infoBoxContext = useContext(InfoBoxContext);
 	const { sendMessage } = useWebSocket(WS_URL, { share: true });
 	const fetched = useRef(false);
 	const selected = useRef(false);
@@ -50,6 +52,11 @@ export default function ChannelList({
 						return ch;
 					});
 				});
+			} else {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: "Couldn't mark channel as read",
+				});
 			}
 		});
 	}
@@ -75,6 +82,8 @@ export default function ChannelList({
 		) {
 			selected.current = true;
 			selectChannel(chatContext.channels[0].id);
+		} else {
+			selected.current = false;
 		}
 	}, [chatContext.channels.length]);
 
