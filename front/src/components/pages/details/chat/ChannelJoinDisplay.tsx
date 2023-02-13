@@ -156,8 +156,9 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 							newChannels.splice(index, 1);
 						return newChannels;
 					});
-					if (channelId == props.selectedChannel)
+					if (channelId == props.selectedChannel) {
 						props.setSelectedChannel(0);
+					}
 				}
 			})
 			.catch((err) => {

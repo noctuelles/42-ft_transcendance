@@ -44,10 +44,7 @@ export default function ChannelList({
 				chatContext.setChannels((prev: IChannel[]) => {
 					return prev.map((ch: IChannel) => {
 						if (ch.id === channeId) {
-							return {
-								...ch,
-								unreaded: 0,
-							};
+							return { ...ch, unreaded: 0 };
 						}
 						return ch;
 					});
@@ -84,6 +81,10 @@ export default function ChannelList({
 			selectChannel(chatContext.channels[0].id);
 		} else {
 			selected.current = false;
+		}
+
+		if (selectedChannel !== 0 && chatContext.channels.length === 0) {
+			setSelectedChannel(0);
 		}
 	}, [chatContext.channels.length]);
 
