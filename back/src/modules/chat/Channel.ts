@@ -534,17 +534,14 @@ export default class Channel {
 	}
 
 	async invite(prismaService: PrismaService, invitedUsername: string) {
-		return new Promise<void>(async (resolve, reject) => {
-			const user = await prismaService.user.findUnique({
-				where: { name: invitedUsername },
-			});
-			await prismaService.userChannelInvitation.create({
-				data: {
-					userId: user.id,
-					channelId: this.id,
-				},
-			});
-			resolve();
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+		});
+		await prismaService.userChannelInvitation.create({
+			data: {
+				userId: user.id,
+				channelId: this.id,
+			},
 		});
 	}
 
@@ -565,14 +562,11 @@ export default class Channel {
 		prismaService: PrismaService,
 		invitedUsername: string,
 	) {
-		return new Promise<void>(async (resolve, reject) => {
-			const user = await prismaService.user.findUnique({
-				where: { name: invitedUsername },
-			});
-			await prismaService.userChannelInvitation.deleteMany({
-				where: { userId: user.id, channelId: this.id },
-			});
-			resolve();
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+		});
+		await prismaService.userChannelInvitation.deleteMany({
+			where: { userId: user.id, channelId: this.id },
 		});
 	}
 }
