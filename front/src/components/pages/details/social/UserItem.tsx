@@ -28,7 +28,7 @@ const UserItem = (props: IProps) => {
 
 	async function handleRemoveUser() {
 		const token = await userContext.getAccessToken();
-
+		console.log(props.removeEndpoint);
 		fetch(BACK_URL + props.removeEndpoint, {
 			method: 'PATCH',
 			headers: {

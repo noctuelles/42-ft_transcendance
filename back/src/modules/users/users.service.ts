@@ -516,6 +516,11 @@ export class UsersService {
 						name: blockedUsername,
 					},
 				},
+				friendsOf: {
+					where: {
+						name: blockedUsername,
+					},
+				},
 				blocked: {
 					where: {
 						name: blockedUsername,
@@ -527,6 +532,20 @@ export class UsersService {
 			throw new ForbiddenException('Cannot block friend');
 		if (currentUserData.blocked.length !== 0)
 			throw new ForbiddenException('Already blocked');
+		if (currentUserData.friendsOf.length !== 0) {
+			await this.prismaService.user.update({
+				where: {
+					name: blockedUsername,
+				},
+				data: {
+					friends: {
+						disconnect: {
+							id: currentUser.id,
+						},
+					}
+				},
+			});
+		}
 
 		const { blocked } = await this.prismaService.user.update({
 			where: {
