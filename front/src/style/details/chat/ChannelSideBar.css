@@ -4,6 +4,7 @@
 	padding-left: 0;
 	padding: 7%;
 	list-style: none;
+	margin-top: -10px;
 }
 
 .invite-user-form {
@@ -33,7 +34,7 @@
 	height: 1px;
 	width: 100%;
 	background-color: black;
-	margin-top: 10px;
+	margin-top: -10px;
 	margin-bottom: 10px;
 }
 
@@ -53,4 +54,8 @@
 
 .channel-sidebar-user li:not(:last-child) {
 	margin-bottom: 10px;
+}
+
+.channel-invitation-list {
+	max-height: 17%;
 }

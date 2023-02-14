@@ -102,8 +102,8 @@ export default function ChannelSideBar({
 							</Form>
 						</Formik>
 					)}
+				<h3>{channel && 'User list'}</h3>
 				<ul className="channel-sidebar-user">
-					<h3>{channel && 'User list'}</h3>
 					{channel?.members.map((member: IUser) => {
 						return (
 							<UserOnChannel
@@ -135,8 +135,8 @@ export default function ChannelSideBar({
 				) !== UserRole.USER && (
 					<>
 						<div className="channel-sidebar-break" />
-						<h4>Invitations</h4>
-						<ul className="channel-sidebar-user">
+						<h3>Invitations</h3>
+						<ul className="channel-sidebar-user channel-invitation-list">
 							{channel?.invitations.map((invit) => {
 								return (
 									<ChannelInvitation
