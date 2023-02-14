@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { NestjsFormDataModule } from 'nestjs-form-data';
@@ -9,7 +9,12 @@ import { TwoFAService } from './TwoFA.service';
 import { GameModule } from '../game/game.module';
 
 @Module({
-	imports: [NestjsFormDataModule, PrismaModule, UsersModule, GameModule],
+	imports: [
+		NestjsFormDataModule,
+		PrismaModule,
+		forwardRef(() => UsersModule),
+		forwardRef(() => GameModule),
+	],
 	controllers: [AuthController],
 	providers: [Api42Service, AuthService, TwoFAService],
 	exports: [AuthService],

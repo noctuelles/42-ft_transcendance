@@ -9,7 +9,7 @@ import { GameService } from './game.service';
 
 @Module({
 	imports: [
-		UsersModule,
+		forwardRef(() => UsersModule),
 		WebsocketsModule,
 		PrismaModule,
 		forwardRef(() => AuthModule),

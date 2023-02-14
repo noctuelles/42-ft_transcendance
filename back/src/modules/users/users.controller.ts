@@ -12,10 +12,16 @@ import { CurrentUser } from '../auth/guards/currentUser.decorator';
 import { UserDto } from './friend.dto';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
+import { ChatService } from '../chat/chat.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('users')
 export class UsersController {
-	constructor(private usersService: UsersService) {}
+	constructor(
+		private usersService: UsersService,
+		private chatService: ChatService,
+		private prismaService: PrismaService,
+	) {}
 
 	@Get('profile/:userName')
 	@UseGuards(AuthGuard)
@@ -71,12 +77,27 @@ export class UsersController {
 	@Post('blocked/add')
 	@UseGuards(AuthGuard)
 	async addBlocked(@CurrentUser() user: User, @Body() userDto: UserDto) {
-		return await this.usersService.addBlocked(user, userDto.username);
+		const res = await this.usersService.addBlocked(user, userDto.username);
+		this.chatService.sendChannelListToUserIds([
+			user.id,
+			res.find((u) => u.name === userDto.username).id,
+		]);
+		return res;
 	}
 
 	@Patch('blocked/remove')
 	@UseGuards(AuthGuard)
 	async removeBlocked(@CurrentUser() user: User, @Body() userDto: UserDto) {
-		return await this.usersService.removeBlocked(user, userDto.username);
+		const res = await this.usersService.removeBlocked(
+			user,
+			userDto.username,
+		);
+		const unblocked = await this.prismaService.user.findUnique({
+			where: {
+				name: userDto.username,
+			},
+		});
+		this.chatService.sendChannelListToUserIds([user.id, unblocked.id]);
+		return res;
 	}
 }

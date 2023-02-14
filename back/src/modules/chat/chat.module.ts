@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { WebsocketsModule } from '../websockets/websockets.module';
 import { ChatGateway } from './chat.gateway';
 import { ChannelsGateway } from './channels.gateway';
@@ -12,12 +12,13 @@ import { UsersModule } from '../users/users.module';
 @Module({
 	imports: [
 		WebsocketsModule,
-		AuthModule,
+		forwardRef(() => AuthModule),
 		PrismaModule,
 		GameModule,
-		UsersModule,
+		forwardRef(() => UsersModule),
 	],
 	providers: [ChatGateway, ChannelsGateway, ChatService],
 	controllers: [ChatController],
+	exports: [ChatService],
 })
 export class ChatModule {}
