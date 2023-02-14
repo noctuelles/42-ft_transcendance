@@ -41,7 +41,7 @@
 .chat-page-right-side {
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: flex-start;
 	min-width: 20%;
 	text-align: center;
 	border-left: 2px solid black;

@@ -2,6 +2,7 @@ import {
 	MathInvitationStatus,
 	Prisma,
 	UserChannel,
+	UserChannelInvitation,
 	UserOnChannel,
 	UserStatus,
 } from '@prisma/client';
@@ -40,9 +41,18 @@ interface reducedUser {
 	profile: { picture: string };
 }
 
+interface invitedUser {
+	id: number;
+	name: string;
+	profile: { picture: string };
+}
+
 type ChannelWithUser = UserChannel & {
 	participants: (UserOnChannel & {
 		user: reducedUser;
+	})[];
+	invitations: (UserChannelInvitation & {
+		user: invitedUser;
 	})[];
 };
 
@@ -57,7 +67,8 @@ export default class Channel {
 	muted: IPunishment[];
 	banned: IPunishment[];
 	hashedPwd: string;
-	completeMembers: UserOnChannel[];
+	completeMembers;
+	invitations;
 	constructor(id: number) {
 		this.id = id;
 	}
@@ -101,6 +112,13 @@ export default class Channel {
 			.map((user) => {
 				return { userId: user.userId, endDate: user.statusEnd };
 			});
+		this.invitations = userChannel.invitations.map((invitation) => {
+			return {
+				userId: invitation.userId,
+				username: invitation.user.name,
+				picture: invitation.user.profile.picture,
+			};
+		});
 	}
 
 	canUserSendMessage(prismaService: PrismaService, userId: number): boolean {
@@ -469,6 +487,86 @@ export default class Channel {
 		});
 		await prismaServie.userChannel.delete({
 			where: { id: this.id },
+		});
+	}
+
+	async canInvite(
+		prismaService: PrismaService,
+		inviterId: number,
+		invitedUsername: string,
+	): Promise<string | null> {
+		if (this.type != UserChannelVisibility.PRIVATE) {
+			return "You can't invite in this channel";
+		}
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+			include: {
+				blocked: true,
+				blockedBy: true,
+			},
+		});
+		if (!user) {
+			return "The user doesn't exist";
+		}
+		if (user.blocked.find((b) => b.id === inviterId)) {
+			return 'You are blocked by this user';
+		}
+		if (user.blockedBy.find((b) => b.id === inviterId)) {
+			return 'You blocked this user';
+		}
+		if (
+			await prismaService.userChannelInvitation.findFirst({
+				where: { userId: user.id, channelId: this.id },
+			})
+		) {
+			return 'User already invited';
+		}
+		if (this.isUserBanned(prismaService, user.id)) {
+			return 'User is banned';
+		}
+		if (this.ownerId !== inviterId && !this.adminsId.includes(inviterId)) {
+			return 'You are not allowed to invite';
+		}
+		if (this.completeMembers.find((m) => m.user.name === invitedUsername)) {
+			return 'User is already in the channel';
+		}
+		return null;
+	}
+
+	async invite(prismaService: PrismaService, invitedUsername: string) {
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+		});
+		await prismaService.userChannelInvitation.create({
+			data: {
+				userId: user.id,
+				channelId: this.id,
+			},
+		});
+	}
+
+	canDeleteInvite(deleterId: number, invitedUsername: string) {
+		if (this.type != UserChannelVisibility.PRIVATE) {
+			return "You can't invite in this channel";
+		}
+		if (this.ownerId !== deleterId && !this.adminsId.includes(deleterId)) {
+			return 'You are not allowed to manage invitations';
+		}
+		if (!this.invitations.find((m) => m.username === invitedUsername)) {
+			return 'User is not invited';
+		}
+		return null;
+	}
+
+	async deleteChatInvitation(
+		prismaService: PrismaService,
+		invitedUsername: string,
+	) {
+		const user = await prismaService.user.findUnique({
+			where: { name: invitedUsername },
+		});
+		await prismaService.userChannelInvitation.deleteMany({
+			where: { userId: user.id, channelId: this.id },
 		});
 	}
 }

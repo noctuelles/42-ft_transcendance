@@ -73,6 +73,17 @@ export class ChatService {
 						},
 					},
 				},
+				invitations: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
 			},
 		});
 		chann.convertFromUserChannel(userChannel);
@@ -187,6 +198,17 @@ export class ChatService {
 						},
 					},
 				},
+				invitations: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
 			},
 		});
 		return rawChannelList.map((rawChannel) => {
@@ -206,6 +228,17 @@ export class ChatService {
 								id: true,
 								name: true,
 								status: true,
+								profile: { select: { picture: true } },
+							},
+						},
+					},
+				},
+				invitations: {
+					include: {
+						user: {
+							select: {
+								id: true,
+								name: true,
 								profile: { select: { picture: true } },
 							},
 						},

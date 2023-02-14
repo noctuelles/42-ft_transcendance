@@ -2,6 +2,45 @@
 	list-style: none;
 	overflow-y: auto;
 	padding-left: 0;
+	padding: 7%;
+	list-style: none;
+}
+
+.invite-user-form {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5px;
+}
+
+.invite-user-form button {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.invite-user-form button svg {
+	width: 30px;
+	height: 30px;
+}
+
+.invite-user-form .field-feedback {
+	font-size: 10px;
+}
+
+.channel-sidebar-break {
+	height: 1px;
+	width: 100%;
+	background-color: black;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.user-cross {
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
 	padding: 4%;
 }
 
