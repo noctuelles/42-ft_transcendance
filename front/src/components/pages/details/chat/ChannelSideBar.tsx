@@ -123,6 +123,7 @@ export default function ChannelSideBar({
 				})}
 				{channel &&
 					channel.type === 'PRIVATE' &&
+					channel?.invitations.length > 0 &&
 					getRole(
 						userContext.user.id,
 						channel.adminsId,

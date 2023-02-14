@@ -378,6 +378,26 @@ export class ChatController {
 		if (error !== null) {
 			throw new BadRequestException(error);
 		}
-		channel.invite(this.prismaService, username);
+		await channel.invite(this.prismaService, username);
+		this.chatService.sendChannelListToUserIds(channel.membersId);
+	}
+
+	@UseGuards(AuthGuard)
+	@Delete('channel/:channelId/invitation/:username')
+	async deleteChatInvitation(
+		@CurrentUser() user: User,
+		@Param('channelId', ParseIntPipe) channelId: number,
+		@Param('username') username: string,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel?.containsUser(user.id)) {
+			throw new ForbiddenException('User is not in this channel');
+		}
+		const error = channel.canDeleteInvite(user.id, username);
+		if (error !== null) {
+			throw new BadRequestException(error);
+		}
+		await channel.deleteChatInvitation(this.prismaService, username);
+		this.chatService.sendChannelListToUserIds(channel.membersId);
 	}
 }

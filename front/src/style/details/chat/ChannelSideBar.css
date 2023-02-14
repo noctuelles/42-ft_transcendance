@@ -3,6 +3,7 @@
 	overflow-y: auto;
 	padding-left: 0;
 	padding: 7%;
+	list-style: none;
 }
 
 .invite-user-form {

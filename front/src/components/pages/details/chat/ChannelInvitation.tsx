@@ -1,5 +1,9 @@
+import { UserContext } from '@/context/UserContext';
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import IChannelInvitation from './IChannel';
+import { back_url } from '@/config.json';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 interface IChannelInvitationProps {
 	invitation: IChannelInvitation;
@@ -7,6 +11,37 @@ interface IChannelInvitationProps {
 }
 
 function ChannelInvitation(props: IChannelInvitationProps) {
+	const userContext = useContext(UserContext);
+	const infoBoxContext = useContext(InfoBoxContext);
+
+	async function deleteInvitation() {
+		const token = await userContext.getAccessToken();
+		fetch(
+			back_url +
+				'/chat/channel/' +
+				props.channelId +
+				'/invitation/' +
+				props.invitation.username,
+			{
+				method: 'DELETE',
+				headers: {
+					Authorization: 'Bearer ' + token,
+				},
+			},
+		)
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error('Impossible to delete invitation');
+				}
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
+				});
+			});
+	}
+
 	return (
 		<div className="user-on-channel">
 			<img
@@ -21,6 +56,7 @@ function ChannelInvitation(props: IChannelInvitationProps) {
 				{props.invitation.username}
 			</Link>
 			<svg
+				onClick={deleteInvitation}
 				className="user-cross"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 320 512"

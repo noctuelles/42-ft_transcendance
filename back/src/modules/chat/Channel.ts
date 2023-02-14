@@ -500,9 +500,19 @@ export default class Channel {
 		}
 		const user = await prismaService.user.findUnique({
 			where: { name: invitedUsername },
+			include: {
+				blocked: true,
+				blockedBy: true,
+			},
 		});
 		if (!user) {
 			return "The user doesn't exist";
+		}
+		if (user.blocked.find((b) => b.id === inviterId)) {
+			return 'You are blocked by this user';
+		}
+		if (user.blockedBy.find((b) => b.id === inviterId)) {
+			return 'You blocked this user';
 		}
 		if (
 			await prismaService.userChannelInvitation.findFirst({
@@ -524,14 +534,45 @@ export default class Channel {
 	}
 
 	async invite(prismaService: PrismaService, invitedUsername: string) {
-		const user = await prismaService.user.findUnique({
-			where: { name: invitedUsername },
+		return new Promise<void>(async (resolve, reject) => {
+			const user = await prismaService.user.findUnique({
+				where: { name: invitedUsername },
+			});
+			await prismaService.userChannelInvitation.create({
+				data: {
+					userId: user.id,
+					channelId: this.id,
+				},
+			});
+			resolve();
 		});
-		await prismaService.userChannelInvitation.create({
-			data: {
-				userId: user.id,
-				channelId: this.id,
-			},
+	}
+
+	canDeleteInvite(deleterId: number, invitedUsername: string) {
+		if (this.type != UserChannelVisibility.PRIVATE) {
+			return "You can't invite in this channel";
+		}
+		if (this.ownerId !== deleterId && !this.adminsId.includes(deleterId)) {
+			return 'You are not allowed to manage invitations';
+		}
+		if (!this.invitations.find((m) => m.username === invitedUsername)) {
+			return 'User is not invited';
+		}
+		return null;
+	}
+
+	async deleteChatInvitation(
+		prismaService: PrismaService,
+		invitedUsername: string,
+	) {
+		return new Promise<void>(async (resolve, reject) => {
+			const user = await prismaService.user.findUnique({
+				where: { name: invitedUsername },
+			});
+			await prismaService.userChannelInvitation.deleteMany({
+				where: { userId: user.id, channelId: this.id },
+			});
+			resolve();
 		});
 	}
 }
