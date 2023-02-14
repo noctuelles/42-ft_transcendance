@@ -83,7 +83,7 @@ export default function UserInput({
 				maxLength={255}
 				disabled={selectedChannel === 0}
 			/>
-			<button type="button" onClick={sendInvite}>
+			<button type="button" onClick={sendInvite} disabled={selectedChannel === 0}>
 				Invite to play
 			</button>
 		</form>

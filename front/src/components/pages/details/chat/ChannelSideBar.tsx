@@ -18,7 +18,7 @@ export default function ChannelSideBar({
 		<>
 			<h3>{channel?.name}</h3>
 			<div className="channel-sidebar-top">
-				<h3>User list</h3>
+				<h3>{channel && 'User list'}</h3>
 				<ul className="channel-sidebar-user">
 					{channel?.members.map((member: IUser) => {
 						return (

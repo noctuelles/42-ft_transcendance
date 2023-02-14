@@ -26,14 +26,7 @@ function ChannelJoinList(props: IChannelJoinListProps) {
 				e.stopPropagation();
 			}}
 		>
-			<Button
-				onClick={props.closeModal}
-				width="80px"
-				height="40px"
-				fontSize="20px"
-			>
-				Close
-			</Button>
+			<Button onClick={props.closeModal}>Close</Button>
 			<ChannelJoinSelector
 				joinType={joinType}
 				setJoinType={setJoinType}
