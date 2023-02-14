@@ -504,6 +504,8 @@ export class UsersService {
 	}
 
 	async addBlocked(currentUser: User, blockedUsername: string) {
+		if (currentUser.name === blockedUsername)
+			throw new ForbiddenException('Invalid username');
 		const currentUserData = await this.prismaService.user.findUnique({
 			where: {
 				id: currentUser.id,
@@ -556,6 +558,8 @@ export class UsersService {
 	}
 
 	async removeBlocked(currentUser: User, blockedUsername: string) {
+		if (currentUser.name === blockedUsername)
+			throw new InternalServerErrorException();
 		const currentUserData = await this.prismaService.user.findUnique({
 			where: {
 				id: currentUser.id,
