@@ -1,5 +1,5 @@
 .channel-sidebar-user {
-	height: 40%;
+	list-style: none;
 	overflow-y: auto;
 	padding-left: 0;
 	padding: 7%;
@@ -41,4 +41,16 @@
 	width: 30px;
 	height: 30px;
 	cursor: pointer;
+	padding: 4%;
+}
+
+.channel-sidebar-top {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 13px;
+	max-height: 60%;
+}
+
+.channel-sidebar-user li:not(:last-child) {
+	margin-bottom: 10px;
 }

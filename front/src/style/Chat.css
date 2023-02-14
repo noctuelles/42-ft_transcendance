@@ -39,6 +39,9 @@
 }
 
 .chat-page-right-side {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
 	min-width: 20%;
 	text-align: center;
 	border-left: 2px solid black;
@@ -46,12 +49,12 @@
 
 .chat-container {
 	margin: 0;
-	height: 100%;
+	height: calc(100% - var(--chat-textinput-size));
 	overflow-y: auto;
 	overflow-x: hidden;
 	list-style: none;
 	background: lightgray;
-	padding: 10px 0 60px 0;
+	padding: 10px 0 20px 0;
 }
 
 .chat-container li {
@@ -61,9 +64,6 @@
 }
 
 input.textarea {
-	position: relative;
-	left: 0px;
-	right: 0px;
 	width: 85%;
 	height: var(--chat-textinput-size);
 	bottom: var(--chat-textinput-size);
@@ -96,7 +96,6 @@ input.textarea {
 
 .chat-user-input button {
 	width: 15%;
-	transform: translateY(-100%);
 	border-top: solid 2px transparent;
 	border-left: solid 2px transparent;
 	border-bottom: solid 1px transparent;
