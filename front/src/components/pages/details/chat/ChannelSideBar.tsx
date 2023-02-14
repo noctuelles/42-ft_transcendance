@@ -15,30 +15,33 @@ export default function ChannelSideBar({
 	const channel = getChannelInfo(selectedChannel);
 	const userContext = useContext(UserContext);
 	return (
-		<div>
+		<>
 			<h3>{channel?.name}</h3>
-			<ul className="channel-sidebar-user">
-				{channel?.members.map((member: IUser) => {
-					return (
-						<UserOnChannel
-							key={member.id}
-							selectedChannel={selectedChannel}
-							user={member}
-							userRole={getRole(
-								member.id,
-								channel.adminsId,
-								channel.ownerId,
-							)}
-							myUserRole={getRole(
-								userContext.user.id,
-								channel.adminsId,
-								channel.ownerId,
-							)}
-						/>
-					);
-				})}
-			</ul>
-		</div>
+			<div className="channel-sidebar-top">
+				<h3>User list</h3>
+				<ul className="channel-sidebar-user">
+					{channel?.members.map((member: IUser) => {
+						return (
+							<UserOnChannel
+								key={member.id}
+								selectedChannel={selectedChannel}
+								user={member}
+								userRole={getRole(
+									member.id,
+									channel.adminsId,
+									channel.ownerId,
+								)}
+								myUserRole={getRole(
+									userContext.user.id,
+									channel.adminsId,
+									channel.ownerId,
+								)}
+							/>
+						);
+					})}
+				</ul>
+			</div>
+		</>
 	);
 
 	function getRole(
