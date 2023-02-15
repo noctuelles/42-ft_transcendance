@@ -187,7 +187,7 @@ function ChannelJoinDisplay(props: IChannelJoinListProps) {
 							<div className="joinable-part joinable-left">
 								<h2 className="joinable-name">{c.name}</h2>
 								<img
-									src={usersGroupIcon}
+									src={usersGroupIcon.toString()}
 									alt="users group icon"
 								/>
 								<h2 className="joinable-members">

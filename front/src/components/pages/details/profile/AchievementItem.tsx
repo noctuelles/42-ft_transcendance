@@ -43,7 +43,7 @@ const AchievementItem = ({ achievement }: AchievementItemProps) => {
 			/>
 			<div className="achievement-item-bottom">
 				<img
-					src={achievement.unlocked ? CheckMark : Cross}
+					src={achievement.unlocked ? CheckMark.toString() : Cross.toString()}
 					alt="unlock_state"
 				/>
 				<span>

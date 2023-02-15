@@ -45,14 +45,14 @@ export function MatchHistoryRowDetails({
 			id: 2,
 			label: 'Winner',
 			userOneData: userOne.winner ? (
-				<img src={CheckMarkIcon} />
+				<img src={CheckMarkIcon.toString()} />
 			) : (
-				<img src={CrossIcon} />
+				<img src={CrossIcon.toString()} />
 			),
 			userTwoData: userTwo.winner ? (
-				<img src={CheckMarkIcon} />
+				<img src={CheckMarkIcon.toString()} />
 			) : (
-				<img src={CrossIcon} />
+				<img src={CrossIcon.toString()} />
 			),
 		},
 		{
@@ -78,7 +78,7 @@ export function MatchHistoryRowDetails({
 	return (
 		<div className="match-details">
 			<img
-				src={type === MatchType.RANKED ? RankedMatchIcon : FunMatchIcon}
+				src={type === MatchType.RANKED ? RankedMatchIcon.toString() : FunMatchIcon.toString()}
 				width={30}
 				height={30}
 				alt=""

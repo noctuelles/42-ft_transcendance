@@ -19,7 +19,7 @@ import Cookies from 'js-cookie';
 import UserCreation from '../pages/auth/UserCreation';
 import TwoFaLog from '../pages/auth/TwoFaLog';
 import Settings from '../pages/Settings';
-import { InfoBoxContext } from '@/context/InfoBoxContext';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 
 function AppRoutes() {
 	const location = useLocation();

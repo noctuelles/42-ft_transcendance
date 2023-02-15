@@ -1,12 +1,8 @@
 import {
-	AchievementType,
 	ProfileData,
-	ProfileDataTarget,
 } from './ProfileTypes';
-import { AchievementMap } from './Data';
 import AchievementItem from './AchievementItem';
 import '@/style/details/profile/AchievementTable.css';
-import { JsxElement } from 'typescript';
 
 interface AchievementTableProps {
 	profile: ProfileData;

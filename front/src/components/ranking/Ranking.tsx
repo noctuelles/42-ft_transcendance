@@ -1,11 +1,11 @@
 import { RankingType } from '../pages/Social';
-import '@/style/social/Ranking.css';
 import RankingElement from './RankingElement';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { back_url } from '@/config.json';
 import Loader from '../global/Loader';
 import { UserContext } from '@/context/UserContext';
-import { InfoBoxContext } from '@/context/InfoBoxContext';
+import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
+import '@/style/social/Ranking.css';
 
 interface IRankingProps {
 	rankingType: RankingType;

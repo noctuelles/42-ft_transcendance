@@ -2,7 +2,9 @@ import TextField from '@/components/global/TextField';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 
-//TODO: interface here, but this is subject to changes.
+interface IValues {
+	searchValue: string;
+}
 
 const ProfileHeaderSearchBar = (props: any) => {
 	const validation = Yup.object().shape({
@@ -12,7 +14,7 @@ const ProfileHeaderSearchBar = (props: any) => {
 		searchValue: '',
 	};
 
-	async function handleSubmit({ searchValue }) {
+	async function handleSubmit({ searchValue }: IValues) {
 		await props.onSearchClick(searchValue);
 	}
 

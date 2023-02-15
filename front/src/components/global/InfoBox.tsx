@@ -2,6 +2,7 @@ import { CSSTransition } from 'react-transition-group';
 import { IInfo, InfoBoxContext } from '@/context/InfoBoxContext';
 import '@/style/InfoBox.css';
 import crossIcon from '@/assets/cross.svg';
+
 import { useContext, useRef } from 'react';
 
 interface IInfoProps {
@@ -33,7 +34,7 @@ function Info(props: IInfoProps) {
 				onClick={props.info.onClick}
 			>
 				<img
-					src={crossIcon}
+					src={crossIcon.toString()}
 					className="cross-icon"
 					alt="cross icon"
 					onClick={() =>
@@ -46,7 +47,7 @@ function Info(props: IInfoProps) {
 	);
 }
 
-function InfoBox(props: any) {
+function InfoBox() {
 	const infoBoxContext = useContext(InfoBoxContext);
 
 	return (

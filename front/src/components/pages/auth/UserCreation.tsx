@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
-import checkIcon from '@/assets/check_icon.png';
+import checkIcon from '@/assets/check-mark.svg';
 import '@/style/auth/UserCreation.css';
 import ImageLoad from 'image-preview-react';
 import { back_url } from '@/config.json';
@@ -150,7 +150,7 @@ function UserCreation() {
 							}
 						>
 							<img
-								src={checkIcon}
+								src={checkIcon.toString()}
 								alt="validate"
 								className="user-creation-form-check"
 							/>

@@ -30,7 +30,7 @@ const MatchHistoryRow = ({ match }: MatchHistoryRowProps) => {
 				{match.userOne.user.name}
 				<img
 					id="fight"
-					src={match.userOne.winner ? Fight : FightFlipped}
+					src={match.userOne.winner ? Fight.toString() : FightFlipped.toString()}
 				/>
 				{match.userTwo.user.name}
 				<img

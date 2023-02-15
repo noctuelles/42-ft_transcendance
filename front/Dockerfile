@@ -15,3 +15,6 @@ RUN npm ci
 
 # Copy the app source into the image
 COPY --chown=node:node . .
+
+FROM nginx:latest as production
+

@@ -2,7 +2,6 @@ import { useFormik } from 'formik';
 import IUser from './IUser';
 import '@/style/details/chat/UserOnChannel.css';
 import StatusDot from '../social/StatusDot';
-import { EUserStatus } from '../social/Types';
 import { Link } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';

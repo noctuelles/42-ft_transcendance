@@ -20,7 +20,7 @@ function ProfileSummaryItem(props: ProfileSummaryItemProps) {
 
 	return (
 		<div className="profile-summary-item">
-			<img src={selectedItem.img} width="60" height="60" />
+			<img src={selectedItem.img.toString()} width="60" height="60" />
 			<div className="profile-summary-item-text">
 				<p>{selectedItem.text}</p>
 				<h3>{props.count || '-'}</h3>
