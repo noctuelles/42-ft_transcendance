@@ -18,3 +18,36 @@ COPY --chown=node:node . .
 
 # Generate prisma client code
 RUN npm run prisma:generate
+
+FROM node:latest AS build
+
+# Create app directory and set it as our working directory for subsequent operation
+WORKDIR /usr/src/app
+
+# Copy application dependency to the container image.
+COPY --chown=node:node package*.json ./
+
+COPY --chown=node:node --from=dev /usr/src/app/node_modules ./node_modules
+
+# Copy the app source into the image
+COPY --chown=node:node . .
+
+RUN npm run build
+
+ENV NODE_ENV production
+
+# Running `npm ci` removes the existing node_modules directory.
+# Passing in --only=production ensures that only the production dependencies are installed.
+# This ensures that the node_modules directory is as optimized as possible.
+RUN npm ci --only=production && npm cache clean --force
+
+FROM node:latest As production
+
+WORKDIR /usr/src/app
+
+# Copy the bundled code from the build stage to the production image
+COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+
+# Start the server using the production build
+CMD [ "node", "dist/main.js" ]

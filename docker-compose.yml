@@ -12,7 +12,6 @@ services:
       - ./back/.env
     volumes:
       - ./back:/usr/src/app
-        # Anonymous volume. Why ? Because there's platform specific data: /usr/src/app/node_modules volume is initialized from the image
       - /usr/src/app/node_modules
     command: npm run start:dev
     restart: always
