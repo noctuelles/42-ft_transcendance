@@ -9,6 +9,7 @@ import { UserRole } from './UserRole';
 import ChannelInvitation from './ChannelInvitation';
 import ChannelInvitationForm from './ChannelInvitationForm';
 import ChannelChangePwdForm from './ChannelChangePwdForm';
+import IChannelInvitation from './IChannel';
 
 export default function ChannelSideBar({
 	selectedChannel,
@@ -39,25 +40,33 @@ export default function ChannelSideBar({
 					) === UserRole.OPERATOR && (<ChannelChangePwdForm channel={channel} />)}
 				<h3>{channel && 'User list'}</h3>
 				<ul className="channel-sidebar-user">
-					{channel?.members.map((member: IUser) => {
-						return (
-							<UserOnChannel
-								key={member.id}
-								selectedChannel={selectedChannel}
-								user={member}
-								userRole={getRole(
-									member.id,
-									channel.adminsId,
-									channel.ownerId,
-								)}
-								myUserRole={getRole(
-									userContext.user.id,
-									channel.adminsId,
-									channel.ownerId,
-								)}
-							/>
-						);
-					})}
+					{channel?.members
+						.sort((a: IUser, b: IUser) => {
+							if (a.name.toLowerCase() < b.name.toLowerCase())
+								return -1;
+							if (a.name.toLowerCase() > b.name.toLowerCase())
+								return 1;
+							return 0;
+						})
+						.map((member: IUser) => {
+							return (
+								<UserOnChannel
+									key={member.id}
+									selectedChannel={selectedChannel}
+									user={member}
+									userRole={getRole(
+										member.id,
+										channel.adminsId,
+										channel.ownerId,
+									)}
+									myUserRole={getRole(
+										userContext.user.id,
+										channel.adminsId,
+										channel.ownerId,
+									)}
+								/>
+							);
+						})}
 				</ul>
 			</div>
 			{channel &&
@@ -72,15 +81,34 @@ export default function ChannelSideBar({
 						<div className="channel-sidebar-break" />
 						<h3>Invitations</h3>
 						<ul className="channel-sidebar-user channel-invitation-list">
-							{channel?.invitations.map((invit) => {
-								return (
-									<ChannelInvitation
-										key={invit.userId}
-										invitation={invit}
-										channelId={channel.id}
-									/>
-								);
-							})}
+							{channel?.invitations
+								.sort(
+									(
+										a: IChannelInvitation,
+										b: IChannelInvitation,
+									) => {
+										if (
+											a.username.toLowerCase() <
+											b.username.toLowerCase()
+										)
+											return -1;
+										if (
+											a.username.toLowerCase() >
+											b.username.toLowerCase()
+										)
+											return 1;
+										return 0;
+									},
+								)
+								.map((invit) => {
+									return (
+										<ChannelInvitation
+											key={invit.userId}
+											invitation={invit}
+											channelId={channel.id}
+										/>
+									);
+								})}
 						</ul>
 					</>
 				)}

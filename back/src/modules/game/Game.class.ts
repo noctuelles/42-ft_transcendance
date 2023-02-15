@@ -697,7 +697,6 @@ export class Game {
 		this._achievementsService.progressAchievements(
 			loser.profile.user.profile.id,
 			[
-				AchievementType.NEW_SUBJECT,
 				AchievementType.WHEATLEY,
 				AchievementType.P_BODY,
 				AchievementType.GLADOS,

@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AchievementType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { WebsocketsService } from '../websockets/websockets.service';
 import { achievmentsList, IAchievement } from './achievments.interface';
 
 @Injectable()
 export class AchievementsService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly websocketsService: WebsocketsService,
+	) {}
 	async initAchievements(userProfileId: number) {
 		await this.prismaService.userAchievement.createMany({
 			data: [
@@ -56,6 +60,7 @@ export class AchievementsService {
 		) {
 			data['unlocked'] = true;
 			data['unlockedAt'] = new Date();
+			this.sendAcheivement(userProfileId, this.getAchievment(type));
 			await this.prismaService.userProfile.update({
 				where: {
 					id: userProfileId,
@@ -115,6 +120,7 @@ export class AchievementsService {
 			) {
 				data['unlocked'] = true;
 				data['unlockedAt'] = new Date();
+				this.sendAcheivement(userProfileId, this.getAchievment(type));
 				await this.prismaService.userProfile.update({
 					where: {
 						id: userProfileId,
@@ -143,5 +149,16 @@ export class AchievementsService {
 		type.forEach((type) => {
 			this.setAchievement(userProfileId, type, value);
 		});
+	}
+
+	sendAcheivement(userId: number, achievement: IAchievement) {
+		const sockets = this.websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length == 1) {
+			const socket = sockets[0];
+			this.websocketsService.send(socket, 'achievement', {
+				name: achievement.name,
+				xp: achievement.xpEarned,
+			});
+		}
 	}
 }

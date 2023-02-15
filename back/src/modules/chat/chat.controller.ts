@@ -79,7 +79,17 @@ export class ChatController {
 		}
 		if (!channel.canBan(user.id, userId))
 			throw new ForbiddenException("You can't do that !");
-		channel.ban(this.prismaService, userId, end);
+		await channel.ban(
+			this.prismaService,
+			this.websocketsService,
+			userId,
+			end,
+		);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+			userId,
+		]);
 	}
 
 	@UseGuards(AuthGuard)
@@ -94,7 +104,7 @@ export class ChatController {
 		}
 		if (!channel.canBan(user.id, userId))
 			throw new ForbiddenException("You can't do that !");
-		channel.mute(this.prismaService, userId, end);
+		channel.mute(this.prismaService, this.websocketsService, userId, end);
 	}
 
 	@UseGuards(AuthGuard)
@@ -109,7 +119,7 @@ export class ChatController {
 		}
 		if (channel.ownerId !== user.id)
 			throw new ForbiddenException("You can't do that !");
-		channel.promote(this.prismaService, userId);
+		channel.promote(this.prismaService, this.websocketsService, userId);
 	}
 
 	@UseGuards(AuthGuard)
@@ -124,7 +134,34 @@ export class ChatController {
 		}
 		if (channel.ownerId !== user.id)
 			throw new ForbiddenException("You can't do that !");
-		channel.unpromote(this.prismaService, userId);
+		channel.unpromote(this.prismaService, this.websocketsService, userId);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/kick')
+	async kick(
+		@CurrentUser() user: User,
+		@Body() { channelId, userId }: PromoteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			throw new NotFoundException('Channel does not exist');
+		}
+		if (!channel.canBan(user.id, userId))
+			throw new ForbiddenException("You can't do that !");
+		await channel.removeUser(this.prismaService, userId);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+			userId,
+		]);
+		const sockets = this.websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			this.websocketsService.send(sockets[0], 'chat-action', {
+				action: 'kicked',
+				channel: channel.name,
+			});
+		}
 	}
 
 	@UseGuards(AuthGuard)
@@ -137,6 +174,11 @@ export class ChatController {
 		if (channel?.containsUser(user.id)) {
 			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
 				throw new ForbiddenException("You can't leave a pm channel");
+			}
+			if (channel.isUserBanned(this.prismaService, user.id)) {
+				throw new ForbiddenException(
+					"You can't leave a channel wehre you are banned",
+				);
 			}
 			let deleted = false;
 			if (channel.ownerId === user.id) {
@@ -377,7 +419,12 @@ export class ChatController {
 		if (error !== null) {
 			throw new BadRequestException(error);
 		}
-		await channel.invite(this.prismaService, username);
+		await channel.invite(
+			this.prismaService,
+			this.websocketsService,
+			username,
+			user.name,
+		);
 		this.chatService.sendChannelListToUserIds(channel.membersId);
 	}
 

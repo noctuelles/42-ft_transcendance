@@ -77,7 +77,9 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
-		this.completeMembers = userChannel.participants;
+		this.completeMembers = userChannel.participants.filter(
+			(m) => m.status != UserOnChannelStatus.BANNED,
+		);
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;
@@ -237,6 +239,28 @@ export default class Channel {
 		prismaService: PrismaService,
 		punishments: IPunishment[],
 	) {
+		const users = await prismaService.userOnChannel.findMany({
+			where: { statusEnd: { lte: new Date() } },
+		});
+		for (const user of users) {
+			if (user.status === UserOnChannelStatus.BANNED) {
+				this.members = this.members.filter((member) => {
+					return member.id !== user.userId;
+				});
+				this.membersId = this.membersId.filter((id) => {
+					return id !== user.userId;
+				});
+				this.banned = this.banned.filter((banned) => {
+					return banned.userId !== user.userId;
+				});
+			}
+		}
+		await prismaService.userOnChannel.deleteMany({
+			where: {
+				statusEnd: { lte: new Date() },
+				status: UserOnChannelStatus.BANNED,
+			},
+		});
 		await prismaService.userOnChannel.updateMany({
 			where: { statusEnd: { lte: new Date() } },
 			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
@@ -246,32 +270,58 @@ export default class Channel {
 		});
 	}
 
-	ban(prismaService: PrismaService, userId: number, unbanDate: Date): void {
-		prismaService.userOnChannel
-			.update({
-				where: { id: { userId: userId, channelId: this.id } },
-				data: {
-					status: UserOnChannelStatus.BANNED,
-					statusEnd: unbanDate,
-				},
-			})
-			.then(),
-			this.banned.push({ userId: userId, endDate: unbanDate });
+	async ban(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+		unbanDate: Date,
+	) {
+		this.banned.push({ userId: userId, endDate: unbanDate });
+		await prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: {
+				status: UserOnChannelStatus.BANNED,
+				statusEnd: unbanDate,
+			},
+		});
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'banned',
+				channel: this.name,
+			});
+		}
 	}
 
-	pardon(prismaService: PrismaService, userId: number): boolean {
+	pardon(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): boolean {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
 				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
 			})
 			.then();
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'unbanned',
+				channel: this.name,
+			});
+		}
 		return this.removeAllMatches(this.banned, (punishment) => {
 			return punishment.userId === userId;
 		});
 	}
 
-	mute(prismaService: PrismaService, userId: number, unmuteDate: Date): void {
+	mute(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+		unmuteDate: Date,
+	): void {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
@@ -282,21 +332,43 @@ export default class Channel {
 			})
 			.then();
 		this.muted.push({ userId: userId, endDate: unmuteDate });
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'muted',
+				channel: this.name,
+			});
+		}
 	}
 
-	unmute(prismaService: PrismaService, userId: number): boolean {
+	unmute(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): boolean {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
 				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
 			})
 			.then();
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'unmuted',
+				channel: this.name,
+			});
+		}
 		return this.removeAllMatches(this.muted, (punishment) => {
 			return punishment.userId === userId;
 		});
 	}
 
-	promote(prismaService: PrismaService, userId: number): void {
+	promote(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): void {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
@@ -306,9 +378,20 @@ export default class Channel {
 			})
 			.then();
 		this.adminsId.push(userId);
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'promoted as admin',
+				channel: this.name,
+			});
+		}
 	}
 
-	unpromote(prismaService: PrismaService, userId: number): void {
+	unpromote(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): void {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
@@ -318,6 +401,13 @@ export default class Channel {
 			})
 			.then();
 		this.adminsId.splice(this.adminsId.indexOf(userId), 1);
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'unpromoted',
+				channel: this.name,
+			});
+		}
 	}
 
 	removeAllMatches(array: any[], condition: (elem: any) => boolean): boolean {
@@ -533,7 +623,12 @@ export default class Channel {
 		return null;
 	}
 
-	async invite(prismaService: PrismaService, invitedUsername: string) {
+	async invite(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		invitedUsername: string,
+		inviterUsername: string,
+	) {
 		const user = await prismaService.user.findUnique({
 			where: { name: invitedUsername },
 		});
@@ -543,6 +638,13 @@ export default class Channel {
 				channelId: this.id,
 			},
 		});
+		const sockets = websocketsService.getSocketsFromUsersId([user.id]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-invitation', {
+				inviter: inviterUsername,
+				channel: this.name,
+			});
+		}
 	}
 
 	canDeleteInvite(deleterId: number, invitedUsername: string) {

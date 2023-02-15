@@ -1,5 +1,5 @@
 import ChatContextProvider from '@/context/ChatContext';
-import { Outlet } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import NavBar from './NavBar';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL } from '@/config.json';
@@ -11,6 +11,7 @@ import SideBar from './SideBar';
 function WebsocketApp() {
 	const infoBoxContext = useContext(InfoBoxContext);
 	const userContext = useContext(UserContext);
+	const navigate = useNavigate();
 
 	useWebSocket(WS_URL, {
 		share: true,
@@ -52,6 +53,45 @@ function WebsocketApp() {
 		},
 		onOpen: () => {
 			userContext.updateUser();
+		},
+		onMessage: (event) => {
+			const data = JSON.parse(event.data);
+			if (data.event == 'achievement') {
+				infoBoxContext.addInfo({
+					type: InfoType.SUCCESS,
+					message:
+						'You unlocked the achievement: ' +
+						data.data.name +
+						' and won ' +
+						data.data.xp +
+						' xp!',
+				});
+			}
+			if (data.event == 'chat-invitation') {
+				infoBoxContext.addInfo({
+					type: InfoType.WARNING,
+					message:
+						data.data.inviter +
+						' invited you to the channel ' +
+						data.data.channel,
+					onClick: () => {
+						navigate('/chat');
+					},
+				});
+			}
+			if (data.event == 'chat-action') {
+				infoBoxContext.addInfo({
+					type: InfoType.WARNING,
+					message:
+						'You have been ' +
+						data.data.action +
+						' in ' +
+						data.data.channel,
+					onClick: () => {
+						navigate('/chat');
+					},
+				});
+			}
 		},
 	});
 
