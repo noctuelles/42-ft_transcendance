@@ -1,7 +1,7 @@
 import { ChatContext } from '@/context/ChatContext';
 import '@/style/details/chat/ChannelSideBar.css';
 import { UserContext } from '@/context/UserContext';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import UserOnChannel from './UserOnChannel';
 import IChannel from './IChannel';
 import IUser from './IUser';
@@ -54,7 +54,7 @@ export default function ChannelSideBar({
 									key={member.id}
 									selectedChannel={selectedChannel}
 									user={member}
-									userRole={getRole(
+									_userRole={getRole(
 										member.id,
 										channel.adminsId,
 										channel.ownerId,

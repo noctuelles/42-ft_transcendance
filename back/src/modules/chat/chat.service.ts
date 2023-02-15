@@ -230,6 +230,7 @@ export class ChatService {
 				},
 			},
 		});
+		// TODO Send more infos to owner/admins or add an endpoint to allow owner/admins to get info about users
 		return rawChannelList.map((rawChannel) => {
 			const channel = new Channel(rawChannel.id);
 			channel.convertFromUserChannel(rawChannel);
