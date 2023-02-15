@@ -53,6 +53,20 @@ function WebsocketApp() {
 		onOpen: () => {
 			userContext.updateUser();
 		},
+		onMessage: (event) => {
+			const data = JSON.parse(event.data);
+			if (data.event == 'achievement') {
+				infoBoxContext.addInfo({
+					type: InfoType.SUCCESS,
+					message:
+						'You unlocked the achievement: ' +
+						data.data.name +
+						' and won ' +
+						data.data.xp +
+						' xp!',
+				});
+			}
+		},
 	});
 
 	return (
