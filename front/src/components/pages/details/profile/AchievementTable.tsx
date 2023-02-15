@@ -30,18 +30,10 @@ const AchievementTable = ({ profile }: AchievementTableProps) => {
 	);
 
 	function generateAchievementItem() {
-		let unlockedAchievement: any[] = [];
-		let lockedAchievement: any[] = [];
-
-		profile.achievements.forEach((a) => {
-			const elem = <AchievementItem key={a.id} achievement={a} />;
-			if (a.unlocked) {
-				unlockedAchievement.push(elem);
-			} else {
-				lockedAchievement.push(elem);
-			}
-		});
-
+		let unlockedAchievement: React.ReactNode[] = profile.achievements.filter((a) => a.unlocked)
+			.map((a) => {a.unlockedAtDate = new Date(a.unlockedAt); return <AchievementItem key={a.id} achievement={a} />});
+		let lockedAchievement: React.ReactNode[] = profile.achievements.filter((a) => !a.unlocked)
+			.map((a) => <AchievementItem key={a.id} achievement={a} />);
 		return [unlockedAchievement, lockedAchievement];
 	}
 };
