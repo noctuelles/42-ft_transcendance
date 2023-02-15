@@ -15,7 +15,7 @@ const TextField = ({ label, helpText, ...props }: Props) => {
 	const [field, meta] = useField(props);
 	const [didFocus, setDidFocus] = useState(false);
 	const showFeedback =
-		(didFocus && field.value.trim().length > 2) || meta.touched;
+		(didFocus && field.value && field.value.trim().length > 2) || meta.touched;
 
 	return (
 		<div

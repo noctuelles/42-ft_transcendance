@@ -295,6 +295,7 @@ export class ChatController {
 		return await this.chatService.joinMp(user, otherName);
 	}
 
+	@UseGuards(AuthGuard)
 	@Patch('channels/:channelId/chpwd')
 	async changeChannelPwd(
 		@CurrentUser() user: User,
