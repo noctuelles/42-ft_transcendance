@@ -270,7 +270,12 @@ export default class Channel {
 		});
 	}
 
-	async ban(prismaService: PrismaService, userId: number, unbanDate: Date) {
+	async ban(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+		unbanDate: Date,
+	) {
 		this.banned.push({ userId: userId, endDate: unbanDate });
 		await prismaService.userOnChannel.update({
 			where: { id: { userId: userId, channelId: this.id } },
@@ -279,21 +284,44 @@ export default class Channel {
 				statusEnd: unbanDate,
 			},
 		});
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'banned',
+				channel: this.name,
+			});
+		}
 	}
 
-	pardon(prismaService: PrismaService, userId: number): boolean {
+	pardon(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): boolean {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
 				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
 			})
 			.then();
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'unbanned',
+				channel: this.name,
+			});
+		}
 		return this.removeAllMatches(this.banned, (punishment) => {
 			return punishment.userId === userId;
 		});
 	}
 
-	mute(prismaService: PrismaService, userId: number, unmuteDate: Date): void {
+	mute(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+		unmuteDate: Date,
+	): void {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
@@ -304,21 +332,43 @@ export default class Channel {
 			})
 			.then();
 		this.muted.push({ userId: userId, endDate: unmuteDate });
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'muted',
+				channel: this.name,
+			});
+		}
 	}
 
-	unmute(prismaService: PrismaService, userId: number): boolean {
+	unmute(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): boolean {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
 				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
 			})
 			.then();
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'unmuted',
+				channel: this.name,
+			});
+		}
 		return this.removeAllMatches(this.muted, (punishment) => {
 			return punishment.userId === userId;
 		});
 	}
 
-	promote(prismaService: PrismaService, userId: number): void {
+	promote(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): void {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
@@ -328,9 +378,20 @@ export default class Channel {
 			})
 			.then();
 		this.adminsId.push(userId);
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'promoted as admin',
+				channel: this.name,
+			});
+		}
 	}
 
-	unpromote(prismaService: PrismaService, userId: number): void {
+	unpromote(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		userId: number,
+	): void {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
@@ -340,6 +401,13 @@ export default class Channel {
 			})
 			.then();
 		this.adminsId.splice(this.adminsId.indexOf(userId), 1);
+		const sockets = websocketsService.getSocketsFromUsersId([userId]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-action', {
+				action: 'unpromoted',
+				channel: this.name,
+			});
+		}
 	}
 
 	removeAllMatches(array: any[], condition: (elem: any) => boolean): boolean {

@@ -79,6 +79,19 @@ function WebsocketApp() {
 					},
 				});
 			}
+			if (data.event == 'chat-action') {
+				infoBoxContext.addInfo({
+					type: InfoType.WARNING,
+					message:
+						'You have been ' +
+						data.data.action +
+						' in ' +
+						data.data.channel,
+					onClick: () => {
+						navigate('/chat');
+					},
+				});
+			}
 		},
 	});
 
