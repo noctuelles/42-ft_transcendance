@@ -370,12 +370,14 @@ export class ChatService {
 		channelId: number,
 		password: string,
 	) {
-		const currentChannel = await this.prismaService.userChannel.findUnique({
+		const currentChannel = await this.prismaService.userChannel.findFirst({
 			where: {
 				id: channelId,
+				visibility: UserChannelVisibility.PWD_PROTECTED,
 			},
 			select: {
 				password: true,
+				visibility: true,
 				participants: {
 					where: {
 						userId: userId,
@@ -387,6 +389,21 @@ export class ChatService {
 		if (!currentChannel) throw new BadRequestException('No such channel');
 		if (currentChannel.participants.length === 0)
 			throw new BadRequestException('Invalid user permission');
+		if (password.length === 0) {
+			return await this.prismaService.userChannel.update({
+			where: {
+				id: channelId,
+			},
+			data: {
+				visibility: UserChannelVisibility.PUBLIC,
+				password: null,
+			},
+			select: {
+				id: true,
+				name: true,
+			},
+		});
+		}
 		if (await argon.verify(currentChannel.password, password))
 			throw new BadRequestException('Password is the same as before');
 		return await this.prismaService.userChannel.update({
