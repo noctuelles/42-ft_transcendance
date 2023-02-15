@@ -11,6 +11,10 @@
 	padding-top: 10px;
 }
 
+.ranking-me {
+	background-color: rgb(161, 161, 161);
+}
+
 .ranking-loading {
 	display: flex;
 	flex-direction: column;
