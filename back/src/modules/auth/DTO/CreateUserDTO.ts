@@ -5,7 +5,12 @@ import {
 	MaxLength,
 	MinLength,
 } from 'class-validator';
-import { IsFile, MaxFileSize, MemoryStoredFile } from 'nestjs-form-data';
+import {
+	HasMimeType,
+	IsFile,
+	MaxFileSize,
+	MemoryStoredFile,
+} from 'nestjs-form-data';
 
 export class CreateUserDTO {
 	@IsString()
@@ -21,6 +26,7 @@ export class CreateUserDTO {
 
 	@IsFile()
 	@MaxFileSize(1e6)
+	@HasMimeType(['image/jpeg'])
 	@IsOptional()
 	profile_picture?: MemoryStoredFile;
 }

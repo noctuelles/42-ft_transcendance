@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { back_url } from '@/config.json';
 import '@/style/auth/Login.css';
 import portal from '@/assets/portal.svg';
@@ -7,7 +7,10 @@ import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 function Login() {
 	const [authUrl, setAuthUrl] = useState('');
 	const infoBoxContext = useContext(InfoBoxContext);
+	const fetched = useRef(false);
 	useEffect(() => {
+		if (fetched.current) return;
+		fetched.current = true;
 		fetch(back_url + '/auth')
 			.then((res) => {
 				if (res.ok) return res.json();
