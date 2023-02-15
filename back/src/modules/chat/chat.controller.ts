@@ -31,8 +31,6 @@ import {
 	PromoteDTO,
 } from './Channel.dto';
 import { ChatService } from './chat.service';
-import Channel from './Channel';
-import { UserDto } from '../users/friend.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -81,7 +79,12 @@ export class ChatController {
 		}
 		if (!channel.canBan(user.id, userId))
 			throw new ForbiddenException("You can't do that !");
-		channel.ban(this.prismaService, userId, end);
+		await channel.ban(this.prismaService, userId, end);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+			userId,
+		]);
 	}
 
 	@UseGuards(AuthGuard)
@@ -127,6 +130,26 @@ export class ChatController {
 		if (channel.ownerId !== user.id)
 			throw new ForbiddenException("You can't do that !");
 		channel.unpromote(this.prismaService, userId);
+	}
+
+	@UseGuards(AuthGuard)
+	@Patch('channel/kick')
+	async kick(
+		@CurrentUser() user: User,
+		@Body() { channelId, userId }: PromoteDTO,
+	) {
+		const channel = await this.chatService.getChannel(channelId);
+		if (!channel) {
+			throw new NotFoundException('Channel does not exist');
+		}
+		if (!channel.canBan(user.id, userId))
+			throw new ForbiddenException("You can't do that !");
+		await channel.removeUser(this.prismaService, userId);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+			userId,
+		]);
 	}
 
 	@UseGuards(AuthGuard)

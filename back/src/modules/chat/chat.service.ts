@@ -113,6 +113,7 @@ export class ChatService {
 		const blocked = await this.usersService.fetchBlockedList(userId);
 		const blockedBy = await this.usersService.fetchBlockedByList(userId);
 		channels = channels.filter((channel) => {
+			if (channel.banned.find((b) => b.userId == userId)) return false;
 			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
 				let found = false;
 				channel.completeMembers.forEach((member) => {
@@ -140,6 +141,12 @@ export class ChatService {
 					completeMembers,
 					...frontChannel
 				} = channel;
+				frontChannel.members = frontChannel.members.filter(
+					(m) => !banned.find((b) => b.userId == m.id),
+				);
+				frontChannel.membersId = frontChannel.membersId.filter(
+					(id) => !banned.find((b) => b.userId == id),
+				);
 				const unreaded =
 					await this.prismaService.messageOnChannel.count({
 						where: {

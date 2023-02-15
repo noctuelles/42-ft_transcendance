@@ -77,7 +77,9 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
-		this.completeMembers = userChannel.participants;
+		this.completeMembers = userChannel.participants.filter(
+			(m) => m.status != UserOnChannelStatus.BANNED,
+		);
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;
@@ -246,7 +248,7 @@ export default class Channel {
 		});
 	}
 
-	ban(prismaService: PrismaService, userId: number, unbanDate: Date): void {
+	async ban(prismaService: PrismaService, userId: number, unbanDate: Date) {
 		prismaService.userOnChannel
 			.update({
 				where: { id: { userId: userId, channelId: this.id } },
