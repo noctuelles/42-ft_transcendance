@@ -149,6 +149,7 @@ export default function UserOnChannel({
 					});
 					break;
 			}
+			setPanelOpened(false);
 			resetForm();
 		},
 	});
