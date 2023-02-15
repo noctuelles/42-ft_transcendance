@@ -187,7 +187,15 @@ export default function UserOnChannel({
 			}}
 		>
 			<div className="user-on-channel">
-				<img alt="profile picture" src={user.profile.picture} />
+				<img
+					alt="profile picture"
+					className={
+						(userRole === UserRole.OPERATOR && 'operator-border') ||
+						(userRole === UserRole.ADMIN && 'admin-border') ||
+						''
+					}
+					src={user.profile.picture}
+				/>
 				<Link className="profile-link" to={`/profile/${user.name}`}>
 					{user.name}
 				</Link>
