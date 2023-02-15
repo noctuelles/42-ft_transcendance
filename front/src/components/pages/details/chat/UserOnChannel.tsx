@@ -2,28 +2,30 @@ import { useFormik } from 'formik';
 import IUser from './IUser';
 import '@/style/details/chat/UserOnChannel.css';
 import StatusDot from '../social/StatusDot';
-import { EUserStatus } from '../social/Types';
 import { Link } from 'react-router-dom';
 import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useContext, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
+import { ChatContext } from '@/context/ChatContext';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { UserRole } from './UserRole';
 
 export default function UserOnChannel({
 	selectedChannel,
 	user,
-	userRole,
+	_userRole,
 	myUserRole,
 }: {
 	selectedChannel: number;
 	user: IUser;
-	userRole: UserRole;
+	_userRole: UserRole;
 	myUserRole: UserRole;
 }) {
 	const userContext = useContext(UserContext);
+	const chatContext = useContext(ChatContext);
 	const infoBoxContext = useContext(InfoBoxContext);
+	const [userRole, setUserRole] = useState(_userRole);
 	const [isPanelOpened, setPanelOpened] = useState(false);
 
 	useWebSocket(WS_URL, {
@@ -36,6 +38,19 @@ export default function UserOnChannel({
 				const jsonMessage = JSON.parse(data);
 				if (user.id === jsonMessage.data.id)
 					user.status = jsonMessage.data.status;
+			}
+			if (isChannelMessage(data)) {
+				const parsedData = JSON.parse(data);
+				const channel = parsedData.data.find((channel: any) => {
+					return channel.id === selectedChannel;
+				});
+				setUserRole(
+					getRole(
+						user.id,
+						channel?.adminsId || [],
+						channel?.ownerId || -1,
+					),
+				);
 			}
 		},
 	});
@@ -209,6 +224,16 @@ export default function UserOnChannel({
 		</li>
 	);
 
+	function getRole(
+		id: number,
+		adminsIds: number[],
+		ownerId: number,
+	): UserRole {
+		if (id === ownerId) return UserRole.OPERATOR;
+		else if (adminsIds.includes(id)) return UserRole.ADMIN;
+		else return UserRole.USER;
+	}
+
 	function isStatusMessage(rawMessage: string) {
 		try {
 			var message = JSON.parse(rawMessage);
@@ -216,5 +241,14 @@ export default function UserOnChannel({
 			return false;
 		}
 		return message?.['event'] == 'user-status';
+	}
+
+	function isChannelMessage(rawMessage: string) {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'channels';
 	}
 }

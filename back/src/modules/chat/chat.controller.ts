@@ -104,7 +104,16 @@ export class ChatController {
 		}
 		if (!channel.canBan(user.id, userId))
 			throw new ForbiddenException("You can't do that !");
-		channel.mute(this.prismaService, this.websocketsService, userId, end);
+		await channel.mute(
+			this.prismaService,
+			this.websocketsService,
+			userId,
+			end,
+		);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+		]);
 	}
 
 	@UseGuards(AuthGuard)
@@ -119,7 +128,15 @@ export class ChatController {
 		}
 		if (channel.ownerId !== user.id)
 			throw new ForbiddenException("You can't do that !");
-		channel.promote(this.prismaService, this.websocketsService, userId);
+		await channel.promote(
+			this.prismaService,
+			this.websocketsService,
+			userId,
+		);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+		]);
 	}
 
 	@UseGuards(AuthGuard)
@@ -134,7 +151,15 @@ export class ChatController {
 		}
 		if (channel.ownerId !== user.id)
 			throw new ForbiddenException("You can't do that !");
-		channel.unpromote(this.prismaService, this.websocketsService, userId);
+		await channel.unpromote(
+			this.prismaService,
+			this.websocketsService,
+			userId,
+		);
+		this.chatService.sendChannelListToUserIds([
+			channel.ownerId,
+			...channel.adminsId,
+		]);
 	}
 
 	@UseGuards(AuthGuard)
