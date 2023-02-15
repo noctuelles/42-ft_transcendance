@@ -406,7 +406,12 @@ export class ChatController {
 		if (error !== null) {
 			throw new BadRequestException(error);
 		}
-		await channel.invite(this.prismaService, username);
+		await channel.invite(
+			this.prismaService,
+			this.websocketsService,
+			username,
+			user.name,
+		);
 		this.chatService.sendChannelListToUserIds(channel.membersId);
 	}
 

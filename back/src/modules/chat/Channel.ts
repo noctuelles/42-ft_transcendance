@@ -555,7 +555,12 @@ export default class Channel {
 		return null;
 	}
 
-	async invite(prismaService: PrismaService, invitedUsername: string) {
+	async invite(
+		prismaService: PrismaService,
+		websocketsService: WebsocketsService,
+		invitedUsername: string,
+		inviterUsername: string,
+	) {
 		const user = await prismaService.user.findUnique({
 			where: { name: invitedUsername },
 		});
@@ -565,6 +570,13 @@ export default class Channel {
 				channelId: this.id,
 			},
 		});
+		const sockets = websocketsService.getSocketsFromUsersId([user.id]);
+		if (sockets.length > 0) {
+			websocketsService.send(sockets[0], 'chat-invitation', {
+				inviter: inviterUsername,
+				channel: this.name,
+			});
+		}
 	}
 
 	canDeleteInvite(deleterId: number, invitedUsername: string) {
