@@ -59,7 +59,14 @@ export default function UserOnChannel({
 		initialValues: { action: 'Ban', date: '' },
 		onSubmit: async (props, { resetForm }) => {
 			const accessToken: string = await userContext.getAccessToken();
-			props.date = new Date(props.date); // Convert from local to UTC
+			const endDate = new Date(props.date);
+			if (endDate.getTime() < new Date().getTime()) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Please use a date in the future!',
+				});
+				return;
+			}
 			switch (props.action) {
 				case 'Ban':
 					fetch(back_url + '/chat/channel/ban', {
@@ -71,7 +78,7 @@ export default function UserOnChannel({
 						body: JSON.stringify({
 							channelId: selectedChannel,
 							userId: user.id,
-							end: props.date,
+							end: endDate,
 						}),
 					}).then((res) => {
 						if (!res.ok) {
@@ -92,7 +99,7 @@ export default function UserOnChannel({
 						body: JSON.stringify({
 							channelId: selectedChannel,
 							userId: user.id,
-							end: props.date,
+							end: endDate,
 						}),
 					}).then((res) => {
 						if (!res.ok) {

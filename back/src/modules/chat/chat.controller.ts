@@ -73,6 +73,9 @@ export class ChatController {
 		@CurrentUser() user: User,
 		@Body() { channelId, end, userId }: ActionInChannelDTO,
 	) {
+		if (end < new Date()) {
+			throw new BadRequestException('End date must be in the future');
+		}
 		const channel = await this.chatService.getChannel(channelId);
 		if (!channel) {
 			throw new NotFoundException('Channel does not exist');
@@ -98,6 +101,9 @@ export class ChatController {
 		@CurrentUser() user: User,
 		@Body() { channelId, end, userId }: ActionInChannelDTO,
 	) {
+		if (end < new Date()) {
+			throw new BadRequestException('End date must be in the future');
+		}
 		const channel = await this.chatService.getChannel(channelId);
 		if (!channel) {
 			throw new NotFoundException('Channel does not exist');
