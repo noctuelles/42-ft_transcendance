@@ -12,6 +12,7 @@ import TextField from '@/components/global/TextField';
 import { back_url } from '@/config.json';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import ChannelInvitation from './ChannelInvitation';
+import IChannelInvitation from './IChannel';
 
 interface IValues {
 	username: string;
@@ -104,25 +105,33 @@ export default function ChannelSideBar({
 					)}
 				<h3>{channel && 'User list'}</h3>
 				<ul className="channel-sidebar-user">
-					{channel?.members.map((member: IUser) => {
-						return (
-							<UserOnChannel
-								key={member.id}
-								selectedChannel={selectedChannel}
-								user={member}
-								userRole={getRole(
-									member.id,
-									channel.adminsId,
-									channel.ownerId,
-								)}
-								myUserRole={getRole(
-									userContext.user.id,
-									channel.adminsId,
-									channel.ownerId,
-								)}
-							/>
-						);
-					})}
+					{channel?.members
+						.sort((a: IUser, b: IUser) => {
+							if (a.name.toLowerCase() < b.name.toLowerCase())
+								return -1;
+							if (a.name.toLowerCase() > b.name.toLowerCase())
+								return 1;
+							return 0;
+						})
+						.map((member: IUser) => {
+							return (
+								<UserOnChannel
+									key={member.id}
+									selectedChannel={selectedChannel}
+									user={member}
+									userRole={getRole(
+										member.id,
+										channel.adminsId,
+										channel.ownerId,
+									)}
+									myUserRole={getRole(
+										userContext.user.id,
+										channel.adminsId,
+										channel.ownerId,
+									)}
+								/>
+							);
+						})}
 				</ul>
 			</div>
 			{channel &&
@@ -137,15 +146,34 @@ export default function ChannelSideBar({
 						<div className="channel-sidebar-break" />
 						<h3>Invitations</h3>
 						<ul className="channel-sidebar-user channel-invitation-list">
-							{channel?.invitations.map((invit) => {
-								return (
-									<ChannelInvitation
-										key={invit.userId}
-										invitation={invit}
-										channelId={channel.id}
-									/>
-								);
-							})}
+							{channel?.invitations
+								.sort(
+									(
+										a: IChannelInvitation,
+										b: IChannelInvitation,
+									) => {
+										if (
+											a.username.toLowerCase() <
+											b.username.toLowerCase()
+										)
+											return -1;
+										if (
+											a.username.toLowerCase() >
+											b.username.toLowerCase()
+										)
+											return 1;
+										return 0;
+									},
+								)
+								.map((invit) => {
+									return (
+										<ChannelInvitation
+											key={invit.userId}
+											invitation={invit}
+											channelId={channel.id}
+										/>
+									);
+								})}
 						</ul>
 					</>
 				)}
