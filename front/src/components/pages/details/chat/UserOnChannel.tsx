@@ -128,6 +128,26 @@ export default function UserOnChannel({
 						}
 					});
 					break;
+				case 'Kick':
+					fetch(back_url + '/chat/channel/kick', {
+						method: 'PATCH',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: 'Bearer ' + accessToken,
+						},
+						body: JSON.stringify({
+							channelId: selectedChannel,
+							userId: user.id,
+						}),
+					}).then((res) => {
+						if (!res.ok) {
+							infoBoxContext.addInfo({
+								type: InfoType.ERROR,
+								message: "You can't do that !",
+							});
+						}
+					});
+					break;
 			}
 			resetForm();
 		},
@@ -164,6 +184,7 @@ export default function UserOnChannel({
 					>
 						<option value="Ban">Ban</option>
 						<option value="Mute">Mute</option>
+						<option value="Kick">Kick</option>
 						{myUserRole === UserRole.OPERATOR &&
 						userRole === UserRole.USER ? (
 							<option value="Promote">Promote</option>

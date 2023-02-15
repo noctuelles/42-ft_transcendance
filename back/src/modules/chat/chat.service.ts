@@ -1,5 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User, UserChannelVisibility, UserOnChannelRole } from '@prisma/client';
+import {
+	User,
+	UserChannelVisibility,
+	UserOnChannel,
+	UserOnChannelRole,
+	UserOnChannelStatus,
+} from '@prisma/client';
 import * as argon from 'argon2';
 import { UsersService } from '../users/users.service';
 
@@ -40,6 +46,8 @@ export class ChatService {
 				if (blocked.find((b) => b.name === message.username)) {
 					return null;
 				}
+				if (channel.isUserBanned(this.prismaService, member.userId))
+					return null;
 				return member.userId;
 			}),
 		);
@@ -113,6 +121,7 @@ export class ChatService {
 		const blocked = await this.usersService.fetchBlockedList(userId);
 		const blockedBy = await this.usersService.fetchBlockedByList(userId);
 		channels = channels.filter((channel) => {
+			if (channel.banned.find((b) => b.userId == userId)) return false;
 			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
 				let found = false;
 				channel.completeMembers.forEach((member) => {
@@ -133,6 +142,10 @@ export class ChatService {
 		});
 		const channelsForFront = await Promise.all(
 			channels.map(async (channel) => {
+				channel.purgeEndedPunishment(
+					this.prismaService,
+					channel.banned,
+				);
 				let {
 					muted,
 					banned,
@@ -140,6 +153,12 @@ export class ChatService {
 					completeMembers,
 					...frontChannel
 				} = channel;
+				frontChannel.members = frontChannel.members.filter(
+					(m) => !banned.find((b) => b.userId === m.id),
+				);
+				frontChannel.membersId = frontChannel.membersId.filter(
+					(id) => !banned.find((b) => b.userId === id),
+				);
 				const unreaded =
 					await this.prismaService.messageOnChannel.count({
 						where: {
@@ -272,6 +291,12 @@ export class ChatService {
 		user,
 		channelVisibility: UserChannelVisibility,
 	) {
+		await this.prismaService.userOnChannel.deleteMany({
+			where: {
+				statusEnd: { lte: new Date() },
+				status: UserOnChannelStatus.BANNED,
+			},
+		});
 		let channels = [];
 		if (channelVisibility == UserChannelVisibility.PRIVATE) {
 			const invitations =
@@ -295,7 +320,22 @@ export class ChatService {
 			);
 		} else {
 			channels = await this.prismaService.userChannel.findMany({
-				where: { visibility: channelVisibility },
+				where: {
+					visibility: channelVisibility,
+					OR: [
+						{ participants: { none: { userId: user.id } } },
+						{
+							participants: {
+								some: {
+									userId: user.id,
+									status: {
+										not: UserOnChannelStatus.BANNED,
+									},
+								},
+							},
+						},
+					],
+				},
 				include: {
 					participants: true,
 				},
@@ -303,6 +343,9 @@ export class ChatService {
 		}
 		return channels
 			.map((channel) => {
+				channel.participants = channel.participants.filter(
+					(p) => p.status !== UserOnChannelStatus.BANNED,
+				);
 				return {
 					id: channel.id,
 					name: channel.name,

@@ -77,7 +77,9 @@ export default class Channel {
 		if (!userChannel) {
 			return;
 		}
-		this.completeMembers = userChannel.participants;
+		this.completeMembers = userChannel.participants.filter(
+			(m) => m.status != UserOnChannelStatus.BANNED,
+		);
 		this.id = userChannel.id;
 		this.name = userChannel.name;
 		this.hashedPwd = userChannel.password;
@@ -237,6 +239,28 @@ export default class Channel {
 		prismaService: PrismaService,
 		punishments: IPunishment[],
 	) {
+		const users = await prismaService.userOnChannel.findMany({
+			where: { statusEnd: { lte: new Date() } },
+		});
+		for (const user of users) {
+			if (user.status === UserOnChannelStatus.BANNED) {
+				this.members = this.members.filter((member) => {
+					return member.id !== user.userId;
+				});
+				this.membersId = this.membersId.filter((id) => {
+					return id !== user.userId;
+				});
+				this.banned = this.banned.filter((banned) => {
+					return banned.userId !== user.userId;
+				});
+			}
+		}
+		await prismaService.userOnChannel.deleteMany({
+			where: {
+				statusEnd: { lte: new Date() },
+				status: UserOnChannelStatus.BANNED,
+			},
+		});
 		await prismaService.userOnChannel.updateMany({
 			where: { statusEnd: { lte: new Date() } },
 			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
@@ -246,17 +270,15 @@ export default class Channel {
 		});
 	}
 
-	ban(prismaService: PrismaService, userId: number, unbanDate: Date): void {
-		prismaService.userOnChannel
-			.update({
-				where: { id: { userId: userId, channelId: this.id } },
-				data: {
-					status: UserOnChannelStatus.BANNED,
-					statusEnd: unbanDate,
-				},
-			})
-			.then(),
-			this.banned.push({ userId: userId, endDate: unbanDate });
+	async ban(prismaService: PrismaService, userId: number, unbanDate: Date) {
+		this.banned.push({ userId: userId, endDate: unbanDate });
+		await prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: {
+				status: UserOnChannelStatus.BANNED,
+				statusEnd: unbanDate,
+			},
+		});
 	}
 
 	pardon(prismaService: PrismaService, userId: number): boolean {
