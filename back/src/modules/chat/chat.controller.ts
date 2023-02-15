@@ -163,6 +163,11 @@ export class ChatController {
 			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
 				throw new ForbiddenException("You can't leave a pm channel");
 			}
+			if (channel.isUserBanned(this.prismaService, user.id)) {
+				throw new ForbiddenException(
+					"You can't leave a channel wehre you are banned",
+				);
+			}
 			let deleted = false;
 			if (channel.ownerId === user.id) {
 				await channel.delete(this.prismaService);
