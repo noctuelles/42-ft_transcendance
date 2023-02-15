@@ -31,8 +31,6 @@ import {
 	PromoteDTO,
 } from './Channel.dto';
 import { ChatService } from './chat.service';
-import Channel from './Channel';
-import { UserDto } from '../users/friend.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -255,6 +253,7 @@ export class ChatController {
 		return await this.chatService.joinMp(user, otherName);
 	}
 
+	@UseGuards(AuthGuard)
 	@Patch('channels/:channelId/chpwd')
 	async changeChannelPwd(
 		@CurrentUser() user: User,

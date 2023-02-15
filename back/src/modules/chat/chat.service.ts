@@ -390,22 +390,25 @@ export class ChatService {
 		if (currentChannel.participants.length === 0)
 			throw new BadRequestException('Invalid user permission');
 		if (password.length === 0) {
-			return await this.prismaService.userChannel.update({
-			where: {
-				id: channelId,
-			},
-			data: {
-				visibility: UserChannelVisibility.PUBLIC,
-				password: null,
-			},
-			select: {
-				id: true,
-				name: true,
-			},
-		});
+			const channel =  await this.prismaService.userChannel.update({
+				where: {
+					id: channelId,
+				},
+				data: {
+					visibility: UserChannelVisibility.PUBLIC,
+					password: null,
+				},
+				select: {
+					id: true,
+					name: true,
+				},
+			});
+			this.sendChannelListWhereUserIs(userId);
+			return channel;
 		}
 		if (await argon.verify(currentChannel.password, password))
 			throw new BadRequestException('Password is the same as before');
+
 		return await this.prismaService.userChannel.update({
 			where: {
 				id: channelId,
