@@ -91,7 +91,7 @@ export default class Channel {
 			return user.userId;
 		});
 		this.members = userChannel.participants.map((participant) => {
-			return participant.user;
+			return { ...participant.user, role: participant.role };
 		});
 		this.adminsId = userChannel.participants
 			.filter((user) => {
@@ -316,21 +316,19 @@ export default class Channel {
 		});
 	}
 
-	mute(
+	async mute(
 		prismaService: PrismaService,
 		websocketsService: WebsocketsService,
 		userId: number,
 		unmuteDate: Date,
-	): void {
-		prismaService.userOnChannel
-			.update({
-				where: { id: { userId: userId, channelId: this.id } },
-				data: {
-					status: UserOnChannelStatus.MUTED,
-					statusEnd: unmuteDate,
-				},
-			})
-			.then();
+	): Promise<void> {
+		await prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: {
+				status: UserOnChannelStatus.MUTED,
+				statusEnd: unmuteDate,
+			},
+		});
 		this.muted.push({ userId: userId, endDate: unmuteDate });
 		const sockets = websocketsService.getSocketsFromUsersId([userId]);
 		if (sockets.length > 0) {
@@ -341,17 +339,15 @@ export default class Channel {
 		}
 	}
 
-	unmute(
+	async unmute(
 		prismaService: PrismaService,
 		websocketsService: WebsocketsService,
 		userId: number,
-	): boolean {
-		prismaService.userOnChannel
-			.update({
-				where: { id: { userId: userId, channelId: this.id } },
-				data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
-			})
-			.then();
+	): Promise<boolean> {
+		await prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: { status: UserOnChannelStatus.CLEAN, statusEnd: null },
+		});
 		const sockets = websocketsService.getSocketsFromUsersId([userId]);
 		if (sockets.length > 0) {
 			websocketsService.send(sockets[0], 'chat-action', {
@@ -364,19 +360,17 @@ export default class Channel {
 		});
 	}
 
-	promote(
+	async promote(
 		prismaService: PrismaService,
 		websocketsService: WebsocketsService,
 		userId: number,
-	): void {
-		prismaService.userOnChannel
-			.update({
-				where: { id: { userId: userId, channelId: this.id } },
-				data: {
-					role: UserOnChannelRole.ADMIN,
-				},
-			})
-			.then();
+	): Promise<void> {
+		await prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: {
+				role: UserOnChannelRole.ADMIN,
+			},
+		});
 		this.adminsId.push(userId);
 		const sockets = websocketsService.getSocketsFromUsersId([userId]);
 		if (sockets.length > 0) {
@@ -387,19 +381,17 @@ export default class Channel {
 		}
 	}
 
-	unpromote(
+	async unpromote(
 		prismaService: PrismaService,
 		websocketsService: WebsocketsService,
 		userId: number,
-	): void {
-		prismaService.userOnChannel
-			.update({
-				where: { id: { userId: userId, channelId: this.id } },
-				data: {
-					role: UserOnChannelRole.USER,
-				},
-			})
-			.then();
+	): Promise<void> {
+		await prismaService.userOnChannel.update({
+			where: { id: { userId: userId, channelId: this.id } },
+			data: {
+				role: UserOnChannelRole.USER,
+			},
+		});
 		this.adminsId.splice(this.adminsId.indexOf(userId), 1);
 		const sockets = websocketsService.getSocketsFromUsersId([userId]);
 		if (sockets.length > 0) {

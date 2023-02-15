@@ -7,22 +7,25 @@ import useWebSocket from 'react-use-websocket';
 import { ws_url as WS_URL, back_url } from '@/config.json';
 import { useContext, useState } from 'react';
 import { UserContext } from '@/context/UserContext';
+import { ChatContext } from '@/context/ChatContext';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { UserRole } from './UserRole';
 
 export default function UserOnChannel({
 	selectedChannel,
 	user,
-	userRole,
+	_userRole,
 	myUserRole,
 }: {
 	selectedChannel: number;
 	user: IUser;
-	userRole: UserRole;
+	_userRole: UserRole;
 	myUserRole: UserRole;
 }) {
 	const userContext = useContext(UserContext);
+	const chatContext = useContext(ChatContext);
 	const infoBoxContext = useContext(InfoBoxContext);
+	const [userRole, setUserRole] = useState(_userRole);
 	const [isPanelOpened, setPanelOpened] = useState(false);
 
 	useWebSocket(WS_URL, {
@@ -36,6 +39,19 @@ export default function UserOnChannel({
 				if (user.id === jsonMessage.data.id)
 					user.status = jsonMessage.data.status;
 			}
+			if (isChannelMessage(data)) {
+				const parsedData = JSON.parse(data);
+				const channel = parsedData.data.find((channel: any) => {
+					return channel.id === selectedChannel;
+				});
+				setUserRole(
+					getRole(
+						user.id,
+						channel?.adminsId || [],
+						channel?.ownerId || -1,
+					),
+				);
+			}
 		},
 	});
 
@@ -43,7 +59,14 @@ export default function UserOnChannel({
 		initialValues: { action: 'Ban', date: '' },
 		onSubmit: async (props, { resetForm }) => {
 			const accessToken: string = await userContext.getAccessToken();
-			props.date = new Date(props.date); // Convert from local to UTC
+			const endDate = new Date(props.date);
+			if (endDate.getTime() < new Date().getTime()) {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: 'Please use a date in the future!',
+				});
+				return;
+			}
 			switch (props.action) {
 				case 'Ban':
 					fetch(back_url + '/chat/channel/ban', {
@@ -55,7 +78,7 @@ export default function UserOnChannel({
 						body: JSON.stringify({
 							channelId: selectedChannel,
 							userId: user.id,
-							end: props.date,
+							end: endDate,
 						}),
 					}).then((res) => {
 						if (!res.ok) {
@@ -76,7 +99,7 @@ export default function UserOnChannel({
 						body: JSON.stringify({
 							channelId: selectedChannel,
 							userId: user.id,
-							end: props.date,
+							end: endDate,
 						}),
 					}).then((res) => {
 						if (!res.ok) {
@@ -208,6 +231,16 @@ export default function UserOnChannel({
 		</li>
 	);
 
+	function getRole(
+		id: number,
+		adminsIds: number[],
+		ownerId: number,
+	): UserRole {
+		if (id === ownerId) return UserRole.OPERATOR;
+		else if (adminsIds.includes(id)) return UserRole.ADMIN;
+		else return UserRole.USER;
+	}
+
 	function isStatusMessage(rawMessage: string) {
 		try {
 			var message = JSON.parse(rawMessage);
@@ -215,5 +248,14 @@ export default function UserOnChannel({
 			return false;
 		}
 		return message?.['event'] == 'user-status';
+	}
+
+	function isChannelMessage(rawMessage: string) {
+		try {
+			var message = JSON.parse(rawMessage);
+		} catch (error) {
+			return false;
+		}
+		return message?.['event'] == 'channels';
 	}
 }

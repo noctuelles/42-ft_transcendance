@@ -8,6 +8,6 @@ export class ChannelsGateway {
 	@SubscribeMessage('channels')
 	async handleMessage(socket: any, data: any) {
 		while (!socket.user) await new Promise((r) => setTimeout(r, 50));
-		this.chatService.sendChannelListWhereUserIs(socket.user.id); // TODO => Everyone in the club
+		this.chatService.sendChannelListWhereUserIs(socket.user.id);
 	}
 }

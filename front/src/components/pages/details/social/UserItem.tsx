@@ -66,6 +66,7 @@ const UserItem = (props: IProps) => {
 						fontSize="10px"
 						withUserName={props.user.name}
 						blockedBy={props.user.blocked}
+						blocked={false}
 					/>
 				)}
 			</div>
