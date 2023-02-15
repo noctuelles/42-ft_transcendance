@@ -58,6 +58,7 @@ const ChannelInvitationForm = ({ channel }: IProps) => {
 				setFieldError('username', errObj.message);
 			});
 	}
+
 	return (
 		<Formik
 			validationSchema={validation}

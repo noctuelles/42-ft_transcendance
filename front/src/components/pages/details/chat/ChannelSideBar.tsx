@@ -8,6 +8,7 @@ import IUser from './IUser';
 import { UserRole } from './UserRole';
 import ChannelInvitation from './ChannelInvitation';
 import ChannelInvitationForm from './ChannelInvitationForm';
+import ChannelChangePwdForm from './ChannelChangePwdForm';
 
 export default function ChannelSideBar({
 	selectedChannel,
@@ -27,7 +28,14 @@ export default function ChannelSideBar({
 						userContext.user.id,
 						channel.adminsId,
 						channel.ownerId,
-					) !== UserRole.USER && (<ChannelInvitationForm channel={channel} />)}
+					) !== UserRole.USER && (<ChannelInvitationForm channel={channel}/>)}
+				{channel &&
+					channel.type === 'PROTECTED' &&
+					getRole(
+						userContext.user.id,
+						channel.adminsId,
+						channel.ownerId,
+					) === UserRole.OPERATOR && (<ChannelChangePwdForm />)}
 				<h3>{channel && 'User list'}</h3>
 				<ul className="channel-sidebar-user">
 					{channel?.members.map((member: IUser) => {
