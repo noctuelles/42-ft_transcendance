@@ -2,7 +2,6 @@ import '@/style/details/profile/AchievementItem.css';
 import ProgressBar from '@/components/global/ProgressBar';
 import CheckMark from '@/assets/check-mark.svg';
 import Cross from '@/assets/cross.svg';
-import NoviceBall from '@/assets/novice-ball.svg';
 import { ProfileAchievementData } from './ProfileTypes';
 
 interface AchievementItemProps {
@@ -53,7 +52,7 @@ const AchievementItem = ({ achievement }: AchievementItemProps) => {
 							Unlocked on
 							<br />
 							<i>
-								{achievement.unlockedAt?.toLocaleString(
+								{achievement.unlockedAtDate?.toLocaleString(
 									'default',
 									{
 										day: '2-digit',

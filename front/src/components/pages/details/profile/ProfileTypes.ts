@@ -24,7 +24,8 @@ export interface ProfileAchievementData {
 	progress: number;
 	objective: number;
 	unlocked: boolean;
-	unlockedAt: Date;
+	unlockedAt: string;
+	unlockedAtDate: Date;
 }
 
 export interface ProfileMatchData {
