@@ -16,5 +16,19 @@ RUN npm ci
 # Copy the app source into the image
 COPY --chown=node:node . .
 
-FROM nginx:latest as production
+FROM node:latest AS build
 
+WORKDIR /usr/src/app
+
+COPY --chown=node:node --from=dev /usr/src/app/node_modules ./node_modules
+
+COPY --chown=node:node . .
+
+RUN npm run build
+
+FROM nginx:latest AS production
+
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]

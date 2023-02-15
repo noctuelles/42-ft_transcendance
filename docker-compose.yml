@@ -41,16 +41,15 @@ services:
   front:
     build:
       context: ./front
-      target: dev
+      target: production
     container_name: react
     volumes:
       - ./front:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
       - back
-    command: npm run dev
     ports:
-      - 8080:8080
+      - 8080:80
     networks:
       - transcendance
 
