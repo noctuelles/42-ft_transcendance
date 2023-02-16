@@ -78,7 +78,6 @@ function Game(props: IGameProps) {
 	function onKey(event: KeyboardEvent, action: string) {
 		switch (event.key) {
 			case 'ArrowUp':
-				console.log('Arrow up !');
 				sendMessage(
 					JSON.stringify({
 						event: 'game-input',
