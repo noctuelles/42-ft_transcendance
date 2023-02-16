@@ -147,7 +147,7 @@ export default function ChannelCreationForm({
 						{msgMap.get(values.channelType)}
 					</div>
 					<div className="creation-form-btns">
-						<Button onClick={closeModal}>Back</Button>
+						<Button type="button" onClick={closeModal}>Back</Button>
 						<Button type="submit" disabled={isSubmitting}>
 							Submit
 						</Button>
