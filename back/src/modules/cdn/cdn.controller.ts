@@ -9,7 +9,7 @@ export class CdnController {
 		if (fs.existsSync(imgPath)) {
 			return res.sendFile(imgPath, { root: './' });
 		} else {
-			return res.sendFile('default.jpg', {
+			return res.sendFile('default-profile-picture.jpg', {
 				root: 'public/cdn/profile_pictures',
 			});
 		}
