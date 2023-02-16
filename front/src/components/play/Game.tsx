@@ -78,6 +78,7 @@ function Game(props: IGameProps) {
 	function onKey(event: KeyboardEvent, action: string) {
 		switch (event.key) {
 			case 'ArrowUp':
+				console.log('Arrow up !');
 				sendMessage(
 					JSON.stringify({
 						event: 'game-input',
@@ -107,24 +108,23 @@ function Game(props: IGameProps) {
 	useEffect(() => {
 		if (!stateRef.current) {
 			stateRef.current = true;
-			return;
-		}
-		if (props.spectator) {
+			if (props.spectator) {
+				return () => {
+					sendMessage(
+						JSON.stringify({
+							event: 'spectate-leave',
+						}),
+					);
+				};
+			}
+			window.addEventListener('keydown', onKeyPress);
+			window.addEventListener('keyup', onKeyRelease);
+
 			return () => {
-				sendMessage(
-					JSON.stringify({
-						event: 'spectate-leave',
-					}),
-				);
+				window.removeEventListener('keydown', onKeyPress);
+				window.removeEventListener('keyup', onKeyRelease);
 			};
 		}
-		window.addEventListener('keydown', onKeyPress);
-		window.addEventListener('keyup', onKeyRelease);
-
-		return () => {
-			window.removeEventListener('keydown', onKeyPress);
-			window.removeEventListener('keyup', onKeyRelease);
-		};
 	}, []);
 
 	return (
