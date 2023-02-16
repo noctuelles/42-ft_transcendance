@@ -119,26 +119,6 @@ export class UsersService {
 		return createdUser;
 	}
 
-	//TODO: Remove this function
-	async createDevUser(name: string) {
-		const user = await this.prismaService.user.create({
-			data: {
-				login: name,
-				name: name,
-				profile: {
-					create: {
-						picture:
-							'https://cdn.discordapp.com/attachments/1052674310034182196/1064564672122077204/turret.png',
-					},
-				},
-			},
-			include: {
-				profile: true,
-			},
-		});
-		this.achievmentsService.initAchievements(user.profile.id);
-	}
-
 	async fetchFriendList(userId: number) {
 		const { friends } = await this.prismaService.user.findUnique({
 			where: {

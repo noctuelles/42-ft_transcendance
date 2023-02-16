@@ -73,8 +73,7 @@ export class Game {
 	async start(onEnd: () => void) {
 		this.onEnd = onEnd;
 		while (this._startCounter > 0) {
-			//TODO: Change to 1000 ms
-			await this._wait(100);
+			await this._wait(1000);
 			this._startCounter--;
 			this._sendToPlayers('match-starting', { time: this._startCounter });
 		}

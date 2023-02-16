@@ -32,7 +32,7 @@ export default function UserInput({
 		}),
 		onSubmit: async ({ inputValue }, { resetForm }) => {
 			const message: IMessage = {
-				username: '', // TODO: We don't trust front anymore, so user field is going to be removed
+				username: '',
 				channel: selectedChannel,
 				message: inputValue,
 			};

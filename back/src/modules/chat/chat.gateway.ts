@@ -23,7 +23,6 @@ export class ChatGateway {
 				socket.user.id,
 			)
 		) {
-			// TODO: Tell why can't send message
 			return;
 		}
 		let message = new Message(data);

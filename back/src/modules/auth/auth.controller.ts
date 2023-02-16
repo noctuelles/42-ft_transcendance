@@ -66,12 +66,6 @@ export class AuthController {
 		return await this.authService.refresh(refreshToken);
 	}
 
-	//TODO: Remove this route
-	@Post('dev/:name')
-	async dev(@Param('name') name: string) {
-		return await this.authService.dev(name);
-	}
-
 	@Get('name/:name')
 	async testName(@Param('name') name: string) {
 		if (name.length < 3)
