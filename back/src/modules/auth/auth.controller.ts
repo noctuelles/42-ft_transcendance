@@ -82,7 +82,7 @@ export class AuthController {
 		if (name.length > 8)
 			return {
 				valid: false,
-				reason: 'The name must be at most 20 characters long',
+				reason: 'The name must be at most 8 characters long',
 			};
 		if (!name.match('^[a-zA-Z0-9_]*$')) {
 			return {
