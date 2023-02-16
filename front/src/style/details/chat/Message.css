@@ -43,7 +43,6 @@
 	border-top-left-radius: var(--message-border-radius);
 	border-bottom-left-radius: var(--message-border-radius);
 	border-bottom-right-radius: var(--message-border-radius);
-	overflow-wrap: anywhere;
 }
 
 .self .message address {
@@ -55,6 +54,7 @@
 	margin: 0;
 	padding: 10px;
 	box-shadow: 0px 4px 0px rgba(0, 0, 0, 0.12);
+	overflow-wrap: anywhere;
 }
 
 .self .message address::after {
