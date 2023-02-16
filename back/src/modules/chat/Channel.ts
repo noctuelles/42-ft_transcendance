@@ -567,7 +567,7 @@ export default class Channel {
 		await prismaServie.userOnChannel.deleteMany({
 			where: { channelId: this.id },
 		});
-		await prismaServie.userChannel.delete({
+		await prismaServie.userChannel.deleteMany({
 			where: { id: this.id },
 		});
 	}

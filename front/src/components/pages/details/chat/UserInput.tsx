@@ -83,7 +83,11 @@ export default function UserInput({
 				maxLength={255}
 				disabled={selectedChannel === 0}
 			/>
-			<button className="chat-btn1" type="submit">
+			<button
+				className="chat-btn1"
+				type="submit"
+				disabled={selectedChannel === 0}
+			>
 				Send
 			</button>
 			<button
