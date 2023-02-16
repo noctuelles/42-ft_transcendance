@@ -32,6 +32,15 @@ export const InfoBoxContext = React.createContext<IInfoBoxContext>(
 	{} as IInfoBoxContext,
 );
 
+function generateId() {
+	const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
+	let id = '';
+	for (let i = 0; i < 10; i++) {
+		id += charset[Math.floor(Math.random() * charset.length)];
+	}
+	return id;
+}
+
 function InfoBoxContextProvider(props: any) {
 	const [infos, setInfos] = useState<IInfo[]>([]);
 	const enable = useRef(true);
@@ -61,7 +70,7 @@ function InfoBoxContextProvider(props: any) {
 
 	async function addInfo(info: IInfoBuilder) {
 		if (!enable.current) return;
-		const id = crypto.randomUUID();
+		const id = generateId();
 		setInfos((inf: IInfo[]) => {
 			if (inf.length >= 5) {
 				inf = inf.slice(1, inf.length);
