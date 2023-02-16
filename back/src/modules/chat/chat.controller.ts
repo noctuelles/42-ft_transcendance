@@ -357,6 +357,17 @@ export class ChatController {
 		if (!channel?.containsUser(user.id)) {
 			throw new ForbiddenException('User is not in this channel');
 		}
+		if (
+			!channel.canUserSendMessage(
+				this.prismaService,
+				this.chatService,
+				user.id,
+			)
+		) {
+			throw new ForbiddenException(
+				'You cannot send messages in this channel',
+			);
+		}
 		if (await this.chatService.hasUserCreatedPlayingInvitation(user.id)) {
 			return {
 				success: false,

@@ -474,13 +474,29 @@ export default class Channel {
 		prismaService: PrismaService,
 		websocketsService: WebsocketsService,
 	) {
-		websocketsService.sendToAllUsers(this.membersId, 'chat', {
-			username: user.name,
-			channel: this.id,
-			message: '',
-			isInvitation: true,
-			invitationStatus: MathInvitationStatus.PENDING,
+		const blockedBy = await prismaService.user.findMany({
+			where: {
+				blocked: {
+					some: {
+						id: user.id,
+					},
+				},
+			},
 		});
+
+		websocketsService.sendToAllUsers(
+			this.membersId.filter((m) => {
+				return blockedBy.find((b) => b.id === m) ? false : true;
+			}),
+			'chat',
+			{
+				username: user.name,
+				channel: this.id,
+				message: '',
+				isInvitation: true,
+				invitationStatus: MathInvitationStatus.PENDING,
+			},
+		);
 		const msg = await prismaService.messageOnChannel.create({
 			data: {
 				authorId: user.id,
