@@ -261,6 +261,7 @@ export default class Channel {
 		const users = await prismaService.userOnChannel.findMany({
 			where: { statusEnd: { lte: new Date() } },
 		});
+		if (users.length == 0) return;
 		for (const user of users) {
 			if (user.status === UserOnChannelStatus.BANNED) {
 				this.members = this.members.filter((member) => {
