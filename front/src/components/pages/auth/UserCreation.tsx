@@ -36,24 +36,22 @@ function UserCreation() {
 	});
 
 	function updateName(e: any) {
-		if (e.target && e.targe.value && e.target.value.length > 0) {
-			userContext.auth.changeName(e.target.value);
-			fetch(back_url + `/auth/name/${e.target.value}`)
-				.then((res) => {
-					if (res.ok) return res.json();
-					throw new Error('Impossible to update name');
-				})
-				.then((data) => {
-					if (data.valid) setError('');
-					else setError(data.reason);
-				})
-				.catch((err) => {
-					infoBoxContext.addInfo({
-						type: InfoType.ERROR,
-						message: err.message,
-					});
+		userContext.auth.changeName(e.target.value);
+		fetch(back_url + `/auth/name/${e.target.value}`)
+			.then((res) => {
+				if (res.ok) return res.json();
+				throw new Error('Impossible to update name');
+			})
+			.then((data) => {
+				if (data.valid) setError('');
+				else setError(data.reason);
+			})
+			.catch((err) => {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: err.message,
 				});
-		}
+			});
 	}
 
 	async function submit(e: any) {
