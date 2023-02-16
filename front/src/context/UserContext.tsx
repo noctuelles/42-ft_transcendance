@@ -126,11 +126,13 @@ function UserContextProvider(props: any) {
 					return '';
 				}
 			}
-			setUser({
-				id: decode.user.id,
-				name: decode.user.name,
-				profile_picture: decode.user.profile_picture,
-			});
+			if (user.id !== decode.user.id) {
+				setUser({
+					id: decode.user.id,
+					name: decode.user.name,
+					profile_picture: decode.user.profile_picture,
+				});
+			}
 		}
 		setUpdating(false);
 		return token;
