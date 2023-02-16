@@ -69,7 +69,7 @@ function NavBar(props: any) {
 
 			<ul className="navbar-nav">
 				<li className="nav-item">
-					<Link to="/play" className="nav-link">
+					<Link to="/play" className="nav-link" reloadDocument>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"

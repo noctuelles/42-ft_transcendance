@@ -7,8 +7,8 @@ import {
 	Length,
 	isString,
 	IsString,
-    matches,
-    Matches,
+	matches,
+	Matches,
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
@@ -33,22 +33,28 @@ export class LeaveChannelDTO {
 }
 
 export class CreateChannelDTO {
-	@Length(10, 25)
-	@Matches(RegExp("^[a-zA-Z]+(?: [a-zA-Z]+)*$"), {message: 'Invalid channel name'})
+	@Length(3, 10)
+	@Matches(RegExp('^[a-zA-Z]+(?: [a-zA-Z]+)*$'), {
+		message: 'Invalid channel name',
+	})
 	channelName: string;
 
 	@IsEnum(EChannelType)
 	channelType: EChannelType;
 
 	@IsOptional()
-	@Length(10, 25)
-	@Matches(RegExp("^[A-Za-z0-9_@./#&+-]*$"), {message: 'Invalid channel password'})
+	@Length(3, 25)
+	@Matches(RegExp('^[A-Za-z0-9_@./#&+-]*$'), {
+		message: 'Invalid channel password',
+	})
 	channelPassword: string | undefined;
 }
 
 export class ChangeChannelPwdDTO {
 	@Length(0, 25)
-	@Matches(RegExp("^[A-Za-z0-9_@./#&+-]*$"), {message: 'Invalid channel password'})
+	@Matches(RegExp('^[A-Za-z0-9_@./#&+-]*$'), {
+		message: 'Invalid channel password',
+	})
 	channelPassword: string;
 }
 

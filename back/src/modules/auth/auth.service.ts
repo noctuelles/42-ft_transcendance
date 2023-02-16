@@ -13,6 +13,7 @@ import { CreateUserDTO } from './DTO/CreateUserDTO';
 import { Prisma } from '@prisma/client';
 import { TwoFAService } from './TwoFA.service';
 import { GameService } from '../game/game.service';
+var crypto = require('crypto');
 
 type UserWithProfile = Prisma.UserGetPayload<{
 	include: {

@@ -15,7 +15,7 @@ import {
 export class CreateUserDTO {
 	@IsString()
 	@MinLength(1)
-	@MaxLength(9)
+	@MaxLength(8)
 	login: string;
 
 	@IsString()
