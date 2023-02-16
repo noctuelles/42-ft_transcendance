@@ -2,6 +2,7 @@ export enum EUserStatus {
 	ONLINE = 'ONLINE',
 	OFFLINE = 'OFFLINE',
 	PLAYING = 'PLAYING',
+	MUTED = 'MUTED',
 }
 
 export default interface IUserData {

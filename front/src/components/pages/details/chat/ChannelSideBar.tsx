@@ -19,7 +19,6 @@ export default function ChannelSideBar({
 	const channel = getChannelInfo(selectedChannel);
 	const userContext = useContext(UserContext);
 
-	console.log(channel)
 	return (
 		<>
 			<h3>{channel?.name}</h3>
@@ -30,14 +29,18 @@ export default function ChannelSideBar({
 						userContext.user.id,
 						channel.adminsId,
 						channel.ownerId,
-					) !== UserRole.USER && (<ChannelInvitationForm channel={channel}/>)}
+					) !== UserRole.USER && (
+						<ChannelInvitationForm channel={channel} />
+					)}
 				{channel &&
 					channel.type === 'PWD_PROTECTED' &&
 					getRole(
 						userContext.user.id,
 						channel.adminsId,
 						channel.ownerId,
-					) === UserRole.OPERATOR && (<ChannelChangePwdForm channel={channel} />)}
+					) === UserRole.OPERATOR && (
+						<ChannelChangePwdForm channel={channel} />
+					)}
 				<h3>{channel && 'User list'}</h3>
 				<ul className="channel-sidebar-user">
 					{channel?.members
@@ -58,6 +61,11 @@ export default function ChannelSideBar({
 										member.id,
 										channel.adminsId,
 										channel.ownerId,
+									)}
+									_isMuted={channel.muted.some(
+										(muted: any) => {
+											return muted.userId === member.id;
+										},
 									)}
 									myUserRole={getRole(
 										userContext.user.id,

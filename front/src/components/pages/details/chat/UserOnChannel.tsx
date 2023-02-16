@@ -10,22 +10,26 @@ import { UserContext } from '@/context/UserContext';
 import { ChatContext } from '@/context/ChatContext';
 import { InfoBoxContext, InfoType } from '@/context/InfoBoxContext';
 import { UserRole } from './UserRole';
+import { EUserStatus } from '../social/Types';
 
 export default function UserOnChannel({
 	selectedChannel,
 	user,
 	_userRole,
+	_isMuted,
 	myUserRole,
 }: {
 	selectedChannel: number;
 	user: IUser;
 	_userRole: UserRole;
+	_isMuted: boolean;
 	myUserRole: UserRole;
 }) {
 	const userContext = useContext(UserContext);
 	const chatContext = useContext(ChatContext);
 	const infoBoxContext = useContext(InfoBoxContext);
 	const [userRole, setUserRole] = useState(_userRole);
+	const [isMuted, setMuted] = useState(_isMuted);
 	const [isPanelOpened, setPanelOpened] = useState(false);
 
 	useWebSocket(WS_URL, {
@@ -50,6 +54,11 @@ export default function UserOnChannel({
 						channel?.adminsId || [],
 						channel?.ownerId || -1,
 					),
+				);
+				setMuted(
+					channel.muted.some((muted: any) => {
+						return muted.userId === user.id;
+					}),
 				);
 			}
 		},
@@ -186,20 +195,21 @@ export default function UserOnChannel({
 				}
 			}}
 		>
-			<div className="user-on-channel">
-				<img
-					alt="profile picture"
-					className={
-						(userRole === UserRole.OPERATOR && 'operator-border') ||
+			<div
+				className={
+					'user-on-channel ' +
+					((userRole === UserRole.OPERATOR && 'operator-border') ||
 						(userRole === UserRole.ADMIN && 'admin-border') ||
-						''
-					}
-					src={user.profile.picture}
-				/>
+						'')
+				}
+			>
+				<img alt="profile picture" src={user.profile.picture} />
 				<Link className="profile-link" to={`/profile/${user.name}`}>
 					{user.name}
 				</Link>
-				<StatusDot status={user.status}></StatusDot>
+				<StatusDot
+					status={(isMuted && EUserStatus.MUTED) || user.status}
+				></StatusDot>
 			</div>
 			{isPanelOpened && (
 				<form
