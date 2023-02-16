@@ -21,7 +21,7 @@ RUN npm run prisma:generate
 
 CMD [ "npm", "run", "start:dev" ]
 
-FROM node:latest AS build
+FROM node:latest AS production
 
 # Create app directory and set it as our working directory for subsequent operation
 WORKDIR /usr/src/app
