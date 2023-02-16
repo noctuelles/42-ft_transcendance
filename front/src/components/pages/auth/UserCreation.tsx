@@ -37,7 +37,7 @@ function UserCreation() {
 
 	function updateName(e: any) {
 		userContext.auth.changeName(e.target.value);
-		if (e.target.value.length > 0) {
+		if (e.target.value.length > 0 && e.target.value.match("^[\\w]+$")) {
 			fetch(back_url + `/auth/name/${e.target.value}`)
 				.then((res) => {
 					if (res.ok) return res.json();
@@ -54,7 +54,7 @@ function UserCreation() {
 					});
 				});
 		} else {
-			setError('Name cannot be empty');
+			setError('Name can only contains alphanumerics characters and _');
 		}
 	}
 
