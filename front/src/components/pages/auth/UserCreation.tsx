@@ -36,7 +36,7 @@ function UserCreation() {
 	});
 
 	function updateName(e: any) {
-		if (e.targe.value && e.target.value.length > 0) {
+		if (e.target && e.targe.value && e.target.value.length > 0) {
 			userContext.auth.changeName(e.target.value);
 			fetch(back_url + `/auth/name/${e.target.value}`)
 				.then((res) => {

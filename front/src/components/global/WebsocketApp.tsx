@@ -92,6 +92,13 @@ function WebsocketApp() {
 					},
 				});
 			}
+			if (data.event == 'error') {
+				infoBoxContext.addInfo({
+					type: InfoType.ERROR,
+					message: data.data.message,
+				});
+				userContext.logout();
+			}
 		},
 	});
 

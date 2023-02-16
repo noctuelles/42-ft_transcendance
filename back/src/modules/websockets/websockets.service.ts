@@ -50,6 +50,13 @@ export class WebsocketsService {
 				socket.close();
 				return;
 			}
+			if (this.getSocketsFromUsersId([user.id]).length > 0) {
+				this.send(socket, 'error', {
+					message: 'You are already connected',
+				});
+				socket.close();
+				return;
+			}
 			await this.prismaService.user.update({
 				where: { id: user.id },
 				data: { status: 'ONLINE' },
@@ -61,7 +68,7 @@ export class WebsocketsService {
 			socket['user'] = user;
 			this._sockets.push(socket);
 		} catch (e) {
-			this.send(socket, 'error', 'Invalid session cookie');
+			this.send(socket, 'error', { message: 'Invalid session cookie' });
 			socket.close();
 			return;
 		}
