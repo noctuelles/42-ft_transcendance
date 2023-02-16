@@ -48,6 +48,9 @@ export default function UserOnChannel({
 				const channel = parsedData.data.find((channel: any) => {
 					return channel.id === selectedChannel;
 				});
+				if (!channel) {
+					return;
+				}
 				setUserRole(
 					getRole(
 						user.id,
