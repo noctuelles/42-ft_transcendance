@@ -7,7 +7,6 @@
 }
 
 .progress-bar-inner {
-	min-width: 8%;
 	max-width: 100%;
 	box-shadow: inset 0px 0px 10px 0px #000000;
 	border-radius: 1em;
