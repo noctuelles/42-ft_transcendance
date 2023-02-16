@@ -28,8 +28,8 @@ export default function ChannelCreationForm({
 }) {
 	const validation = Yup.object().shape({
 		channelName: Yup.string()
-			.max(25, '25 characters or less')
-			.min(10, 'At least 10 characters')
+			.max(10, '10 characters or less')
+			.min(3, 'At least 3 characters')
 			.required('Requiered')
 			.matches(/^[a-zA-Z]+(?: [a-zA-Z]+)*$/i, 'Invalid channel name'),
 		channelType: Yup.string().required('Requiered'),
@@ -37,7 +37,7 @@ export default function ChannelCreationForm({
 			is: 'Password Protected',
 			then: Yup.string()
 				.max(25, '25 characters or less')
-				.min(10, 'At least 10 characters')
+				.min(3, 'At least 3 characters')
 				.required('Requiered')
 				.matches(/^[A-Za-z0-9_@./#&+-]*$/i, 'Invalid password'),
 		}),
@@ -147,7 +147,9 @@ export default function ChannelCreationForm({
 						{msgMap.get(values.channelType)}
 					</div>
 					<div className="creation-form-btns">
-						<Button type="button" onClick={closeModal}>Back</Button>
+						<Button type="button" onClick={closeModal}>
+							Back
+						</Button>
 						<Button type="submit" disabled={isSubmitting}>
 							Submit
 						</Button>
