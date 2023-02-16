@@ -43,13 +43,5 @@ ENV NODE_ENV production
 # This ensures that the node_modules directory is as optimized as possible.
 RUN npm ci --only=production && npm cache clean --force
 
-FROM node:latest As production
-
-WORKDIR /usr/src/app
-
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-
 # Start the server using the production build
 CMD [ "npm", "run", "start:prod" ]
