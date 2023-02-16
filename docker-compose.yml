@@ -6,14 +6,13 @@ services:
   back:
     build:
       context: ./back
-      target: dev
-    container_name: nestjs
+      target: production
+    container_name: node
     env_file:
       - ./back/.env
     volumes:
       - ./back:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run start:dev
     restart: always
     depends_on:
       - db
@@ -42,7 +41,7 @@ services:
     build:
       context: ./front
       target: production
-    container_name: react
+    container_name: app
     volumes:
       - ./front:/usr/src/app
       - /usr/src/app/node_modules

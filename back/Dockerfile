@@ -19,6 +19,8 @@ COPY --chown=node:node . .
 # Generate prisma client code
 RUN npm run prisma:generate
 
+CMD [ "npm", "run", "start:dev" ]
+
 FROM node:latest AS build
 
 # Create app directory and set it as our working directory for subsequent operation
@@ -50,4 +52,4 @@ COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
 # Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+CMD [ "npm", "run", "start:prod" ]

@@ -16,6 +16,8 @@ RUN npm ci
 # Copy the app source into the image
 COPY --chown=node:node . .
 
+CMD [ "npm", "run", "dev" ]
+
 FROM node:latest AS build
 
 WORKDIR /usr/src/app
