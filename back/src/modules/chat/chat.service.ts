@@ -46,7 +46,13 @@ export class ChatService {
 				if (blocked.find((b) => b.name === message.username)) {
 					return null;
 				}
-				if (channel.isUserBanned(this.prismaService, member.userId))
+				if (
+					channel.isUserBanned(
+						this.prismaService,
+						this,
+						member.userId,
+					)
+				)
 					return null;
 				return member.userId;
 			}),
@@ -115,6 +121,7 @@ export class ChatService {
 
 	async sendChannelListWhereUserIsToSocket(
 		socket: any,
+		chatService: ChatService,
 		userId: number,
 	): Promise<void> {
 		let channels = await this.getChannelWehreUserIs(userId);
@@ -144,6 +151,7 @@ export class ChatService {
 			channels.map(async (channel) => {
 				channel.purgeEndedPunishment(
 					this.prismaService,
+					chatService,
 					channel.banned,
 				);
 				let { banned, hashedPwd, completeMembers, ...frontChannel } =
@@ -272,6 +280,7 @@ export class ChatService {
 		if (this.websocketsService.getSocketsFromUsersId([userId]).length > 0) {
 			this.sendChannelListWhereUserIsToSocket(
 				this.websocketsService.getSocketsFromUsersId([userId])[0],
+				this,
 				userId,
 			);
 		}

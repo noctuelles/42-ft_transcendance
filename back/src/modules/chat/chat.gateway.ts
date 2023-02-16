@@ -17,7 +17,11 @@ export class ChatGateway {
 			!this.chatService.isIMessage(data) ||
 			!(
 				await this.chatService.getChannel(data.channel)
-			).canUserSendMessage(this.prismaService, socket.user.id)
+			).canUserSendMessage(
+				this.prismaService,
+				this.chatService,
+				socket.user.id,
+			)
 		) {
 			// TODO: Tell why can't send message
 			return;

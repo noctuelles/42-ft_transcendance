@@ -54,7 +54,7 @@ export default function ChannelSideBar({
 						.map((member: IUser) => {
 							return (
 								<UserOnChannel
-									key={member.id}
+									key={member.id + '-' + selectedChannel}
 									selectedChannel={selectedChannel}
 									user={member}
 									_userRole={getRole(

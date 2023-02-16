@@ -189,7 +189,12 @@ export default function UserOnChannel({
 			onClick={() => {
 				if (
 					myUserRole !== UserRole.USER &&
-					user.id !== userContext.user.id
+					user.id !== userContext.user.id &&
+					userRole !== UserRole.OPERATOR &&
+					!(
+						userRole == UserRole.ADMIN &&
+						myUserRole == UserRole.ADMIN
+					)
 				) {
 					setPanelOpened(!isPanelOpened);
 				}
