@@ -499,11 +499,11 @@ export class ChatService {
 		return invite.message.channel.id == channelId ? invite : null;
 	}
 
-	sendChannelListToAllUsers(userIds: number[]) {
-		this.sendChannelListToAllSockets(
-			this.websocketsService.getSocketsFromUsersId(userIds),
-		);
-	}
+	//	sendChannelListToAllUsers(userIds: number[]) {
+	//		this.sendChannelListToAllSockets(
+	//			this.websocketsService.getSocketsFromUsersId(userIds),
+	//		);
+	//	}
 
 	async getMpChannel(name1: string, name2: string): Promise<Channel | null> {
 		const chan = await this.prismaService.userChannel.findFirst({

@@ -287,7 +287,7 @@ export default class Channel {
 		this.removeAllMatches(punishments, (punishment) => {
 			return punishment.endDate < new Date(Date.now());
 		});
-		chatService.sendChannelListToAllUsers(this.membersId);
+		chatService.sendChannelListToUserIds(this.membersId);
 	}
 
 	async ban(
