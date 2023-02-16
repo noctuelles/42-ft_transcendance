@@ -10,6 +10,7 @@ export class GameService {
 	private _rankedQueue = [];
 	private _funQueue = [];
 	games = [];
+	private _usedInvitations: number[] = [];
 
 	constructor(
 		private readonly websocketsService: WebsocketsService,
@@ -146,7 +147,12 @@ export class GameService {
 		);
 	}
 
+	async isInvitationAvailable(invitationId: number) {
+		return !this._usedInvitations.includes(invitationId);
+	}
+
 	async createFriendGame(sockets, invitation) {
+		this._usedInvitations.push(invitation.id);
 		sockets[0].user.profile = (
 			await this.prismaService.user.findUnique({
 				where: { id: sockets[0].user.id },

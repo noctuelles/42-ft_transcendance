@@ -416,6 +416,9 @@ export class ChatController {
 		if (!invitation) {
 			throw new BadRequestException('Invitation not found');
 		}
+		if (!this.gameService.isInvitationAvailable(invitation.id)) {
+			throw new BadRequestException('Invitation is not available');
+		}
 		channel.acceptInvitation(
 			invitation,
 			user.id,
