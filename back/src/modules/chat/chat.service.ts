@@ -149,11 +149,6 @@ export class ChatService {
 		});
 		const channelsForFront = await Promise.all(
 			channels.map(async (channel) => {
-				channel.purgeEndedPunishment(
-					this.prismaService,
-					chatService,
-					channel.banned,
-				);
 				let { banned, hashedPwd, completeMembers, ...frontChannel } =
 					channel;
 				frontChannel.members = frontChannel.members.filter(
