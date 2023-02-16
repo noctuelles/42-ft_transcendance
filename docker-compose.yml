@@ -6,7 +6,7 @@ services:
   back:
     build:
       context: ./back
-      target: production
+      target: dev
     container_name: node
     env_file:
       - ./back/.env
@@ -40,7 +40,7 @@ services:
   front:
     build:
       context: ./front
-      target: production
+      target: dev
     container_name: app
     volumes:
       - ./front:/usr/src/app
@@ -48,7 +48,7 @@ services:
     depends_on:
       - back
     ports:
-      - 8080:80
+      - 8080:8080
     networks:
       - transcendance
 
