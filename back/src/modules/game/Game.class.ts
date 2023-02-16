@@ -274,9 +274,11 @@ export class Game {
 	private _resetBall(ball: IBall) {
 		ball.position.x = this._gameState.gameInfos.width / 2;
 		ball.position.y = this._gameState.gameInfos.height / 2;
-		ball.direction.x = Math.random() * (Math.random() < 0.5 ? -1 : 1);
 		ball.direction.y =
 			(Math.random() * 0.6 + 0.2) * (Math.random() < 0.5 ? -1 : 1);
+		ball.direction.x =
+			Math.sqrt(1 - ball.direction.y * ball.direction.y) *
+			(Math.random() < 0.5 ? -1 : 1);
 		ball.velocity = GameParams.BALL_DEFAULT_SPEED;
 	}
 
