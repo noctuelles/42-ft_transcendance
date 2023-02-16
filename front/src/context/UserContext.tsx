@@ -126,7 +126,7 @@ function UserContextProvider(props: any) {
 					return '';
 				}
 			}
-			if (user.id !== decode.user.id) {
+			if (user.id !== decode.user.id && decode.user.id !== undefined) {
 				setUser({
 					id: decode.user.id,
 					name: decode.user.name,
