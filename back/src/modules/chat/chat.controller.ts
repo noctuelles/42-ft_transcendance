@@ -49,7 +49,14 @@ export class ChatController {
 		@Body() { channelId, password }: JoinChannelDTO,
 	) {
 		const channel = await this.chatService.getChannel(channelId);
-		if (await channel?.canUserJoin(this.prismaService, user.id, password)) {
+		if (
+			await channel?.canUserJoin(
+				this.prismaService,
+				this.chatService,
+				user.id,
+				password,
+			)
+		) {
 			await channel.addUser(this.prismaService, user.id);
 			this.chatService.sendChannelListToUserIds(channel.membersId);
 			return {
@@ -62,7 +69,11 @@ export class ChatController {
 		} else {
 			return {
 				sucess: false,
-				reason: channel?.getJoinError(this.prismaService, user.id),
+				reason: channel?.getJoinError(
+					this.prismaService,
+					this.chatService,
+					user.id,
+				),
 			};
 		}
 	}
@@ -89,8 +100,7 @@ export class ChatController {
 			end,
 		);
 		this.chatService.sendChannelListToUserIds([
-			channel.ownerId,
-			...channel.adminsId,
+			...channel.membersId,
 			userId,
 		]);
 	}
@@ -116,10 +126,7 @@ export class ChatController {
 			userId,
 			end,
 		);
-		this.chatService.sendChannelListToUserIds([
-			channel.ownerId,
-			...channel.adminsId,
-		]);
+		this.chatService.sendChannelListToUserIds(channel.membersId);
 	}
 
 	@UseGuards(AuthGuard)
@@ -139,10 +146,7 @@ export class ChatController {
 			this.websocketsService,
 			userId,
 		);
-		this.chatService.sendChannelListToUserIds([
-			channel.ownerId,
-			...channel.adminsId,
-		]);
+		this.chatService.sendChannelListToUserIds(channel.membersId);
 	}
 
 	@UseGuards(AuthGuard)
@@ -162,10 +166,7 @@ export class ChatController {
 			this.websocketsService,
 			userId,
 		);
-		this.chatService.sendChannelListToUserIds([
-			channel.ownerId,
-			...channel.adminsId,
-		]);
+		this.chatService.sendChannelListToUserIds(channel.membersId);
 	}
 
 	@UseGuards(AuthGuard)
@@ -206,7 +207,13 @@ export class ChatController {
 			if (channel.type === UserChannelVisibility.PRIVATE_MESSAGE) {
 				throw new ForbiddenException("You can't leave a pm channel");
 			}
-			if (channel.isUserBanned(this.prismaService, user.id)) {
+			if (
+				channel.isUserBanned(
+					this.prismaService,
+					this.chatService,
+					user.id,
+				)
+			) {
 				throw new ForbiddenException(
 					"You can't leave a channel wehre you are banned",
 				);
@@ -444,6 +451,7 @@ export class ChatController {
 		}
 		const error = await channel.canInvite(
 			this.prismaService,
+			this.chatService,
 			user.id,
 			username,
 		);

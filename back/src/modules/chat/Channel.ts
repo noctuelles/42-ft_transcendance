@@ -14,6 +14,7 @@ import { WebsocketsService } from '../websockets/websockets.service';
 import { GameService } from '../game/game.service';
 import * as argon from 'argon2';
 import { UsersService } from '../users/users.service';
+import { ChatService } from './chat.service';
 
 export enum ChannelType {
 	PUBLIC,
@@ -123,11 +124,15 @@ export default class Channel {
 		});
 	}
 
-	canUserSendMessage(prismaService: PrismaService, userId: number): boolean {
+	canUserSendMessage(
+		prismaService: PrismaService,
+		chatService: ChatService,
+		userId: number,
+	): boolean {
 		return (
 			this.containsUser(userId) &&
-			!this.isUserMuted(prismaService, userId) &&
-			!this.isUserBanned(prismaService, userId)
+			!this.isUserMuted(prismaService, chatService, userId) &&
+			!this.isUserBanned(prismaService, chatService, userId)
 		);
 	}
 
@@ -181,6 +186,7 @@ export default class Channel {
 
 	async canUserJoin(
 		prismaService: PrismaService,
+		chatService: ChatService,
 		userId: number,
 		password: string,
 	): Promise<boolean> {
@@ -197,7 +203,7 @@ export default class Channel {
 			});
 			return true;
 		}
-		if (this.isUserBanned(prismaService, userId)) {
+		if (this.isUserBanned(prismaService, chatService, userId)) {
 			return false;
 		}
 		if (
@@ -209,11 +215,15 @@ export default class Channel {
 		return true;
 	}
 
-	getJoinError(prismaService: PrismaService, userId: number) {
+	getJoinError(
+		prismaService: PrismaService,
+		chatService: ChatService,
+		userId: number,
+	) {
 		if (this.type === UserChannelVisibility.PRIVATE) {
 			return 'This channel is private';
 		}
-		if (this.isUserBanned(prismaService, userId)) {
+		if (this.isUserBanned(prismaService, chatService, userId)) {
 			return 'You are banned from this channel';
 		}
 		if (this.type === UserChannelVisibility.PWD_PROTECTED) {
@@ -221,15 +231,23 @@ export default class Channel {
 		}
 	}
 
-	isUserBanned(prismaService: PrismaService, userId: number): boolean {
-		this.purgeEndedPunishment(prismaService, this.banned);
+	isUserBanned(
+		prismaService: PrismaService,
+		chatService: ChatService,
+		userId: number,
+	): boolean {
+		this.purgeEndedPunishment(prismaService, chatService, this.banned);
 		return this.banned.some((bannedInfos) => {
 			return bannedInfos.userId === userId;
 		});
 	}
 
-	isUserMuted(prismaService: PrismaService, userId: number) {
-		this.purgeEndedPunishment(prismaService, this.muted);
+	isUserMuted(
+		prismaService: PrismaService,
+		chatService: ChatService,
+		userId: number,
+	) {
+		this.purgeEndedPunishment(prismaService, chatService, this.muted);
 		return this.muted.some((mutedInfos) => {
 			return mutedInfos.userId === userId;
 		});
@@ -237,6 +255,7 @@ export default class Channel {
 
 	async purgeEndedPunishment(
 		prismaService: PrismaService,
+		chatService: ChatService,
 		punishments: IPunishment[],
 	) {
 		const users = await prismaService.userOnChannel.findMany({
@@ -268,6 +287,7 @@ export default class Channel {
 		this.removeAllMatches(punishments, (punishment) => {
 			return punishment.endDate < new Date(Date.now());
 		});
+		chatService.sendChannelListToAllUsers(this.membersId);
 	}
 
 	async ban(
@@ -574,6 +594,7 @@ export default class Channel {
 
 	async canInvite(
 		prismaService: PrismaService,
+		chatService: ChatService,
 		inviterId: number,
 		invitedUsername: string,
 	): Promise<string | null> {
@@ -603,7 +624,7 @@ export default class Channel {
 		) {
 			return 'User already invited';
 		}
-		if (this.isUserBanned(prismaService, user.id)) {
+		if (this.isUserBanned(prismaService, chatService, user.id)) {
 			return 'User is banned';
 		}
 		if (this.ownerId !== inviterId && !this.adminsId.includes(inviterId)) {
