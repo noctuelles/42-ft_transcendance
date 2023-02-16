@@ -36,7 +36,6 @@ const ChannelChangePwdForm = ({ channel }: IProps) => {
 		},
 	) {
 		const token = await userContext.getAccessToken();
-		console.log(values.password);
 		fetch(BACK_URL + '/chat/channels/' + channel.id + '/chpwd', {
 			method: 'PATCH',
 			headers: {

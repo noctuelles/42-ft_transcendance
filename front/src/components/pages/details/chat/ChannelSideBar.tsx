@@ -1,7 +1,7 @@
 import { ChatContext } from '@/context/ChatContext';
 import '@/style/details/chat/ChannelSideBar.css';
 import { UserContext } from '@/context/UserContext';
-import { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import UserOnChannel from './UserOnChannel';
 import IChannel from './IChannel';
 import IUser from './IUser';
@@ -19,7 +19,6 @@ export default function ChannelSideBar({
 	const channel = getChannelInfo(selectedChannel);
 	const userContext = useContext(UserContext);
 
-	console.log(channel)
 	return (
 		<>
 			<h3>{channel?.name}</h3>
