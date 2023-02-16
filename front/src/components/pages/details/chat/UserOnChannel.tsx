@@ -213,7 +213,11 @@ export default function UserOnChannel({
 					{user.name}
 				</Link>
 				<StatusDot
-					status={(isMuted && EUserStatus.MUTED) || user.status}
+					status={
+						((user.status === EUserStatus.ONLINE || !isMuted) &&
+							user.status) ||
+						EUserStatus.MUTED
+					}
 				></StatusDot>
 			</div>
 			{isPanelOpened && (
