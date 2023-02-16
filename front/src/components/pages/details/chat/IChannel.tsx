@@ -15,6 +15,7 @@ export default interface IChannel {
 	membersId: number[];
 	adminsId: number[];
 	unreaded: number;
+	muted: any;
 	invitations: IChannelInvitation[];
 }
 

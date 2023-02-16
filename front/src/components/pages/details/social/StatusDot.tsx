@@ -12,6 +12,7 @@ const DotColor = new Map<EUserStatus, string>([
 	[EUserStatus.ONLINE, 'rgb(0, 204, 0)'],
 	[EUserStatus.PLAYING, 'rgb(255, 153, 0)'],
 	[EUserStatus.OFFLINE, 'darkgrey'],
+	[EUserStatus.MUTED, 'red'],
 ]);
 
 export default class StatusDot extends React.Component<IProps, IState> {

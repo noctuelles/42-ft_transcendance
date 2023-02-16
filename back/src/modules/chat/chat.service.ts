@@ -146,13 +146,8 @@ export class ChatService {
 					this.prismaService,
 					channel.banned,
 				);
-				let {
-					muted,
-					banned,
-					hashedPwd,
-					completeMembers,
-					...frontChannel
-				} = channel;
+				let { banned, hashedPwd, completeMembers, ...frontChannel } =
+					channel;
 				frontChannel.members = frontChannel.members.filter(
 					(m) => !banned.find((b) => b.userId === m.id),
 				);
@@ -188,7 +183,7 @@ export class ChatService {
 				socket,
 				'channels',
 				channels.map((channel) => {
-					let { muted, banned, ...frontChannels } = channel;
+					let { banned, ...frontChannels } = channel;
 					return frontChannels;
 				}),
 			);
@@ -434,7 +429,7 @@ export class ChatService {
 		if (currentChannel.participants.length === 0)
 			throw new BadRequestException('Invalid user permission');
 		if (password.length === 0) {
-			const channel =  await this.prismaService.userChannel.update({
+			const channel = await this.prismaService.userChannel.update({
 				where: {
 					id: channelId,
 				},
